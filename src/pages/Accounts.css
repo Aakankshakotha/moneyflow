@@ -1,0 +1,32 @@
+.accounts-page {
+  padding: 2rem;
+}
+
+.accounts-page__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+}
+
+.accounts-page__header h1 {
+  margin: 0;
+}
+
+.accounts-page__error {
+  color: #e74c3c;
+  font-size: 1.125rem;
+  margin-bottom: 1rem;
+}
+
+@media (max-width: 768px) {
+  .accounts-page {
+    padding: 1rem;
+  }
+
+  .accounts-page__header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1rem;
+  }
+}

@@ -1,0 +1,100 @@
+.account-card {
+  margin-bottom: 1rem;
+}
+
+.account-card__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 1rem;
+}
+
+.account-card__name {
+  margin: 0 0 0.25rem 0;
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #2c3e50;
+}
+
+.account-card__type {
+  display: inline-block;
+  padding: 0.25rem 0.5rem;
+  background-color: #ecf0f1;
+  color: #7f8c8d;
+  border-radius: 4px;
+  font-size: 0.875rem;
+  font-weight: 500;
+}
+
+.account-card__badge {
+  padding: 0.25rem 0.75rem;
+  border-radius: 12px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.account-card__badge--active {
+  background-color: #d4edda;
+  color: #155724;
+}
+
+.account-card__badge--archived {
+  background-color: #f8d7da;
+  color: #721c24;
+}
+
+.account-card__balance {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.75rem 0;
+  border-top: 1px solid #ecf0f1;
+  border-bottom: 1px solid #ecf0f1;
+}
+
+.account-card__balance-label {
+  font-size: 0.875rem;
+  color: #7f8c8d;
+}
+
+.account-card__balance-amount {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #27ae60;
+}
+
+.account-card__actions {
+  display: flex;
+  gap: 0.5rem;
+  margin-top: 1rem;
+}
+
+.account-card__button {
+  flex: 1;
+  padding: 0.5rem 1rem;
+  border: none;
+  border-radius: 4px;
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.account-card__button--edit {
+  background-color: #3498db;
+  color: white;
+}
+
+.account-card__button--edit:hover {
+  background-color: #2980b9;
+}
+
+.account-card__button--delete {
+  background-color: #e74c3c;
+  color: white;
+}
+
+.account-card__button--delete:hover {
+  background-color: #c0392b;
+}
