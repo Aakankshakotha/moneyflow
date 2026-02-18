@@ -3,14 +3,48 @@
   line-height: 1.5;
   font-weight: 400;
 
-  color-scheme: light dark;
-  color: rgba(255, 255, 255, 0.87);
-  background-color: #242424;
-
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+
+  /* Light theme variables */
+  --text-primary: #1a1a1a;
+  --text-secondary: #6b7280;
+  --background: #ffffff;
+  --card-background: #ffffff;
+  --border-color: #e5e7eb;
+  --border-color-light: #f3f4f6;
+  --button-background: #f9fafb;
+  --button-hover-background: #f3f4f6;
+  --hover-background: #f9fafb;
+  --primary-color: #3b82f6;
+  --icon-background: #f3f4f6;
+  --badge-background: #f3f4f6;
+
+  color-scheme: light;
+  color: var(--text-primary);
+  background-color: var(--background);
+}
+
+/* Dark theme variables */
+[data-theme='dark'] {
+  --text-primary: #e5e7eb;
+  --text-secondary: #9ca3af;
+  --background: #0f0f1e;
+  --card-background: rgba(30, 30, 40, 0.8);
+  --border-color: rgba(255, 255, 255, 0.1);
+  --border-color-light: rgba(255, 255, 255, 0.05);
+  --button-background: rgba(255, 255, 255, 0.05);
+  --button-hover-background: rgba(255, 255, 255, 0.1);
+  --hover-background: rgba(255, 255, 255, 0.03);
+  --primary-color: #60a5fa;
+  --icon-background: rgba(255, 255, 255, 0.05);
+  --badge-background: rgba(255, 255, 255, 0.1);
+
+  color-scheme: dark;
+  color: var(--text-primary);
+  background-color: var(--background);
 }
 
 body {
@@ -19,6 +53,11 @@ body {
   place-items: center;
   min-width: 320px;
   min-height: 100vh;
+  background: var(--background);
+  color: var(--text-primary);
+  transition:
+    background-color 0.3s ease,
+    color 0.3s ease;
 }
 
 #root {

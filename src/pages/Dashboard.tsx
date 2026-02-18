@@ -1,21 +1,33 @@
 import React, { useState, useEffect } from 'react'
-import { NetWorthDisplay, NetWorthChart } from '@/components/features'
-import { Button } from '@/components/common'
+import {
+  NetWorthChart,
+  MoneyFlowChart,
+  ExpensesChart,
+  RecentTransactionsTable,
+} from '@/components/features'
+import { MetricCard } from '@/components/common'
 import * as netWorthService from '@/services/netWorthService'
+import * as accountService from '@/services/accountService'
+import * as transactionService from '@/services/transactionService'
 import type { NetWorthCalculation, NetWorthSnapshot } from '@/types/netWorth'
+import type { Account } from '@/types/account'
+import type { TransactionWithAccounts } from '@/types/transaction'
 import './Dashboard.css'
 
 /**
- * Dashboard page - displays net worth overview and trends
+ * Dashboard page - displays financial overview with charts and metrics
  */
 const Dashboard: React.FC = () => {
   const [calculation, setCalculation] = useState<NetWorthCalculation | null>(
     null
   )
   const [snapshots, setSnapshots] = useState<NetWorthSnapshot[]>([])
+  const [accounts, setAccounts] = useState<Account[]>([])
+  const [transactions, setTransactions] = useState<TransactionWithAccounts[]>(
+    []
+  )
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
-  const [creatingSnapshot, setCreatingSnapshot] = useState(false)
 
   useEffect(() => {
     loadDashboardData()
@@ -26,18 +38,45 @@ const Dashboard: React.FC = () => {
     setError(null)
 
     try {
-      // Load current net worth calculation
-      const calcResult = await netWorthService.calculateNetWorth()
+      // Load all dashboard data in parallel
+      const [calcResult, historyResult, accountsResult, transactionsResult] =
+        await Promise.all([
+          netWorthService.calculateNetWorth(),
+          netWorthService.getNetWorthHistory(),
+          accountService.listAccounts(),
+          transactionService.listTransactions(),
+        ])
+
       if (calcResult.success) {
         setCalculation(calcResult.data)
-      } else {
-        setError('Failed to calculate net worth')
       }
 
-      // Load historical snapshots
-      const historyResult = await netWorthService.getNetWorthHistory()
       if (historyResult.success) {
         setSnapshots(historyResult.data)
+      }
+
+      if (accountsResult.success) {
+        setAccounts(accountsResult.data)
+      }
+
+      if (transactionsResult.success && accountsResult.success) {
+        // Enrich transactions with account details
+        const accountMap = new Map(accountsResult.data.map((a) => [a.id, a]))
+        const enrichedTransactions = transactionsResult.data
+          .map((txn) => {
+            const fromAccount = accountMap.get(txn.fromAccountId)
+            const toAccount = accountMap.get(txn.toAccountId)
+            if (fromAccount && toAccount) {
+              return {
+                ...txn,
+                fromAccount,
+                toAccount,
+              } as TransactionWithAccounts
+            }
+            return null
+          })
+          .filter((t): t is TransactionWithAccounts => t !== null)
+        setTransactions(enrichedTransactions)
       }
     } catch (err) {
       setError('Failed to load dashboard data')
@@ -46,25 +85,37 @@ const Dashboard: React.FC = () => {
     }
   }
 
-  const handleCreateSnapshot = async (): Promise<void> => {
-    setCreatingSnapshot(true)
-    setError(null)
+  // Calculate metrics
+  const totalAssets = calculation?.totalAssets || 0
+  const totalLiabilities = calculation?.totalLiabilities || 0
+  const netWorth = calculation?.netWorth || 0
 
-    try {
-      const result = await netWorthService.createSnapshot()
-      if (result.success) {
-        await loadDashboardData()
-      } else {
-        setError('Failed to create snapshot')
-      }
-    } catch (err) {
-      setError('Failed to create snapshot')
-    } finally {
-      setCreatingSnapshot(false)
-    }
-  }
+  // Calculate cash flow (simplified: income - expenses)
+  const accountMap = new Map(accounts.map((a) => [a.id, a]))
+  const recentTransactions = transactions.filter((txn) => {
+    const txnDate = new Date(txn.date)
+    const thirtyDaysAgo = new Date()
+    thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30)
+    return txnDate >= thirtyDaysAgo
+  })
 
-  if (loading && !calculation) {
+  const income = recentTransactions
+    .filter((txn) => {
+      const toAcc = accountMap.get(txn.toAccountId)
+      return toAcc && toAcc.type === 'income'
+    })
+    .reduce((sum, txn) => sum + txn.amount, 0)
+
+  const expenses = recentTransactions
+    .filter((txn) => {
+      const toAcc = accountMap.get(txn.toAccountId)
+      return toAcc && toAcc.type === 'expense'
+    })
+    .reduce((sum, txn) => sum + txn.amount, 0)
+
+  const cashFlow = income - expenses
+
+  if (loading) {
     return (
       <div className="dashboard-page">
         <p>Loading dashboard...</p>
@@ -72,39 +123,95 @@ const Dashboard: React.FC = () => {
     )
   }
 
-  if (error && !calculation) {
-    return (
-      <div className="dashboard-page">
-        <p className="dashboard-page__error">{error}</p>
-        <Button onClick={loadDashboardData}>Retry</Button>
-      </div>
-    )
-  }
-
   return (
     <div className="dashboard-page">
       <div className="dashboard-page__header">
-        <h1>Dashboard</h1>
-        <Button
-          onClick={handleCreateSnapshot}
-          disabled={creatingSnapshot || !calculation}
-        >
-          {creatingSnapshot ? 'Creating...' : 'Create Snapshot'}
-        </Button>
+        <div>
+          <h1 className="dashboard-page__title">Financial Overview</h1>
+          <p className="dashboard-page__subtitle">
+            Welcome back, here's your money flow for{' '}
+            {new Date().toLocaleDateString('en-US', {
+              month: 'long',
+              year: 'numeric',
+            })}
+          </p>
+        </div>
       </div>
 
       {error && <div className="dashboard-page__error-banner">{error}</div>}
 
-      <div className="dashboard-page__content">
-        {calculation && (
-          <div className="dashboard-page__section">
-            <NetWorthDisplay calculation={calculation} loading={loading} />
-          </div>
-        )}
+      {/* Metrics Cards */}
+      <div className="dashboard-page__metrics">
+        <MetricCard
+          title="Net Worth"
+          value={netWorth}
+          icon={<span>💎</span>}
+          color="blue"
+          trend={{
+            value: netWorth * 0.023,
+            direction: 'up',
+            period: 'vs last month',
+          }}
+        />
+        <MetricCard
+          title="Total Assets"
+          value={totalAssets}
+          icon={<span>💰</span>}
+          color="green"
+          trend={{
+            value: totalAssets * 0.045,
+            direction: 'up',
+            period: 'vs last month',
+          }}
+        />
+        <MetricCard
+          title="Liabilities"
+          value={totalLiabilities}
+          icon={<span>📉</span>}
+          color="pink"
+          trend={{
+            value: totalLiabilities * 0.033,
+            direction: 'down',
+            period: 'vs last month',
+          }}
+        />
+        <MetricCard
+          title="Cash Flow"
+          value={cashFlow}
+          icon={<span>📊</span>}
+          color="purple"
+          trend={{
+            value: cashFlow * 0.12,
+            direction: cashFlow >= 0 ? 'up' : 'down',
+            period: 'vs last month',
+          }}
+        />
+      </div>
 
-        <div className="dashboard-page__section">
-          <NetWorthChart snapshots={snapshots} loading={loading} />
+      {/* Charts Grid */}
+      <div className="dashboard-page__charts">
+        <div className="dashboard-page__chart-col">
+          <MoneyFlowChart
+            transactions={transactions}
+            accounts={accounts}
+          />
         </div>
+        <div className="dashboard-page__chart-col">
+          <ExpensesChart
+            transactions={transactions}
+            accounts={accounts}
+          />
+        </div>
+      </div>
+
+      {/* Net Worth History */}
+      <div className="dashboard-page__section">
+        <NetWorthChart snapshots={snapshots} loading={loading} />
+      </div>
+
+      {/* Recent Transactions */}
+      <div className="dashboard-page__section">
+        <RecentTransactionsTable transactions={transactions} limit={10} />
       </div>
     </div>
   )

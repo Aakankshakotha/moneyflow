@@ -1,0 +1,36 @@
+.money-flow-chart {
+  background: var(--card-background);
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  padding: 20px;
+}
+
+.money-flow-chart__header {
+  margin-bottom: 20px;
+}
+
+.money-flow-chart__title {
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin: 0 0 4px 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.money-flow-chart__icon {
+  font-size: 1.25rem;
+}
+
+.money-flow-chart__subtitle {
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+  margin: 0;
+}
+
+/* Dark theme */
+[data-theme='dark'] .money-flow-chart {
+  background: rgba(30, 30, 40, 0.8);
+  border-color: rgba(255, 255, 255, 0.1);
+}

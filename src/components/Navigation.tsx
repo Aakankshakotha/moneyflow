@@ -1,5 +1,6 @@
 import React from 'react'
 import { NavLink } from 'react-router-dom'
+import { useTheme } from '@/contexts/ThemeContext'
 import './Navigation.css'
 
 /**
@@ -7,6 +8,8 @@ import './Navigation.css'
  * Provides links to all primary pages
  */
 const Navigation: React.FC = () => {
+  const { theme, toggleTheme } = useTheme()
+
   return (
     <nav className="navigation">
       <div className="navigation__brand">
@@ -63,6 +66,13 @@ const Navigation: React.FC = () => {
           </NavLink>
         </li>
       </ul>
+      <button
+        className="navigation__theme-toggle"
+        onClick={toggleTheme}
+        aria-label="Toggle theme"
+      >
+        {theme === 'light' ? '🌙' : '☀️'}
+      </button>
     </nav>
   )
 }

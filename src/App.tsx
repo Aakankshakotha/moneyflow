@@ -1,5 +1,6 @@
 import React from 'react'
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
+import { ThemeProvider } from './contexts/ThemeContext'
 import Navigation from './components/Navigation'
 import Dashboard from './pages/Dashboard'
 import Accounts from './pages/Accounts'
@@ -13,19 +14,21 @@ import './App.css'
  */
 const App: React.FC = () => {
   return (
-    <Router>
-      <div className="app">
-        <Navigation />
-        <main className="app__content">
-          <Routes>
-            <Route path="/" element={<Dashboard />} />
-            <Route path="/accounts" element={<Accounts />} />
-            <Route path="/transactions" element={<Transactions />} />
-            <Route path="/recurring" element={<Recurring />} />
-          </Routes>
-        </main>
-      </div>
-    </Router>
+    <ThemeProvider>
+      <Router>
+        <div className="app">
+          <Navigation />
+          <main className="app__content">
+            <Routes>
+              <Route path="/" element={<Dashboard />} />
+              <Route path="/accounts" element={<Accounts />} />
+              <Route path="/transactions" element={<Transactions />} />
+              <Route path="/recurring" element={<Recurring />} />
+            </Routes>
+          </main>
+        </div>
+      </Router>
+    </ThemeProvider>
   )
 }
 

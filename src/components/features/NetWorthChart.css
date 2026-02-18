@@ -5,7 +5,7 @@
 .net-worth-chart__loading {
   text-align: center;
   padding: 4rem 2rem;
-  color: var(--color-text-secondary, #666);
+  color: var(--color-text-secondary, #6b7280);
 }
 
 .net-worth-chart__title {
@@ -22,7 +22,7 @@
 .net-worth-chart__empty {
   text-align: center;
   padding: 4rem 2rem;
-  color: var(--color-text-secondary, #666);
+  color: var(--color-text-secondary, #6b7280);
 }
 
 .net-worth-chart__empty p {
@@ -31,7 +31,7 @@
 
 .net-worth-chart__empty-hint {
   font-size: 0.875rem;
-  color: var(--color-text-secondary, #999);
+  color: var(--color-text-secondary, #9ca3af);
 }
 
 @media (max-width: 640px) {

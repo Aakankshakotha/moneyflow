@@ -13,14 +13,14 @@
   margin: 0 0 0.25rem 0;
   font-size: 1.25rem;
   font-weight: 600;
-  color: #2c3e50;
+  color: #1a1a1a;
 }
 
 .account-card__type {
   display: inline-block;
   padding: 0.25rem 0.5rem;
-  background-color: #ecf0f1;
-  color: #7f8c8d;
+  background-color: #f3f4f6;
+  color: #6b7280;
   border-radius: 4px;
   font-size: 0.875rem;
   font-weight: 500;
@@ -35,13 +35,13 @@
 }
 
 .account-card__badge--active {
-  background-color: #d4edda;
-  color: #155724;
+  background-color: #d1fae5;
+  color: #059669;
 }
 
 .account-card__badge--archived {
-  background-color: #f8d7da;
-  color: #721c24;
+  background-color: #fee2e2;
+  color: #dc2626;
 }
 
 .account-card__balance {
@@ -49,13 +49,13 @@
   justify-content: space-between;
   align-items: center;
   padding: 0.75rem 0;
-  border-top: 1px solid #ecf0f1;
-  border-bottom: 1px solid #ecf0f1;
+  border-top: 1px solid #e5e7eb;
+  border-bottom: 1px solid #e5e7eb;
 }
 
 .account-card__balance-label {
   font-size: 0.875rem;
-  color: #7f8c8d;
+  color: #6b7280;
 }
 
 .account-card__balance-amount {
