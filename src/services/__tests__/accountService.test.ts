@@ -286,8 +286,8 @@ describe('AccountService', () => {
       vi.mocked(storageService.getAccount).mockResolvedValue({
         success: false,
         error: {
+          type: 'NotFoundError',
           message: 'Account not found',
-          code: 'NOT_FOUND',
         },
       })
 
@@ -342,7 +342,7 @@ describe('AccountService', () => {
       const result = await updateAccount(accountId, updateDto)
 
       expect(result.success).toBe(false)
-      if (!result.success) {
+      if (!result.success && 'field' in result.error) {
         expect(result.error.field).toBe('name')
         expect(result.error.code).toBe('DUPLICATE_NAME')
       }
@@ -453,8 +453,8 @@ describe('AccountService', () => {
       vi.mocked(storageService.getAccount).mockResolvedValue({
         success: false,
         error: {
+          type: 'NotFoundError',
           message: 'Account not found',
-          code: 'NOT_FOUND',
         },
       })
 
@@ -500,8 +500,8 @@ describe('AccountService', () => {
       vi.mocked(storageService.getAccount).mockResolvedValue({
         success: false,
         error: {
+          type: 'NotFoundError',
           message: 'Account not found',
-          code: 'NOT_FOUND',
         },
       })
 

@@ -1,3 +1,5 @@
 export { default as AccountCard } from './AccountCard'
 export { default as AccountList } from './AccountList'
 export { default as AccountForm } from './AccountForm'
+export { default as NetWorthDisplay } from './NetWorthDisplay'
+export { default as NetWorthChart } from './NetWorthChart'

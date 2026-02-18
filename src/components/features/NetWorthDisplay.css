@@ -1,0 +1,103 @@
+.net-worth-display {
+  padding: 2rem;
+}
+
+.net-worth-display__loading {
+  text-align: center;
+  padding: 2rem;
+  color: var(--color-text-secondary, #666);
+}
+
+.net-worth-display__title {
+  font-size: 1.25rem;
+  font-weight: 600;
+  margin: 0 0 1rem 0;
+  color: var(--color-text-primary, #1a1a1a);
+}
+
+.net-worth-display__value {
+  font-size: 2.5rem;
+  font-weight: 700;
+  margin: 1rem 0 2rem 0;
+}
+
+.net-worth-display__value.positive {
+  color: var(--color-success, #10b981);
+}
+
+.net-worth-display__value.negative {
+  color: var(--color-error, #ef4444);
+}
+
+.net-worth-display__breakdown {
+  display: flex;
+  gap: 2rem;
+  margin: 2rem 0;
+  padding: 1.5rem 0;
+  border-top: 1px solid var(--color-border, #e5e7eb);
+  border-bottom: 1px solid var(--color-border, #e5e7eb);
+}
+
+.net-worth-display__item {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.net-worth-display__label {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--color-text-secondary, #666);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.net-worth-display__amount {
+  font-size: 1.5rem;
+  font-weight: 600;
+}
+
+.net-worth-display__amount.asset {
+  color: var(--color-success, #10b981);
+}
+
+.net-worth-display__amount.liability {
+  color: var(--color-warning, #f59e0b);
+}
+
+.net-worth-display__count {
+  font-size: 0.875rem;
+  color: var(--color-text-secondary, #666);
+}
+
+.net-worth-display__footer {
+  margin-top: 1.5rem;
+  padding-top: 1rem;
+  text-align: center;
+}
+
+.net-worth-display__timestamp {
+  font-size: 0.75rem;
+  color: var(--color-text-secondary, #999);
+  font-style: italic;
+}
+
+@media (max-width: 640px) {
+  .net-worth-display {
+    padding: 1.5rem;
+  }
+
+  .net-worth-display__value {
+    font-size: 2rem;
+  }
+
+  .net-worth-display__breakdown {
+    flex-direction: column;
+    gap: 1.5rem;
+  }
+
+  .net-worth-display__amount {
+    font-size: 1.25rem;
+  }
+}
