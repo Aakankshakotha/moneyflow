@@ -143,6 +143,24 @@ describe('ValidationService - Account Validation', () => {
         expect(result.error.code).toBe('REQUIRED_FIELD')
       }
     })
+
+    it('should validate balance when provided', () => {
+      const result = validateUpdateAccount({
+        balance: 125000,
+      })
+      expect(result.success).toBe(true)
+    })
+
+    it('should reject non-integer update balance', () => {
+      const result = validateUpdateAccount({
+        balance: 100.5,
+      })
+      expect(result.success).toBe(false)
+      if (!result.success) {
+        expect(result.error.field).toBe('balance')
+        expect(result.error.code).toBe('INVALID_AMOUNT')
+      }
+    })
   })
 })
 

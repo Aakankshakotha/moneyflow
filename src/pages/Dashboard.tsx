@@ -191,16 +191,10 @@ const Dashboard: React.FC = () => {
       {/* Charts Grid */}
       <div className="dashboard-page__charts">
         <div className="dashboard-page__chart-col">
-          <MoneyFlowChart
-            transactions={transactions}
-            accounts={accounts}
-          />
+          <MoneyFlowChart transactions={transactions} accounts={accounts} />
         </div>
         <div className="dashboard-page__chart-col">
-          <ExpensesChart
-            transactions={transactions}
-            accounts={accounts}
-          />
+          <ExpensesChart transactions={transactions} accounts={accounts} />
         </div>
       </div>
 

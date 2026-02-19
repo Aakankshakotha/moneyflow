@@ -93,6 +93,25 @@ const Accounts: React.FC = () => {
       return
     }
 
+    if (account.status === 'active') {
+      const shouldArchive = confirm(
+        'This account is active. It must be archived before deletion. Archive it now?'
+      )
+
+      if (!shouldArchive) {
+        return
+      }
+
+      const archiveResult = await accountService.updateAccount(account.id, {
+        status: 'archived',
+      })
+
+      if (!archiveResult.success) {
+        alert(`Error: ${archiveResult.error.message}`)
+        return
+      }
+    }
+
     const result = await accountService.deleteAccount(account.id)
 
     if (result.success) {
@@ -100,6 +119,22 @@ const Accounts: React.FC = () => {
     } else {
       alert(`Error: ${result.error.message}`)
     }
+  }
+
+  const handleToggleAccountStatus = async (account: Account): Promise<void> => {
+    const nextStatus: AccountStatus =
+      account.status === 'active' ? 'archived' : 'active'
+
+    const result = await accountService.updateAccount(account.id, {
+      status: nextStatus,
+    })
+
+    if (result.success) {
+      await loadAccounts()
+      return
+    }
+
+    alert(`Error: ${result.error.message}`)
   }
 
   const handleFilterChange = async (
@@ -152,6 +187,7 @@ const Accounts: React.FC = () => {
       <AccountList
         accounts={filteredAccounts}
         onEdit={handleEditAccount}
+        onToggleStatus={handleToggleAccountStatus}
         onDelete={handleDeleteAccount}
         onFilterChange={handleFilterChange}
       />
@@ -160,6 +196,7 @@ const Accounts: React.FC = () => {
         isOpen={isFormOpen}
         onClose={handleCloseForm}
         onSubmit={handleCreateAccount}
+        accounts={accounts}
         account={editingAccount || undefined}
       />
     </div>

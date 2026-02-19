@@ -1,6 +1,7 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import type {
   AccountType,
+  AccountStatus,
   CreateAccountDto,
   UpdateAccountDto,
   Account,
@@ -13,6 +14,7 @@ interface AccountFormProps {
   isOpen: boolean
   onClose: () => void
   onSubmit: (data: CreateAccountDto | UpdateAccountDto) => void
+  accounts: Account[]
   account?: Account
   title?: string
 }
@@ -24,18 +26,37 @@ const AccountForm: React.FC<AccountFormProps> = ({
   isOpen,
   onClose,
   onSubmit,
+  accounts,
   account,
   title,
 }) => {
   const isEdit = !!account
+  const isDerivedFlowAccount =
+    isEdit && (account?.type === 'income' || account?.type === 'expense')
 
   const [name, setName] = useState(account?.name || '')
   const [type, setType] = useState<AccountType>(account?.type || 'asset')
   const [balance, setBalance] = useState(
     account ? centsToDollars(account.balance).toString() : '0'
   )
-  const [status, setStatus] = useState(account?.status || 'active')
+  const [status, setStatus] = useState<AccountStatus>(
+    account?.status || 'active'
+  )
+  const [parentAccountId, setParentAccountId] = useState(
+    account?.parentAccountId || ''
+  )
   const [errors, setErrors] = useState<Record<string, string>>({})
+
+  useEffect(() => {
+    if (isOpen) {
+      setName(account?.name || '')
+      setType(account?.type || 'asset')
+      setBalance(account ? centsToDollars(account.balance).toString() : '0')
+      setStatus(account?.status || 'active')
+      setParentAccountId(account?.parentAccountId || '')
+      setErrors({})
+    }
+  }, [isOpen, account])
 
   const handleSubmit = (e: React.FormEvent): void => {
     e.preventDefault()
@@ -69,12 +90,17 @@ const AccountForm: React.FC<AccountFormProps> = ({
       const updateData: UpdateAccountDto = {
         name: name.trim(),
         status,
+        parentAccountId: parentAccountId || null,
+        ...(isDerivedFlowAccount
+          ? {}
+          : { balance: dollarsToCents(balanceNum) }),
       }
       onSubmit(updateData)
     } else {
       const createData: CreateAccountDto = {
         name: name.trim(),
         type,
+        parentAccountId: parentAccountId || null,
         balance: dollarsToCents(balanceNum),
       }
       onSubmit(createData)
@@ -89,9 +115,23 @@ const AccountForm: React.FC<AccountFormProps> = ({
     setType('asset')
     setBalance('0')
     setStatus('active')
+    setParentAccountId('')
     setErrors({})
     onClose()
   }
+
+  const selectedType = isEdit ? account?.type : type
+  const parentOptions = accounts
+    .filter(
+      (candidate) =>
+        candidate.status === 'active' &&
+        candidate.type === selectedType &&
+        candidate.id !== account?.id
+    )
+    .map((candidate) => ({
+      value: candidate.id,
+      label: candidate.name,
+    }))
 
   const modalContent = (
     <form onSubmit={handleSubmit} className="account-form">
@@ -105,31 +145,43 @@ const AccountForm: React.FC<AccountFormProps> = ({
       />
 
       {!isEdit && (
-        <>
-          <Select
-            label="Account Type"
-            value={type}
-            onChange={(e) => setType(e.target.value as AccountType)}
-            options={[
-              { value: 'asset', label: 'Asset (what you own)' },
-              { value: 'liability', label: 'Liability (what you owe)' },
-              { value: 'income', label: 'Income (money coming in)' },
-              { value: 'expense', label: 'Expense (money going out)' },
-            ]}
-            required
-          />
-
-          <Input
-            label="Initial Balance ($)"
-            type="number"
-            value={balance}
-            onChange={(e) => setBalance(e.target.value)}
-            error={errors.balance}
-            placeholder="0.00"
-            step="0.01"
-          />
-        </>
+        <Select
+          label="Account Type"
+          value={type}
+          onChange={(e) => setType(e.target.value as AccountType)}
+          options={[
+            { value: 'asset', label: 'Asset (what you own)' },
+            { value: 'liability', label: 'Liability (what you owe)' },
+            { value: 'income', label: 'Income (money coming in)' },
+            { value: 'expense', label: 'Expense (money going out)' },
+          ]}
+          required
+        />
       )}
+
+      <Select
+        label="Parent Account (Optional)"
+        value={parentAccountId}
+        onChange={(e) => setParentAccountId(e.target.value)}
+        options={parentOptions}
+        placeholder="No parent (top-level account)"
+      />
+
+      <Input
+        label={isEdit ? 'Balance ($)' : 'Initial Balance ($)'}
+        type="number"
+        value={balance}
+        onChange={(e) => setBalance(e.target.value)}
+        error={errors.balance}
+        helperText={
+          isDerivedFlowAccount
+            ? 'For income/expense accounts, this value is derived from transactions.'
+            : undefined
+        }
+        placeholder="0.00"
+        step="0.01"
+        disabled={isDerivedFlowAccount}
+      />
 
       {isEdit && (
         <Select

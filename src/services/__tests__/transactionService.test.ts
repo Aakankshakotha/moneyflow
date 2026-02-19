@@ -188,6 +188,153 @@ describe('TransactionService', () => {
         expect(result.error.code).toBe('INSUFFICIENT_BALANCE')
       }
     })
+
+    it('should allow income source account even when balance is zero', async () => {
+      const fromId = crypto.randomUUID()
+      const toId = crypto.randomUUID()
+
+      const fromAccount: Account = {
+        id: fromId,
+        name: 'Salary',
+        type: 'income',
+        balance: 0,
+        status: 'active',
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+      }
+
+      const toAccount: Account = {
+        id: toId,
+        name: 'Checking',
+        type: 'asset',
+        balance: 100000,
+        status: 'active',
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+      }
+
+      vi.mocked(accountService.getAccount)
+        .mockResolvedValueOnce({ success: true, data: fromAccount })
+        .mockResolvedValueOnce({ success: true, data: toAccount })
+
+      vi.mocked(storageService.saveAccount)
+        .mockResolvedValueOnce({
+          success: true,
+          data: { ...fromAccount, balance: -500000 },
+        })
+        .mockResolvedValueOnce({
+          success: true,
+          data: { ...toAccount, balance: 600000 },
+        })
+
+      vi.mocked(storageService.saveTransaction).mockResolvedValue({
+        success: true,
+        data: {} as Transaction,
+      })
+
+      const dto: CreateTransactionDto = {
+        fromAccountId: fromId,
+        toAccountId: toId,
+        amount: 500000,
+        description: 'Monthly salary',
+        date: '2026-02-19',
+      }
+
+      const result = await transactionService.recordTransaction(dto)
+
+      expect(result.success).toBe(true)
+      if (result.success) {
+        expect(result.data.description).toBe('Monthly salary')
+      }
+    })
+
+    it('should reject when expense account is used as source', async () => {
+      const fromId = crypto.randomUUID()
+      const toId = crypto.randomUUID()
+
+      const fromAccount: Account = {
+        id: fromId,
+        name: 'Rent',
+        type: 'expense',
+        balance: 0,
+        status: 'active',
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+      }
+
+      const toAccount: Account = {
+        id: toId,
+        name: 'Checking',
+        type: 'asset',
+        balance: 100000,
+        status: 'active',
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+      }
+
+      vi.mocked(accountService.getAccount)
+        .mockResolvedValueOnce({ success: true, data: fromAccount })
+        .mockResolvedValueOnce({ success: true, data: toAccount })
+
+      const dto: CreateTransactionDto = {
+        fromAccountId: fromId,
+        toAccountId: toId,
+        amount: 10000,
+        description: 'Invalid direction',
+        date: '2026-02-19',
+      }
+
+      const result = await transactionService.recordTransaction(dto)
+
+      expect(result.success).toBe(false)
+      if (!result.success) {
+        expect(result.error.code).toBe('INVALID_DIRECTION')
+      }
+    })
+
+    it('should reject when income account is used as destination', async () => {
+      const fromId = crypto.randomUUID()
+      const toId = crypto.randomUUID()
+
+      const fromAccount: Account = {
+        id: fromId,
+        name: 'Checking',
+        type: 'asset',
+        balance: 100000,
+        status: 'active',
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+      }
+
+      const toAccount: Account = {
+        id: toId,
+        name: 'Salary',
+        type: 'income',
+        balance: 0,
+        status: 'active',
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+      }
+
+      vi.mocked(accountService.getAccount)
+        .mockResolvedValueOnce({ success: true, data: fromAccount })
+        .mockResolvedValueOnce({ success: true, data: toAccount })
+
+      const dto: CreateTransactionDto = {
+        fromAccountId: fromId,
+        toAccountId: toId,
+        amount: 10000,
+        description: 'Invalid direction',
+        date: '2026-02-19',
+      }
+
+      const result = await transactionService.recordTransaction(dto)
+
+      expect(result.success).toBe(false)
+      if (!result.success) {
+        expect(result.error.code).toBe('INVALID_DIRECTION')
+      }
+    })
   })
 
   describe('listTransactions', () => {

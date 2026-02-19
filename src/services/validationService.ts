@@ -110,6 +110,20 @@ export function validateCreateAccount(
     }
   }
 
+  // Validate parentAccountId if provided
+  if (data.parentAccountId !== undefined && data.parentAccountId !== null) {
+    if (!isValidUUID(data.parentAccountId)) {
+      return {
+        success: false,
+        error: createValidationError(
+          'parentAccountId',
+          'Parent account ID must be a valid UUID',
+          'INVALID_UUID'
+        ),
+      }
+    }
+  }
+
   // Validate balance if provided
   if (data.balance !== undefined) {
     if (
@@ -121,6 +135,20 @@ export function validateCreateAccount(
           'balance',
           'Balance must be a valid integer amount in cents',
           'INVALID_AMOUNT'
+        ),
+      }
+    }
+  }
+
+  // Validate parentAccountId if provided
+  if (data.parentAccountId !== undefined && data.parentAccountId !== null) {
+    if (!isValidUUID(data.parentAccountId)) {
+      return {
+        success: false,
+        error: createValidationError(
+          'parentAccountId',
+          'Parent account ID must be a valid UUID',
+          'INVALID_UUID'
         ),
       }
     }
@@ -172,6 +200,22 @@ export function validateUpdateAccount(
         `Status must be one of: ${VALID_ACCOUNT_STATUSES.join(', ')}`,
         'INVALID_STATUS'
       ),
+    }
+  }
+
+  // Validate balance if provided
+  if (data.balance !== undefined) {
+    if (
+      !isValidAmount(data.balance, { allowNegative: true, allowZero: true })
+    ) {
+      return {
+        success: false,
+        error: createValidationError(
+          'balance',
+          'Balance must be a valid integer amount in cents',
+          'INVALID_AMOUNT'
+        ),
+      }
     }
   }
 

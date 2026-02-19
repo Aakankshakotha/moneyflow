@@ -7,6 +7,7 @@ import './AccountList.css'
 interface AccountListProps {
   accounts: Account[]
   onEdit?: (account: Account) => void
+  onToggleStatus?: (account: Account) => void
   onDelete?: (account: Account) => void
   onFilterChange?: (type?: AccountType, status?: AccountStatus) => void
 }
@@ -17,6 +18,7 @@ interface AccountListProps {
 const AccountList: React.FC<AccountListProps> = ({
   accounts,
   onEdit,
+  onToggleStatus,
   onDelete,
   onFilterChange,
 }) => {
@@ -56,6 +58,53 @@ const AccountList: React.FC<AccountListProps> = ({
     },
     {} as Record<string, Account[]>
   )
+
+  const accountMap = new Map(accounts.map((account) => [account.id, account]))
+
+  const orderedAccountsForType = (typeAccounts: Account[]): Account[] => {
+    const byParentId = new Map<string, Account[]>()
+    const roots: Account[] = []
+
+    typeAccounts.forEach((account) => {
+      if (!account.parentAccountId) {
+        roots.push(account)
+        return
+      }
+
+      if (!byParentId.has(account.parentAccountId)) {
+        byParentId.set(account.parentAccountId, [])
+      }
+      byParentId.get(account.parentAccountId)!.push(account)
+    })
+
+    const ordered: Account[] = []
+    const visit = (parent: Account): void => {
+      ordered.push(parent)
+      const children = byParentId.get(parent.id) || []
+      children
+        .sort((a, b) => a.name.localeCompare(b.name))
+        .forEach((child) => visit(child))
+    }
+
+    roots
+      .sort((a, b) => a.name.localeCompare(b.name))
+      .forEach((root) => visit(root))
+
+    const orphanChildren = typeAccounts.filter(
+      (account) =>
+        account.parentAccountId && !accountMap.has(account.parentAccountId)
+    )
+
+    orphanChildren
+      .sort((a, b) => a.name.localeCompare(b.name))
+      .forEach((account) => {
+        if (!ordered.some((item) => item.id === account.id)) {
+          ordered.push(account)
+        }
+      })
+
+    return ordered
+  }
 
   const typeLabels: Record<string, string> = {
     asset: 'Assets',
@@ -103,11 +152,17 @@ const AccountList: React.FC<AccountListProps> = ({
                 {typeLabels[type] || type}
               </h2>
               <div className="account-list__cards">
-                {typeAccounts.map((account) => (
+                {orderedAccountsForType(typeAccounts).map((account) => (
                   <AccountCard
                     key={account.id}
                     account={account}
+                    parentName={
+                      account.parentAccountId
+                        ? accountMap.get(account.parentAccountId)?.name
+                        : undefined
+                    }
                     onEdit={onEdit}
+                    onToggleStatus={onToggleStatus}
                     onDelete={onDelete}
                   />
                 ))}

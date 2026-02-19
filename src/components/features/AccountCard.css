@@ -16,6 +16,12 @@
   color: #1a1a1a;
 }
 
+.account-card__parent {
+  margin-bottom: 0.4rem;
+  font-size: 0.8rem;
+  color: #6b7280;
+}
+
 .account-card__type {
   display: inline-block;
   padding: 0.25rem 0.5rem;
@@ -61,7 +67,16 @@
 .account-card__balance-amount {
   font-size: 1.5rem;
   font-weight: 700;
+}
+
+.account-card__balance-amount--asset,
+.account-card__balance-amount--income {
   color: #27ae60;
+}
+
+.account-card__balance-amount--liability,
+.account-card__balance-amount--expense {
+  color: #e74c3c;
 }
 
 .account-card__actions {

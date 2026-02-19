@@ -25,6 +25,7 @@ export interface Account {
   id: string // UUID v4
   name: string // 1-100 characters, unique within type
   type: AccountType
+  parentAccountId?: string // Optional parent account UUID for sub-accounts
   balance: number // Current balance in cents (integer)
   status: AccountStatus
   createdAt: string // ISO 8601 timestamp
@@ -45,6 +46,7 @@ export interface AccountWithBalance extends Account {
 export interface CreateAccountDto {
   name: string
   type: AccountType
+  parentAccountId?: string | null
   balance?: number // Optional, defaults to 0
 }
 
@@ -54,6 +56,8 @@ export interface CreateAccountDto {
 export interface UpdateAccountDto {
   name?: string
   status?: AccountStatus
+  parentAccountId?: string | null
+  balance?: number // Optional updated balance in cents
 }
 
 /**

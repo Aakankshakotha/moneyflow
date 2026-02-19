@@ -57,8 +57,28 @@ export async function recordTransaction(
   const fromAccount = fromAccountResult.data
   const toAccount = toAccountResult.data
 
+  if (fromAccount.type === 'expense') {
+    return {
+      success: false,
+      error: {
+        message: 'Expense accounts can only be destination accounts',
+        code: 'INVALID_DIRECTION',
+      },
+    }
+  }
+
+  if (toAccount.type === 'income') {
+    return {
+      success: false,
+      error: {
+        message: 'Income accounts can only be source accounts',
+        code: 'INVALID_DIRECTION',
+      },
+    }
+  }
+
   // Check if from account has sufficient balance
-  if (fromAccount.balance < data.amount) {
+  if (fromAccount.type !== 'income' && fromAccount.balance < data.amount) {
     return {
       success: false,
       error: {

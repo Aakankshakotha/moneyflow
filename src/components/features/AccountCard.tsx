@@ -6,7 +6,9 @@ import './AccountCard.css'
 
 interface AccountCardProps {
   account: Account
+  parentName?: string
   onEdit?: (account: Account) => void
+  onToggleStatus?: (account: Account) => void
   onDelete?: (account: Account) => void
 }
 
@@ -15,10 +17,46 @@ interface AccountCardProps {
  */
 const AccountCard: React.FC<AccountCardProps> = ({
   account,
+  parentName,
   onEdit,
+  onToggleStatus,
   onDelete,
 }) => {
-  const getTypeLabel = (type: string) => {
+  const getAmountDisplay = (
+    accountData: Account
+  ): { label: string; value: number; tone: string } => {
+    if (accountData.type === 'income') {
+      return {
+        label: 'Total Inflow:',
+        value: Math.abs(accountData.balance),
+        tone: 'income',
+      }
+    }
+
+    if (accountData.type === 'expense') {
+      return {
+        label: 'Total Spent:',
+        value: Math.abs(accountData.balance),
+        tone: 'expense',
+      }
+    }
+
+    if (accountData.type === 'liability') {
+      return {
+        label: 'Balance:',
+        value: accountData.balance,
+        tone: 'liability',
+      }
+    }
+
+    return {
+      label: 'Balance:',
+      value: accountData.balance,
+      tone: 'asset',
+    }
+  }
+
+  const getTypeLabel = (type: string): string => {
     const labels: Record<string, string> = {
       asset: 'Asset',
       liability: 'Liability',
@@ -28,7 +66,7 @@ const AccountCard: React.FC<AccountCardProps> = ({
     return labels[type] || type
   }
 
-  const getStatusBadge = (status: string) => {
+  const getStatusBadge = (status: string): JSX.Element => {
     return status === 'active' ? (
       <span className="account-card__badge account-card__badge--active">
         Active
@@ -40,11 +78,18 @@ const AccountCard: React.FC<AccountCardProps> = ({
     )
   }
 
+  const amountDisplay = getAmountDisplay(account)
+
   return (
     <Card className="account-card">
       <div className="account-card__header">
         <div>
           <h3 className="account-card__name">{account.name}</h3>
+          {parentName && (
+            <div className="account-card__parent">
+              Sub-account of {parentName}
+            </div>
+          )}
           <span className="account-card__type">
             {getTypeLabel(account.type)}
           </span>
@@ -52,12 +97,16 @@ const AccountCard: React.FC<AccountCardProps> = ({
         {getStatusBadge(account.status)}
       </div>
       <div className="account-card__balance">
-        <span className="account-card__balance-label">Balance:</span>
-        <span className="account-card__balance-amount">
-          {formatCurrency(account.balance)}
+        <span className="account-card__balance-label">
+          {amountDisplay.label}
+        </span>
+        <span
+          className={`account-card__balance-amount account-card__balance-amount--${amountDisplay.tone}`}
+        >
+          {formatCurrency(amountDisplay.value)}
         </span>
       </div>
-      {(onEdit || onDelete) && (
+      {(onEdit || onToggleStatus || onDelete) && (
         <div className="account-card__actions">
           {onEdit && (
             <button
@@ -67,7 +116,15 @@ const AccountCard: React.FC<AccountCardProps> = ({
               Edit
             </button>
           )}
-          {onDelete && account.status === 'archived' && (
+          {onToggleStatus && (
+            <button
+              className="account-card__button account-card__button--edit"
+              onClick={() => onToggleStatus(account)}
+            >
+              {account.status === 'active' ? 'Archive' : 'Unarchive'}
+            </button>
+          )}
+          {onDelete && (
             <button
               className="account-card__button account-card__button--delete"
               onClick={() => onDelete(account)}

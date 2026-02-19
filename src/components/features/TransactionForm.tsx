@@ -30,8 +30,8 @@ const TransactionForm: React.FC<TransactionFormProps> = ({
   defaultFromAccountId,
   defaultToAccountId,
 }) => {
-  const [fromAccountId, setFromAccountId] = useState('')
-  const [toAccountId, setToAccountId] = useState('')
+  const [primaryAccountId, setPrimaryAccountId] = useState('') // The first account user selects
+  const [secondaryAccountId, setSecondaryAccountId] = useState('') // The second account
   const [amount, setAmount] = useState('')
   const [description, setDescription] = useState('')
   const [date, setDate] = useState(new Date().toISOString().split('T')[0])
@@ -43,8 +43,8 @@ const TransactionForm: React.FC<TransactionFormProps> = ({
   // Set defaults when dialog opens
   useEffect(() => {
     if (isOpen) {
-      setFromAccountId(defaultFromAccountId || '')
-      setToAccountId(defaultToAccountId || '')
+      setPrimaryAccountId(defaultFromAccountId || '')
+      setSecondaryAccountId(defaultToAccountId || '')
       setAmount('')
       setDescription('')
       setDate(new Date().toISOString().split('T')[0])
@@ -64,6 +64,18 @@ const TransactionForm: React.FC<TransactionFormProps> = ({
     }
   }, [description])
 
+  // Auto-detect entry mode based on primary account type
+  const activeAccounts = accounts.filter((acc) => acc.status === 'active')
+  const primaryAccount = activeAccounts.find(
+    (acc) => acc.id === primaryAccountId
+  )
+  const entryMode =
+    primaryAccount?.type === 'income'
+      ? 'income'
+      : primaryAccount?.type === 'expense'
+        ? 'expense'
+        : 'transfer'
+
   const handleSubmit = async (e: React.FormEvent): Promise<void> => {
     e.preventDefault()
     setError(null)
@@ -77,6 +89,26 @@ const TransactionForm: React.FC<TransactionFormProps> = ({
         setError('Please enter a valid amount greater than 0')
         setSubmitting(false)
         return
+      }
+
+      if (!primaryAccountId || !secondaryAccountId) {
+        setError('Please select both accounts')
+        setSubmitting(false)
+        return
+      }
+
+      // Map primary/secondary to from/to based on entry mode
+      let fromAccountId: string
+      let toAccountId: string
+
+      if (entryMode === 'expense') {
+        // For expense: secondary (asset) pays to primary (expense)
+        fromAccountId = secondaryAccountId
+        toAccountId = primaryAccountId
+      } else {
+        // For income and transfer: primary sends to secondary
+        fromAccountId = primaryAccountId
+        toAccountId = secondaryAccountId
       }
 
       const dto: CreateTransactionDto = {
@@ -101,8 +133,8 @@ const TransactionForm: React.FC<TransactionFormProps> = ({
 
   const handleClose = (): void => {
     if (!submitting) {
-      setFromAccountId('')
-      setToAccountId('')
+      setPrimaryAccountId('')
+      setSecondaryAccountId('')
       setAmount('')
       setDescription('')
       setDate(new Date().toISOString().split('T')[0])
@@ -121,12 +153,42 @@ const TransactionForm: React.FC<TransactionFormProps> = ({
     }
   }
 
-  // Get available accounts (active only)
-  const activeAccounts = accounts.filter((acc) => acc.status === 'active')
+  // Get label and available accounts for secondary field based on entry mode
+  const getSecondaryFieldConfig = (): {
+    label: string
+    accounts: Account[]
+    helperText: string
+  } => {
+    if (entryMode === 'income') {
+      return {
+        label: 'Deposit To (Asset Account)',
+        accounts: activeAccounts.filter((acc) => acc.type === 'asset'),
+        helperText: 'Select where to deposit the income',
+      }
+    } else if (entryMode === 'expense') {
+      return {
+        label: 'Pay From (Asset Account)',
+        accounts: activeAccounts.filter((acc) => acc.type === 'asset'),
+        helperText: 'Select which account to pay from',
+      }
+    } else {
+      return {
+        label: 'To Account',
+        accounts: activeAccounts.filter(
+          (acc) => acc.id !== primaryAccountId && acc.type !== 'income'
+        ),
+        helperText: 'Select destination account',
+      }
+    }
+  }
 
-  // Get from account balance
-  const fromAccount = activeAccounts.find((acc) => acc.id === fromAccountId)
-  const fromBalance = fromAccount ? fromAccount.balance : 0
+  const secondaryConfig = getSecondaryFieldConfig()
+
+  // Get balance info for display
+  const displayAccount =
+    entryMode === 'expense'
+      ? activeAccounts.find((acc) => acc.id === secondaryAccountId)
+      : primaryAccount
 
   // Group categories by group
   const groupedCategories = Object.entries(CATEGORY_GROUPS).map(
@@ -143,37 +205,47 @@ const TransactionForm: React.FC<TransactionFormProps> = ({
     <Modal isOpen={isOpen} onClose={handleClose} title="Record Transaction">
       <form onSubmit={handleSubmit} className="transaction-form">
         <Select
-          label="From Account"
-          value={fromAccountId}
-          onChange={(e) => setFromAccountId(e.target.value)}
+          label={
+            entryMode === 'income'
+              ? 'Income Account'
+              : entryMode === 'expense'
+                ? 'Expense Account'
+                : 'From Account'
+          }
+          value={primaryAccountId}
+          onChange={(e) => {
+            setPrimaryAccountId(e.target.value)
+            setSecondaryAccountId('') // Reset secondary when primary changes
+          }}
           options={activeAccounts.map((acc) => ({
             value: acc.id,
             label: `${acc.name} (${formatCurrency(acc.balance)})`,
           }))}
           required
-          placeholder="Select source account"
+          placeholder={!primaryAccountId ? 'Select account' : 'Select account'}
         />
 
-        {fromAccount && (
-          <div className="transaction-form__balance">
-            Available: {formatCurrency(fromBalance)}
-          </div>
-        )}
+        {displayAccount &&
+          displayAccount.type !== 'income' &&
+          displayAccount.type !== 'expense' && (
+            <div className="transaction-form__balance">
+              Available: {formatCurrency(displayAccount.balance)}
+            </div>
+          )}
 
-        <Select
-          label="To Account"
-          value={toAccountId}
-          onChange={(e) => setToAccountId(e.target.value)}
-          options={activeAccounts
-            .filter((acc) => acc.id !== fromAccountId)
-            .map((acc) => ({
+        {primaryAccountId && (
+          <Select
+            label={secondaryConfig.label}
+            value={secondaryAccountId}
+            onChange={(e) => setSecondaryAccountId(e.target.value)}
+            options={secondaryConfig.accounts.map((acc) => ({
               value: acc.id,
               label: `${acc.name} (${formatCurrency(acc.balance)})`,
             }))}
-          required
-          placeholder="Select destination account"
-          disabled={!fromAccountId}
-        />
+            required
+            placeholder={secondaryConfig.helperText}
+          />
+        )}
 
         <Input
           label="Amount"

@@ -280,6 +280,46 @@ describe('AccountService', () => {
       }
     })
 
+    it('should update account balance successfully', async () => {
+      const accountId = generateUUID()
+      const existingAccount: Account = {
+        id: accountId,
+        name: 'Test Account',
+        type: 'asset',
+        balance: 100000,
+        status: 'active',
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+      }
+
+      vi.mocked(storageService.getAccount).mockResolvedValue({
+        success: true,
+        data: existingAccount,
+      })
+
+      const updateDto: UpdateAccountDto = {
+        balance: 250000,
+      }
+
+      const updatedAccount = {
+        ...existingAccount,
+        balance: updateDto.balance!,
+        updatedAt: new Date().toISOString(),
+      }
+
+      vi.mocked(storageService.saveAccount).mockResolvedValue({
+        success: true,
+        data: updatedAccount,
+      })
+
+      const result = await updateAccount(accountId, updateDto)
+
+      expect(result.success).toBe(true)
+      if (result.success) {
+        expect(result.data.balance).toBe(updateDto.balance)
+      }
+    })
+
     it('should return NotFoundError if account does not exist', async () => {
       const accountId = generateUUID()
 

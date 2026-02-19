@@ -1,9 +1,9 @@
-import React, { useMemo } from 'react'
+import React, { useMemo, useState } from 'react'
 import ReactECharts from 'echarts-for-react'
 import type { Transaction } from '@/types/transaction'
 import type { Account } from '@/types/account'
+import { Select } from '@/components/common'
 import { formatCurrency } from '@/utils/currencyUtils'
-import { categoryService } from '@/services/categoryService'
 import { useTheme } from '@/contexts/ThemeContext'
 import './MoneyFlowChart.css'
 
@@ -12,123 +12,80 @@ interface MoneyFlowChartProps {
   accounts: Account[]
 }
 
+const getAccountColor = (accountType: Account['type']): string => {
+  if (accountType === 'income') return '#10b981'
+  if (accountType === 'asset') return '#3b82f6'
+  if (accountType === 'expense') return '#ef4444'
+  return '#f59e0b'
+}
+
 /**
  * MoneyFlowChart Component
- * Displays a Sankey diagram showing 3-level money flow:
- * Income Categories → Asset Accounts → Expense Categories
+ * Displays a Sankey diagram showing account-to-account money flow.
  */
 export const MoneyFlowChart: React.FC<MoneyFlowChartProps> = ({
   transactions,
   accounts,
 }) => {
   const { theme } = useTheme()
+  const [fromFilter, setFromFilter] = useState('all')
+  const [toFilter, setToFilter] = useState('all')
+
+  const accountMap = useMemo(
+    () => new Map(accounts.map((account) => [account.id, account])),
+    [accounts]
+  )
+
+  const filteredTransactions = useMemo(
+    () =>
+      transactions.filter((txn) => {
+        if (fromFilter !== 'all' && txn.fromAccountId !== fromFilter) {
+          return false
+        }
+        if (toFilter !== 'all' && txn.toAccountId !== toFilter) {
+          return false
+        }
+        return true
+      }),
+    [transactions, fromFilter, toFilter]
+  )
 
   const chartOptions = useMemo(() => {
-    // Build account map
-    const accountMap = new Map(accounts.map((a) => [a.id, a]))
-
-    // Track flows and nodes
     const flowMap = new Map<string, number>()
     const nodeMap = new Map<
       string,
       { name: string; itemStyle: { color: string } }
     >()
 
-    // Helper to add a node with color
     const addNode = (name: string, color: string): void => {
       if (!nodeMap.has(name)) {
         nodeMap.set(name, { name, itemStyle: { color } })
       }
     }
 
-    // Helper to add flow
-    const addFlow = (from: string, to: string, amount: number): void => {
-      const key = `${from}->${to}`
-      flowMap.set(key, (flowMap.get(key) || 0) + amount)
-    }
+    filteredTransactions.forEach((txn) => {
+      const fromAccount = accountMap.get(txn.fromAccountId)
+      const toAccount = accountMap.get(txn.toAccountId)
+      if (!fromAccount || !toAccount) return
 
-    // Process all transactions to build 3-level flow
-    transactions.forEach((txn) => {
-      const fromAcc = accountMap.get(txn.fromAccountId)
-      const toAcc = accountMap.get(txn.toAccountId)
+      addNode(fromAccount.name, getAccountColor(fromAccount.type))
+      addNode(toAccount.name, getAccountColor(toAccount.type))
 
-      if (!fromAcc || !toAcc) return
-
-      // Pattern 1: Income → Asset (left to middle)
-      if (fromAcc.type === 'income' && toAcc.type === 'asset') {
-        const incomeName = txn.category
-          ? categoryService.getCategoryName(txn.category)
-          : fromAcc.name
-        const assetName = toAcc.name
-
-        addNode(incomeName, '#10b981') // Green for income
-        addNode(assetName, '#3b82f6') // Blue for assets
-        addFlow(incomeName, assetName, txn.amount)
-      }
-      // Pattern 2: Asset → Anything (middle to right)
-      else if (fromAcc.type === 'asset') {
-        const assetName = fromAcc.name
-        let targetName: string
-        let targetColor: string
-
-        // If category is provided, use it
-        if (txn.category) {
-          const category = categoryService.getCategoryById(txn.category)
-          // Skip income categories on the expense side
-          if (category && category.group === 'income') return
-
-          targetName = categoryService.getCategoryName(txn.category)
-          targetColor = categoryService.getCategoryColor(txn.category)
-        }
-        // Otherwise, use the destination account name
-        else {
-          targetName = toAcc.name
-          // Color based on account type
-          if (toAcc.type === 'expense') {
-            targetColor = '#ef4444' // Red for expenses
-          } else if (toAcc.type === 'asset') {
-            targetColor = '#3b82f6' // Blue for asset transfers
-          } else {
-            targetColor = '#6b7280' // Gray for other
-          }
-        }
-
-        addNode(assetName, '#3b82f6') // Blue for assets
-        addNode(targetName, targetColor)
-        addFlow(assetName, targetName, txn.amount)
-      }
-      // Pattern 3: Any other outflow (fallback)
-      else if (fromAcc.type !== 'liability') {
-        const fromName = fromAcc.name
-        const toName = txn.category
-          ? categoryService.getCategoryName(txn.category)
-          : toAcc.name
-
-        const fromColor = fromAcc.type === 'income' ? '#10b981' : '#6b7280'
-        const toColor = txn.category
-          ? categoryService.getCategoryColor(txn.category)
-          : '#ef4444'
-
-        addNode(fromName, fromColor)
-        addNode(toName, toColor)
-        addFlow(fromName, toName, txn.amount)
-      }
+      const flowKey = `${fromAccount.name}->${toAccount.name}`
+      flowMap.set(flowKey, (flowMap.get(flowKey) || 0) + txn.amount)
     })
 
-    // Convert to ECharts format
-    const nodeArray = Array.from(nodeMap.values())
-
+    const nodes = Array.from(nodeMap.values())
     const links = Array.from(flowMap.entries()).map(([key, value]) => {
       const [source, target] = key.split('->')
       return {
         source,
         target,
-        value: value / 100, // Convert cents to dollars
+        value: value / 100,
       }
     })
 
-    // Check if we have data to display
-    const hasData = nodeArray.length > 0 && links.length > 0
+    const hasData = nodes.length > 0 && links.length > 0
 
     return {
       backgroundColor: 'transparent',
@@ -155,7 +112,7 @@ export const MoneyFlowChart: React.FC<MoneyFlowChartProps> = ({
           type: 'sankey',
           left: '5%',
           right: '20%',
-          top: '5%',
+          top: '8%',
           bottom: '5%',
           nodeWidth: 30,
           nodeGap: 15,
@@ -165,7 +122,7 @@ export const MoneyFlowChart: React.FC<MoneyFlowChartProps> = ({
           emphasis: {
             focus: 'adjacency',
           },
-          data: hasData ? nodeArray : [],
+          data: hasData ? nodes : [],
           links: hasData ? links : [],
           lineStyle: {
             color: 'gradient',
@@ -184,38 +141,23 @@ export const MoneyFlowChart: React.FC<MoneyFlowChartProps> = ({
         },
       ],
     }
-  }, [transactions, accounts, theme])
+  }, [filteredTransactions, accountMap, theme])
 
-  // Check if we have any data to display
-  const hasFlowData = useMemo(() => {
-    const accountMap = new Map(accounts.map((a) => [a.id, a]))
+  const hasFlowData = filteredTransactions.some((txn) => {
+    const fromAccount = accountMap.get(txn.fromAccountId)
+    const toAccount = accountMap.get(txn.toAccountId)
+    return Boolean(fromAccount && toAccount)
+  })
 
-    // Check for income → asset flows
-    const hasIncomeFlow = transactions.some((txn) => {
-      const fromAcc = accountMap.get(txn.fromAccountId)
-      const toAcc = accountMap.get(txn.toAccountId)
-      return fromAcc?.type === 'income' && toAcc?.type === 'asset'
-    })
-
-    // Check for asset → expense flows (with or without categories)
-    const hasExpenseFlow = transactions.some((txn) => {
-      const fromAcc = accountMap.get(txn.fromAccountId)
-      return (
-        fromAcc?.type === 'asset' &&
-        (txn.category || accountMap.get(txn.toAccountId)?.type === 'expense')
-      )
-    })
-
-    return hasIncomeFlow || hasExpenseFlow
-  }, [transactions, accounts])
-
-  // Check if transactions are missing categories
-  const needsCategoryWarning = useMemo(() => {
-    const transactionsWithCategories = transactions.filter(
-      (t) => t.category
-    ).length
-    return transactions.length > 0 && transactionsWithCategories === 0
-  }, [transactions])
+  const accountOptions = [
+    { value: 'all', label: 'All Accounts' },
+    ...accounts
+      .filter((account) => account.status === 'active')
+      .map((account) => ({
+        value: account.id,
+        label: account.name,
+      })),
+  ]
 
   return (
     <div className="money-flow-chart">
@@ -225,56 +167,31 @@ export const MoneyFlowChart: React.FC<MoneyFlowChartProps> = ({
           Money Flow
         </h3>
         <p className="money-flow-chart__subtitle">
-          Income sources → Accounts → Spending categories
+          Account-to-account money movement
         </p>
       </div>
 
-      {/* Warning if no categories are used */}
-      {hasFlowData && needsCategoryWarning && (
-        <div
-          style={{
-            backgroundColor: '#fef3c7',
-            color: '#92400e',
-            padding: '12px 16px',
-            marginBottom: '16px',
-            borderRadius: '8px',
-            border: '1px solid #fbbf24',
-            display: 'flex',
-            alignItems: 'center',
-            gap: '8px',
-          }}
-        >
-          <span style={{ fontSize: '20px' }}>⚠️</span>
-          <div style={{ flex: 1, fontSize: '14px', lineHeight: '1.5' }}>
-            <strong>No categories found!</strong> Your transactions don't have
-            categories assigned.
-            <br />
-            <span style={{ fontSize: '13px' }}>
-              Edit your transactions and add categories like{' '}
-              <code
-                style={{
-                  background: '#fff',
-                  padding: '2px 6px',
-                  borderRadius: '4px',
-                }}
-              >
-                food-groceries
-              </code>
-              ,{' '}
-              <code
-                style={{
-                  background: '#fff',
-                  padding: '2px 6px',
-                  borderRadius: '4px',
-                }}
-              >
-                home-rent
-              </code>{' '}
-              to see detailed spending breakdown.
-            </span>
-          </div>
-        </div>
-      )}
+      <div
+        style={{
+          display: 'grid',
+          gap: '12px',
+          gridTemplateColumns: '1fr 1fr',
+          marginBottom: '16px',
+        }}
+      >
+        <Select
+          label="From Account"
+          value={fromFilter}
+          onChange={(e) => setFromFilter(e.target.value)}
+          options={accountOptions}
+        />
+        <Select
+          label="To Account"
+          value={toFilter}
+          onChange={(e) => setToFilter(e.target.value)}
+          options={accountOptions}
+        />
+      </div>
 
       {hasFlowData ? (
         <ReactECharts
@@ -301,41 +218,12 @@ export const MoneyFlowChart: React.FC<MoneyFlowChartProps> = ({
             No Money Flow Data Yet
           </h4>
           <p style={{ maxWidth: '500px', lineHeight: '1.6' }}>
-            To see your money flow visualization:
-          </p>
-          <ol
-            style={{ textAlign: 'left', marginTop: '1rem', lineHeight: '1.8' }}
-          >
-            <li>
-              Create accounts: <strong>Income</strong> → <strong>Asset</strong>{' '}
-              → <strong>Expense</strong>
-            </li>
-            <li>
-              Add transaction: Income account → Asset account (e.g., Salary →
-              Checking)
-            </li>
-            <li>
-              Add transaction: Asset account → Any account (e.g., Checking →
-              Expenses)
-            </li>
-            <li>
-              Optional: Add <strong>categories</strong> to transactions for
-              detailed breakdown
-            </li>
-          </ol>
-          <p
-            style={{
-              marginTop: '1rem',
-              fontSize: '0.9rem',
-              fontStyle: 'italic',
-            }}
-          >
-            💡 With categories: shows "Checking → 🛒 Groceries"
-            <br />
-            Without categories: shows "Checking → Expense Account Name"
+            Record transactions between accounts to visualize money movement.
           </p>
         </div>
       )}
     </div>
   )
 }
+
+export default MoneyFlowChart
