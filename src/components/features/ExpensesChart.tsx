@@ -20,10 +20,27 @@ export const ExpensesChart: React.FC<ExpensesChartProps> = ({
   accounts,
 }) => {
   const chartOptions = useMemo(() => {
+    const rootStyles = getComputedStyle(document.documentElement)
+    const getThemeVar = (name: string, fallback: string): string =>
+      rootStyles.getPropertyValue(name).trim() || fallback
+
+    const palette = [
+      getThemeVar('--chart-series-1', '#5b7cfa'),
+      getThemeVar('--chart-series-2', '#7c8cf8'),
+      getThemeVar('--chart-series-3', '#6aa9ff'),
+      getThemeVar('--chart-series-4', '#36b6a8'),
+      getThemeVar('--chart-series-5', '#f59e8b'),
+    ]
+    const tooltipBg = getThemeVar('--chart-tooltip-bg', '#ffffff')
+    const tooltipBorder = getThemeVar('--chart-tooltip-border', '#dbe4f0')
+    const tooltipText = getThemeVar('--chart-tooltip-text', '#1f2937')
+    const legendText = getThemeVar('--text-primary', '#1f2937')
+    const cardBg = getThemeVar('--card-background', '#ffffff')
+
     const accountMap = new Map(accounts.map((a) => [a.id, a]))
     const expensesByCategory = new Map<
       string,
-      { name: string; color: string; amount: number }
+      { name: string; amount: number }
     >()
 
     // Filter for expense transactions and group by category
@@ -33,17 +50,14 @@ export const ExpensesChart: React.FC<ExpensesChartProps> = ({
         // Use transaction category if available, otherwise use account name
         let categoryKey: string
         let categoryName: string
-        let categoryColor: string
 
         if (txn.category) {
           categoryKey = txn.category
           categoryName = categoryService.getCategoryName(txn.category)
-          categoryColor = categoryService.getCategoryColor(txn.category)
         } else {
           // Fall back to expense account name
           categoryKey = `account-${toAcc.id}`
           categoryName = toAcc.name
-          categoryColor = '#ef4444' // Default red for uncategorized
         }
 
         const existing = expensesByCategory.get(categoryKey)
@@ -52,7 +66,6 @@ export const ExpensesChart: React.FC<ExpensesChartProps> = ({
         } else {
           expensesByCategory.set(categoryKey, {
             name: categoryName,
-            color: categoryColor,
             amount: txn.amount,
           })
         }
@@ -61,16 +74,21 @@ export const ExpensesChart: React.FC<ExpensesChartProps> = ({
 
     // Convert to chart data format
     const data = Array.from(expensesByCategory.values())
-      .map(({ name, color, amount }) => ({
+      .map(({ name, amount }, index) => ({
         name,
         value: amount / 100, // Convert to dollars
-        itemStyle: { color },
+        itemStyle: { color: palette[index % palette.length] },
       }))
       .sort((a, b) => b.value - a.value)
 
     return {
       tooltip: {
         trigger: 'item',
+        backgroundColor: tooltipBg,
+        borderColor: tooltipBorder,
+        textStyle: {
+          color: tooltipText,
+        },
         formatter: (params: {
           name?: string
           value?: number
@@ -87,7 +105,7 @@ export const ExpensesChart: React.FC<ExpensesChartProps> = ({
         right: 10,
         top: 'center',
         textStyle: {
-          color: 'var(--text-primary)',
+          color: legendText,
         },
       },
       series: [
@@ -99,7 +117,7 @@ export const ExpensesChart: React.FC<ExpensesChartProps> = ({
           avoidLabelOverlap: false,
           itemStyle: {
             borderRadius: 8,
-            borderColor: 'var(--card-background)',
+            borderColor: cardBg,
             borderWidth: 3,
           },
           label: {
@@ -110,7 +128,7 @@ export const ExpensesChart: React.FC<ExpensesChartProps> = ({
               show: true,
               fontSize: 14,
               fontWeight: 'bold',
-              color: 'var(--text-primary)',
+              color: legendText,
             },
           },
           labelLine: {

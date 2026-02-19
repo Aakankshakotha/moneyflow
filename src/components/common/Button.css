@@ -20,56 +20,57 @@
 
 /* Variants */
 .btn-primary {
-  background-color: #3b82f6;
-  color: white;
+  background-color: var(--primary-color);
+  color: #ffffff;
 }
 
 .btn-primary:hover:not(:disabled) {
-  background-color: #2563eb;
+  background-color: var(--primary-strong);
 }
 
 .btn-primary:active:not(:disabled) {
-  background-color: #1d4ed8;
+  filter: brightness(0.96);
 }
 
 .btn-secondary {
-  background-color: #6b7280;
-  color: white;
+  background-color: var(--button-background);
+  color: var(--text-primary);
+  border: 1px solid var(--border-color);
 }
 
 .btn-secondary:hover:not(:disabled) {
-  background-color: #4b5563;
+  background-color: var(--button-hover-background);
 }
 
 .btn-secondary:active:not(:disabled) {
-  background-color: #374151;
+  filter: brightness(0.98);
 }
 
 .btn-danger {
-  background-color: #ef4444;
-  color: white;
+  background-color: var(--error-color);
+  color: #ffffff;
 }
 
 .btn-danger:hover:not(:disabled) {
-  background-color: #dc2626;
+  filter: brightness(0.94);
 }
 
 .btn-danger:active:not(:disabled) {
-  background-color: #b91c1c;
+  filter: brightness(0.9);
 }
 
 .btn-ghost {
   background-color: transparent;
-  color: #374151;
-  border: 1px solid #d1d5db;
+  color: var(--text-primary);
+  border: 1px solid var(--border-color);
 }
 
 .btn-ghost:hover:not(:disabled) {
-  background-color: #f3f4f6;
+  background-color: var(--hover-background);
 }
 
 .btn-ghost:active:not(:disabled) {
-  background-color: #e5e7eb;
+  background-color: var(--button-hover-background);
 }
 
 /* Sizes */

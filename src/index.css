@@ -8,19 +8,61 @@
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 
-  /* Light theme variables */
-  --text-primary: #1a1a1a;
+  /* Subtle light theme */
+  --text-primary: #1f2937;
   --text-secondary: #6b7280;
-  --background: #ffffff;
+  --text-muted: #9ca3af;
+  --background: #f6f8fb;
   --card-background: #ffffff;
-  --border-color: #e5e7eb;
-  --border-color-light: #f3f4f6;
-  --button-background: #f9fafb;
-  --button-hover-background: #f3f4f6;
-  --hover-background: #f9fafb;
-  --primary-color: #3b82f6;
-  --icon-background: #f3f4f6;
-  --badge-background: #f3f4f6;
+  --background-secondary: #f3f6fb;
+  --border-color: #e5eaf2;
+  --border-color-light: #eef2f7;
+  --border-color-hover: #d7dfeb;
+  --button-background: #eef3fb;
+  --button-hover-background: #e2ebf8;
+  --hover-background: #f3f6fb;
+  --primary-color: #5b7cfa;
+  --primary-strong: #4769ee;
+  --icon-background: #edf2fb;
+  --badge-background: #edf2fb;
+  --input-background: #ffffff;
+  --input-background-focus: #f8fbff;
+  --input-background-disabled: #f3f6fb;
+  --shadow-soft: 0 6px 20px rgba(15, 23, 42, 0.05);
+  --success-color: #16a34a;
+  --success-soft: rgba(22, 163, 74, 0.12);
+  --error-color: #dc2626;
+  --error-soft: rgba(220, 38, 38, 0.12);
+  --warning-color: #d97706;
+  --warning-soft: rgba(217, 119, 6, 0.12);
+  --info-color: #2563eb;
+  --info-soft: rgba(37, 99, 235, 0.12);
+  --chart-grid: #e6edf7;
+  --chart-axis: #94a3b8;
+  --chart-tooltip-bg: #ffffff;
+  --chart-tooltip-border: #dbe4f0;
+  --chart-tooltip-text: #1f2937;
+  --chart-series-1: #5b7cfa;
+  --chart-series-2: #7c8cf8;
+  --chart-series-3: #6aa9ff;
+  --chart-series-4: #36b6a8;
+  --chart-series-5: #f59e8b;
+  --chart-series-income: #3dbb91;
+  --chart-series-expense: #ef7d7d;
+  --chart-series-liability: #f2b36f;
+
+  /* Legacy alias tokens used across older CSS */
+  --color-text-primary: var(--text-primary);
+  --color-text-secondary: var(--text-secondary);
+  --color-bg-secondary: var(--background-secondary);
+  --color-bg-hover: var(--hover-background);
+  --color-border: var(--border-color);
+  --color-border-hover: var(--border-color-hover);
+  --color-card-bg: var(--card-background);
+  --color-primary: var(--primary-color);
+  --color-success: var(--success-color);
+  --color-error: var(--error-color);
+  --color-warning: var(--warning-color);
 
   color-scheme: light;
   color: var(--text-primary);
@@ -30,17 +72,59 @@
 /* Dark theme variables */
 [data-theme='dark'] {
   --text-primary: #e5e7eb;
-  --text-secondary: #9ca3af;
-  --background: #0f0f1e;
-  --card-background: rgba(30, 30, 40, 0.8);
-  --border-color: rgba(255, 255, 255, 0.1);
-  --border-color-light: rgba(255, 255, 255, 0.05);
-  --button-background: rgba(255, 255, 255, 0.05);
-  --button-hover-background: rgba(255, 255, 255, 0.1);
-  --hover-background: rgba(255, 255, 255, 0.03);
-  --primary-color: #60a5fa;
-  --icon-background: rgba(255, 255, 255, 0.05);
-  --badge-background: rgba(255, 255, 255, 0.1);
+  --text-secondary: #a7b1c2;
+  --text-muted: #8692a7;
+  --background: #0f1420;
+  --card-background: #151c2b;
+  --background-secondary: #1a2335;
+  --border-color: #27334a;
+  --border-color-light: #202b40;
+  --border-color-hover: #31425f;
+  --button-background: #1d2840;
+  --button-hover-background: #253454;
+  --hover-background: #1a2539;
+  --primary-color: #88a3ff;
+  --primary-strong: #7896ff;
+  --icon-background: #202d46;
+  --badge-background: #1e2a41;
+  --input-background: #131d30;
+  --input-background-focus: #18243a;
+  --input-background-disabled: #121a2b;
+  --shadow-soft: 0 8px 24px rgba(2, 6, 23, 0.35);
+  --success-color: #4ade80;
+  --success-soft: rgba(74, 222, 128, 0.16);
+  --error-color: #f87171;
+  --error-soft: rgba(248, 113, 113, 0.16);
+  --warning-color: #fbbf24;
+  --warning-soft: rgba(251, 191, 36, 0.16);
+  --info-color: #93c5fd;
+  --info-soft: rgba(147, 197, 253, 0.16);
+  --chart-grid: #24314a;
+  --chart-axis: #8ea0be;
+  --chart-tooltip-bg: #101a2b;
+  --chart-tooltip-border: #31425f;
+  --chart-tooltip-text: #e5e7eb;
+  --chart-series-1: #88a3ff;
+  --chart-series-2: #b090ff;
+  --chart-series-3: #7fc8ff;
+  --chart-series-4: #5fd6c4;
+  --chart-series-5: #f7a990;
+  --chart-series-income: #5fd6a1;
+  --chart-series-expense: #f59a9a;
+  --chart-series-liability: #f3c178;
+
+  /* Legacy alias tokens used across older CSS */
+  --color-text-primary: var(--text-primary);
+  --color-text-secondary: var(--text-secondary);
+  --color-bg-secondary: var(--background-secondary);
+  --color-bg-hover: var(--hover-background);
+  --color-border: var(--border-color);
+  --color-border-hover: var(--border-color-hover);
+  --color-card-bg: var(--card-background);
+  --color-primary: var(--primary-color);
+  --color-success: var(--success-color);
+  --color-error: var(--error-color);
+  --color-warning: var(--warning-color);
 
   color-scheme: dark;
   color: var(--text-primary);
@@ -56,8 +140,8 @@ body {
   background: var(--background);
   color: var(--text-primary);
   transition:
-    background-color 0.3s ease,
-    color 0.3s ease;
+    background-color 0.25s ease,
+    color 0.25s ease;
 }
 
 #root {

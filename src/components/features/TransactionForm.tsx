@@ -9,6 +9,7 @@ import {
 import type { CreateTransactionDto } from '@/types/transaction'
 import type { Account } from '@/types/account'
 import './TransactionForm.css'
+import './TransactionFormFlowPreview.css'
 
 interface TransactionFormProps {
   isOpen: boolean
@@ -30,6 +31,9 @@ const TransactionForm: React.FC<TransactionFormProps> = ({
   defaultFromAccountId,
   defaultToAccountId,
 }) => {
+  const [entryMode, setEntryMode] = useState<'expense' | 'income' | 'transfer'>(
+    'expense'
+  )
   const [primaryAccountId, setPrimaryAccountId] = useState('') // The first account user selects
   const [secondaryAccountId, setSecondaryAccountId] = useState('') // The second account
   const [amount, setAmount] = useState('')
@@ -43,6 +47,7 @@ const TransactionForm: React.FC<TransactionFormProps> = ({
   // Set defaults when dialog opens
   useEffect(() => {
     if (isOpen) {
+      setEntryMode('expense')
       setPrimaryAccountId(defaultFromAccountId || '')
       setSecondaryAccountId(defaultToAccountId || '')
       setAmount('')
@@ -64,17 +69,8 @@ const TransactionForm: React.FC<TransactionFormProps> = ({
     }
   }, [description])
 
-  // Auto-detect entry mode based on primary account type
+  // Get available accounts (active only)
   const activeAccounts = accounts.filter((acc) => acc.status === 'active')
-  const primaryAccount = activeAccounts.find(
-    (acc) => acc.id === primaryAccountId
-  )
-  const entryMode =
-    primaryAccount?.type === 'income'
-      ? 'income'
-      : primaryAccount?.type === 'expense'
-        ? 'expense'
-        : 'transfer'
 
   const handleSubmit = async (e: React.FormEvent): Promise<void> => {
     e.preventDefault()
@@ -188,7 +184,26 @@ const TransactionForm: React.FC<TransactionFormProps> = ({
   const displayAccount =
     entryMode === 'expense'
       ? activeAccounts.find((acc) => acc.id === secondaryAccountId)
-      : primaryAccount
+      : activeAccounts.find((acc) => acc.id === primaryAccountId)
+
+  // Get available accounts for primary selector based on mode
+  const getPrimaryAccounts = (): Account[] => {
+    if (entryMode === 'income') {
+      return activeAccounts.filter((acc) => acc.type === 'income')
+    } else if (entryMode === 'expense') {
+      return activeAccounts.filter((acc) => acc.type === 'expense')
+    } else {
+      return activeAccounts.filter((acc) => acc.type !== 'expense')
+    }
+  }
+
+  const primaryAccounts = getPrimaryAccounts()
+
+  // Reset selections when mode changes
+  useEffect(() => {
+    setPrimaryAccountId('')
+    setSecondaryAccountId('')
+  }, [entryMode])
 
   // Group categories by group
   const groupedCategories = Object.entries(CATEGORY_GROUPS).map(
@@ -202,128 +217,237 @@ const TransactionForm: React.FC<TransactionFormProps> = ({
   )
 
   return (
-    <Modal isOpen={isOpen} onClose={handleClose} title="Record Transaction">
+    <Modal isOpen={isOpen} onClose={handleClose} title="Add Transaction">
       <form onSubmit={handleSubmit} className="transaction-form">
-        <Select
-          label={
-            entryMode === 'income'
-              ? 'Income Account'
-              : entryMode === 'expense'
-                ? 'Expense Account'
-                : 'From Account'
-          }
-          value={primaryAccountId}
-          onChange={(e) => {
-            setPrimaryAccountId(e.target.value)
-            setSecondaryAccountId('') // Reset secondary when primary changes
-          }}
-          options={activeAccounts.map((acc) => ({
-            value: acc.id,
-            label: `${acc.name} (${formatCurrency(acc.balance)})`,
-          }))}
-          required
-          placeholder={!primaryAccountId ? 'Select account' : 'Select account'}
-        />
+        {/* Tab Navigation */}
+        <div className="transaction-form__tabs">
+          <button
+            type="button"
+            className={`transaction-form__tab ${
+              entryMode === 'expense' ? 'active' : ''
+            }`}
+            onClick={() => setEntryMode('expense')}
+          >
+            Expense
+          </button>
+          <button
+            type="button"
+            className={`transaction-form__tab ${
+              entryMode === 'income' ? 'active' : ''
+            }`}
+            onClick={() => setEntryMode('income')}
+          >
+            Income
+          </button>
+          <button
+            type="button"
+            className={`transaction-form__tab ${
+              entryMode === 'transfer' ? 'active' : ''
+            }`}
+            onClick={() => setEntryMode('transfer')}
+          >
+            Transfer
+          </button>
+        </div>
 
-        {displayAccount &&
-          displayAccount.type !== 'income' &&
-          displayAccount.type !== 'expense' && (
-            <div className="transaction-form__balance">
-              Available: {formatCurrency(displayAccount.balance)}
-            </div>
-          )}
+        <div className="transaction-form__content">
+          {/* Flow Preview */}
+          {primaryAccountId &&
+            secondaryAccountId &&
+            amount &&
+            parseFloat(amount) > 0 && (
+              <div className={`transaction-form__flow-preview ${entryMode}`}>
+                <div className="transaction-form__flow-preview-title">
+                  Flow Preview
+                </div>
+                <div className="transaction-form__flow-diagram">
+                  <div className="transaction-form__flow-account">
+                    <div className="transaction-form__flow-account-type">
+                      {entryMode === 'expense'
+                        ? 'From Asset'
+                        : entryMode === 'income'
+                          ? 'From Income'
+                          : 'From'}
+                    </div>
+                    <div className="transaction-form__flow-account-name">
+                      {entryMode === 'expense'
+                        ? secondaryConfig.accounts.find(
+                            (a) => a.id === secondaryAccountId
+                          )?.name || 'Asset'
+                        : primaryAccounts.find((a) => a.id === primaryAccountId)
+                            ?.name || 'Account'}
+                    </div>
+                    <div className="transaction-form__flow-account-balance">
+                      {formatCurrency(
+                        entryMode === 'expense'
+                          ? secondaryConfig.accounts.find(
+                              (a) => a.id === secondaryAccountId
+                            )?.balance || 0
+                          : primaryAccounts.find(
+                              (a) => a.id === primaryAccountId
+                            )?.balance || 0
+                      )}
+                    </div>
+                  </div>
+                  <div className="transaction-form__flow-arrow">
+                    <div className="transaction-form__flow-arrow-icon">→</div>
+                    <div className="transaction-form__flow-arrow-amount">
+                      {formatCurrency(Math.round(parseFloat(amount) * 100))}
+                    </div>
+                  </div>
+                  <div className="transaction-form__flow-account">
+                    <div className="transaction-form__flow-account-type">
+                      {entryMode === 'expense'
+                        ? 'To Expense'
+                        : entryMode === 'income'
+                          ? 'To Asset'
+                          : 'To'}
+                    </div>
+                    <div className="transaction-form__flow-account-name">
+                      {entryMode === 'expense'
+                        ? primaryAccounts.find((a) => a.id === primaryAccountId)
+                            ?.name || 'Expense'
+                        : secondaryConfig.accounts.find(
+                            (a) => a.id === secondaryAccountId
+                          )?.name || 'Account'}
+                    </div>
+                    <div className="transaction-form__flow-account-balance">
+                      {formatCurrency(
+                        entryMode === 'expense'
+                          ? primaryAccounts.find(
+                              (a) => a.id === primaryAccountId
+                            )?.balance || 0
+                          : secondaryConfig.accounts.find(
+                              (a) => a.id === secondaryAccountId
+                            )?.balance || 0
+                      )}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
 
-        {primaryAccountId && (
           <Select
-            label={secondaryConfig.label}
-            value={secondaryAccountId}
-            onChange={(e) => setSecondaryAccountId(e.target.value)}
-            options={secondaryConfig.accounts.map((acc) => ({
+            label={
+              entryMode === 'income'
+                ? 'Income Account'
+                : entryMode === 'expense'
+                  ? 'Expense Account'
+                  : 'From Account'
+            }
+            value={primaryAccountId}
+            onChange={(e) => {
+              setPrimaryAccountId(e.target.value)
+              setSecondaryAccountId('') // Reset secondary when primary changes
+            }}
+            options={primaryAccounts.map((acc) => ({
               value: acc.id,
               label: `${acc.name} (${formatCurrency(acc.balance)})`,
             }))}
             required
-            placeholder={secondaryConfig.helperText}
+            placeholder="Select account"
           />
-        )}
 
-        <Input
-          label="Amount"
-          type="text"
-          value={amount}
-          onChange={handleAmountChange}
-          placeholder="0.00"
-          required
-          helperText="Enter amount in dollars (e.g., 25.50)"
-        />
+          {displayAccount &&
+            displayAccount.type !== 'income' &&
+            displayAccount.type !== 'expense' && (
+              <div className="transaction-form__balance">
+                Available: {formatCurrency(displayAccount.balance)}
+              </div>
+            )}
 
-        <Input
-          label="Description"
-          type="text"
-          value={description}
-          onChange={(e) => setDescription(e.target.value)}
-          placeholder="What is this transaction for?"
-          required
-        />
+          {primaryAccountId && (
+            <Select
+              label={secondaryConfig.label}
+              value={secondaryAccountId}
+              onChange={(e) => setSecondaryAccountId(e.target.value)}
+              options={secondaryConfig.accounts.map((acc) => ({
+                value: acc.id,
+                label: `${acc.name} (${formatCurrency(acc.balance)})`,
+              }))}
+              required
+              placeholder={secondaryConfig.helperText}
+            />
+          )}
 
-        {suggestedCategories.length > 0 && (
-          <div className="transaction-form__suggestions">
-            <label className="transaction-form__suggestions-label">
-              Suggested:
-            </label>
-            <div className="transaction-form__suggestions-list">
-              {suggestedCategories.slice(0, 3).map((catId) => {
-                const cat = TRANSACTION_CATEGORIES.find((c) => c.id === catId)
-                if (!cat) return null
-                return (
-                  <button
-                    key={catId}
-                    type="button"
-                    className={`transaction-form__suggestion ${category === catId ? 'active' : ''}`}
-                    onClick={() => setCategory(catId)}
-                    style={{
-                      backgroundColor:
-                        category === catId ? cat.color : `${cat.color}20`,
-                      color: category === catId ? '#fff' : cat.color,
-                    }}
-                  >
-                    {cat.name}
-                  </button>
-                )
-              })}
+          <Input
+            label="Amount"
+            type="text"
+            value={amount}
+            onChange={handleAmountChange}
+            placeholder="0.00"
+            required
+            helperText="Enter amount in dollars (e.g., 25.50)"
+          />
+
+          <Input
+            label="Description"
+            type="text"
+            value={description}
+            onChange={(e) => setDescription(e.target.value)}
+            placeholder="What is this transaction for?"
+            required
+          />
+
+          {suggestedCategories.length > 0 && (
+            <div className="transaction-form__suggestions">
+              <label className="transaction-form__suggestions-label">
+                Suggested:
+              </label>
+              <div className="transaction-form__suggestions-list">
+                {suggestedCategories.slice(0, 3).map((catId) => {
+                  const cat = TRANSACTION_CATEGORIES.find((c) => c.id === catId)
+                  if (!cat) return null
+                  return (
+                    <button
+                      key={catId}
+                      type="button"
+                      className={`transaction-form__suggestion ${category === catId ? 'active' : ''}`}
+                      onClick={() => setCategory(catId)}
+                      style={{
+                        backgroundColor:
+                          category === catId ? cat.color : `${cat.color}20`,
+                        color: category === catId ? '#fff' : cat.color,
+                      }}
+                    >
+                      {cat.name}
+                    </button>
+                  )
+                })}
+              </div>
             </div>
+          )}
+
+          <div className="transaction-form__category-select">
+            <Select
+              label="Category (Optional)"
+              value={category}
+              onChange={(e) => setCategory(e.target.value)}
+              options={groupedCategories.flatMap((group) => [
+                {
+                  value: `__group_${group.group}`,
+                  label: group.label,
+                  disabled: true,
+                },
+                ...group.categories.map((cat) => ({
+                  value: cat.id,
+                  label: `  ${cat.name}`,
+                })),
+              ])}
+              placeholder="Select a category"
+            />
           </div>
-        )}
 
-        <div className="transaction-form__category-select">
-          <Select
-            label="Category (Optional)"
-            value={category}
-            onChange={(e) => setCategory(e.target.value)}
-            options={groupedCategories.flatMap((group) => [
-              {
-                value: `__group_${group.group}`,
-                label: group.label,
-                disabled: true,
-              },
-              ...group.categories.map((cat) => ({
-                value: cat.id,
-                label: `  ${cat.name}`,
-              })),
-            ])}
-            placeholder="Select a category"
+          <Input
+            label="Date"
+            type="date"
+            value={date}
+            onChange={(e) => setDate(e.target.value)}
+            required
           />
+
+          {error && <div className="transaction-form__error">{error}</div>}
         </div>
-
-        <Input
-          label="Date"
-          type="date"
-          value={date}
-          onChange={(e) => setDate(e.target.value)}
-          required
-        />
-
-        {error && <div className="transaction-form__error">{error}</div>}
 
         <div className="transaction-form__actions">
           <Button

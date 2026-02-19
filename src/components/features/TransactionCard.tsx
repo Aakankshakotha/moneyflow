@@ -28,6 +28,30 @@ const TransactionCard: React.FC<TransactionCardProps> = ({
     ? getCategoryById(transaction.category)
     : null
 
+  // Determine transaction type
+  const getTransactionType = (): 'income' | 'expense' | 'transfer' => {
+    if (
+      transaction.fromAccount.type === 'income' &&
+      transaction.toAccount.type === 'asset'
+    ) {
+      return 'income'
+    }
+    if (
+      transaction.fromAccount.type === 'asset' &&
+      transaction.toAccount.type === 'expense'
+    ) {
+      return 'expense'
+    }
+    return 'transfer'
+  }
+
+  const transactionType = getTransactionType()
+  const typeLabels = {
+    income: 'INCOME',
+    expense: 'EXPENSE',
+    transfer: 'TRANSFER',
+  }
+
   return (
     <Card className="transaction-card">
       <div className="transaction-card__main">
@@ -50,6 +74,11 @@ const TransactionCard: React.FC<TransactionCardProps> = ({
         </div>
 
         <div className="transaction-card__right">
+          <span
+            className={`transaction-card__type transaction-card__type--${transactionType}`}
+          >
+            {typeLabels[transactionType]}
+          </span>
           {category && (
             <span
               className="transaction-card__category"

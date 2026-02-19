@@ -1,0 +1,96 @@
+.transaction-metrics {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.transaction-metrics__card {
+  background: var(--card-background);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  padding: 1.5rem;
+  position: relative;
+  overflow: hidden;
+}
+
+.transaction-metrics__card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 4px;
+  height: 100%;
+  background: var(--accent-color);
+}
+
+.transaction-metrics__card--income::before {
+  background: var(--success-color);
+}
+
+.transaction-metrics__card--expenses::before {
+  background: var(--error-color);
+}
+
+.transaction-metrics__header {
+  margin-bottom: 0.5rem;
+}
+
+.transaction-metrics__label {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.transaction-metrics__value {
+  font-size: 2rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0.5rem 0;
+  line-height: 1;
+}
+
+.transaction-metrics__card--income .transaction-metrics__value {
+  color: var(--success-color);
+}
+
+.transaction-metrics__card--expenses .transaction-metrics__value {
+  color: var(--error-color);
+}
+
+.transaction-metrics__footer {
+  margin-top: 0.75rem;
+  font-size: 0.875rem;
+}
+
+.transaction-metrics__trend {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  font-weight: 500;
+}
+
+.transaction-metrics__trend--up {
+  color: var(--success-color);
+}
+
+.transaction-metrics__trend--down {
+  color: var(--error-color);
+}
+
+.transaction-metrics__trend--neutral {
+  color: var(--text-secondary);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .transaction-metrics {
+    grid-template-columns: 1fr;
+  }
+
+  .transaction-metrics__value {
+    font-size: 1.75rem;
+  }
+}

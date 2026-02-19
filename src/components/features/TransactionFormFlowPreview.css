@@ -1,0 +1,95 @@
+.transaction-form__flow-preview {
+  background: var(--card-background);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  padding: 1rem;
+  margin: 0.5rem 0;
+}
+
+.transaction-form__flow-preview-title {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 0.75rem;
+}
+
+.transaction-form__flow-diagram {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.transaction-form__flow-account {
+  flex: 1;
+  padding: 0.75rem;
+  background: var(--background-secondary, #f9fafb);
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  text-align: center;
+}
+
+.transaction-form__flow-account-type {
+  font-size: 0.625rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 0.25rem;
+}
+
+.transaction-form__flow-account-name {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 0.25rem;
+}
+
+.transaction-form__flow-account-balance {
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+}
+
+.transaction-form__flow-arrow {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  color: var(--text-secondary);
+  flex-shrink: 0;
+}
+
+.transaction-form__flow-arrow-icon {
+  font-size: 1.5rem;
+}
+
+.transaction-form__flow-arrow-amount {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--color-primary, #2563eb);
+  margin-top: 0.25rem;
+}
+
+/* Type-specific colors */
+.transaction-form__flow-preview.income .transaction-form__flow-arrow-icon {
+  color: #10b981;
+}
+
+.transaction-form__flow-preview.expense .transaction-form__flow-arrow-icon {
+  color: #ef4444;
+}
+
+.transaction-form__flow-preview.transfer .transaction-form__flow-arrow-icon {
+  color: #3b82f6;
+}
+
+@media (max-width: 640px) {
+  .transaction-form__flow-diagram {
+    flex-direction: column;
+  }
+
+  .transaction-form__flow-arrow {
+    transform: rotate(90deg);
+  }
+}

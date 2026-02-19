@@ -1,37 +1,36 @@
 /* Card Container */
 .card {
-  background-color: var(--color-card-bg, #ffffff);
-  border: 1px solid var(--color-border, #e5e7eb);
+  background-color: var(--color-card-bg);
+  border: 1px solid var(--color-border);
   border-radius: 0.5rem;
   overflow: hidden;
   transition: all 0.2s ease;
+  box-shadow: var(--shadow-soft);
 }
 
 .card-hoverable:hover {
-  box-shadow:
-    0 4px 6px -1px rgba(0, 0, 0, 0.1),
-    0 2px 4px -1px rgba(0, 0, 0, 0.06);
-  border-color: var(--color-border-hover, #cbd5e1);
+  box-shadow: 0 10px 30px rgba(15, 23, 42, 0.12);
+  border-color: var(--color-border-hover);
 }
 
 /* Card Header */
 .card-header {
   padding: 1rem 1.5rem;
-  border-bottom: 1px solid var(--color-border, #e5e7eb);
+  border-bottom: 1px solid var(--color-border);
 }
 
 .card-title {
   margin: 0;
   font-size: 1.125rem;
   font-weight: 600;
-  color: var(--color-text-primary, #1a1a1a);
+  color: var(--color-text-primary);
   line-height: 1.75rem;
 }
 
 .card-subtitle {
   margin: 0.25rem 0 0 0;
   font-size: 0.875rem;
-  color: var(--color-text-secondary, #6b7280);
+  color: var(--color-text-secondary);
   line-height: 1.25rem;
 }
 
@@ -47,6 +46,6 @@
 /* Card Footer */
 .card-footer {
   padding: 1rem 1.5rem;
-  background-color: var(--color-bg-secondary, #f9fafb);
-  border-top: 1px solid var(--color-border, rgba(255, 255, 255, 0.1));
+  background-color: var(--color-bg-secondary);
+  border-top: 1px solid var(--color-border);
 }

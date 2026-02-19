@@ -89,6 +89,49 @@
   white-space: nowrap;
 }
 
+.transaction-card__type {
+  font-size: 0.625rem;
+  padding: 0.25rem 0.5rem;
+  border-radius: 0.25rem;
+  font-weight: 600;
+  white-space: nowrap;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.transaction-card__type--income {
+  background-color: #d1fae5;
+  color: #065f46;
+}
+
+.transaction-card__type--expense {
+  background-color: #fee2e2;
+  color: #991b1b;
+}
+
+.transaction-card__type--transfer {
+  background-color: #dbeafe;
+  color: #1e40af;
+}
+
+/* Dark mode */
+@media (prefers-color-scheme: dark) {
+  .transaction-card__type--income {
+    background-color: #065f46;
+    color: #d1fae5;
+  }
+
+  .transaction-card__type--expense {
+    background-color: #991b1b;
+    color: #fee2e2;
+  }
+
+  .transaction-card__type--transfer {
+    background-color: #1e40af;
+    color: #dbeafe;
+  }
+}
+
 .transaction-card__delete {
   background: none;
   border: none;

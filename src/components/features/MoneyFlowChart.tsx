@@ -4,7 +4,6 @@ import type { Transaction } from '@/types/transaction'
 import type { Account } from '@/types/account'
 import { Select } from '@/components/common'
 import { formatCurrency } from '@/utils/currencyUtils'
-import { useTheme } from '@/contexts/ThemeContext'
 import './MoneyFlowChart.css'
 
 interface MoneyFlowChartProps {
@@ -12,11 +11,16 @@ interface MoneyFlowChartProps {
   accounts: Account[]
 }
 
-const getAccountColor = (accountType: Account['type']): string => {
-  if (accountType === 'income') return '#10b981'
-  if (accountType === 'asset') return '#3b82f6'
-  if (accountType === 'expense') return '#ef4444'
-  return '#f59e0b'
+const getAccountColor = (
+  accountType: Account['type'],
+  getThemeVar: (name: string, fallback: string) => string
+): string => {
+  if (accountType === 'income')
+    return getThemeVar('--chart-series-income', '#5fd6a1')
+  if (accountType === 'asset') return getThemeVar('--chart-series-1', '#88a3ff')
+  if (accountType === 'expense')
+    return getThemeVar('--chart-series-expense', '#f59a9a')
+  return getThemeVar('--chart-series-liability', '#f3c178')
 }
 
 /**
@@ -27,7 +31,6 @@ export const MoneyFlowChart: React.FC<MoneyFlowChartProps> = ({
   transactions,
   accounts,
 }) => {
-  const { theme } = useTheme()
   const [fromFilter, setFromFilter] = useState('all')
   const [toFilter, setToFilter] = useState('all')
 
@@ -51,6 +54,15 @@ export const MoneyFlowChart: React.FC<MoneyFlowChartProps> = ({
   )
 
   const chartOptions = useMemo(() => {
+    const rootStyles = getComputedStyle(document.documentElement)
+    const getThemeVar = (name: string, fallback: string): string =>
+      rootStyles.getPropertyValue(name).trim() || fallback
+
+    const tooltipBg = getThemeVar('--chart-tooltip-bg', '#101a2b')
+    const tooltipBorder = getThemeVar('--chart-tooltip-border', '#31425f')
+    const tooltipText = getThemeVar('--chart-tooltip-text', '#e5e7eb')
+    const labelColor = getThemeVar('--text-primary', '#e5e7eb')
+
     const flowMap = new Map<string, number>()
     const nodeMap = new Map<
       string,
@@ -68,8 +80,8 @@ export const MoneyFlowChart: React.FC<MoneyFlowChartProps> = ({
       const toAccount = accountMap.get(txn.toAccountId)
       if (!fromAccount || !toAccount) return
 
-      addNode(fromAccount.name, getAccountColor(fromAccount.type))
-      addNode(toAccount.name, getAccountColor(toAccount.type))
+      addNode(fromAccount.name, getAccountColor(fromAccount.type, getThemeVar))
+      addNode(toAccount.name, getAccountColor(toAccount.type, getThemeVar))
 
       const flowKey = `${fromAccount.name}->${toAccount.name}`
       flowMap.set(flowKey, (flowMap.get(flowKey) || 0) + txn.amount)
@@ -91,10 +103,10 @@ export const MoneyFlowChart: React.FC<MoneyFlowChartProps> = ({
       backgroundColor: 'transparent',
       tooltip: {
         trigger: 'item',
-        backgroundColor: 'rgba(0, 0, 0, 0.8)',
-        borderColor: '#333',
+        backgroundColor: tooltipBg,
+        borderColor: tooltipBorder,
         textStyle: {
-          color: '#fff',
+          color: tooltipText,
         },
         formatter: (params: {
           dataType?: string
@@ -127,11 +139,11 @@ export const MoneyFlowChart: React.FC<MoneyFlowChartProps> = ({
           lineStyle: {
             color: 'gradient',
             curveness: 0.5,
-            opacity: 0.25,
+            opacity: 0.18,
           },
           label: {
             show: true,
-            color: theme === 'dark' ? '#f3f4f6' : '#1f2937',
+            color: labelColor,
             fontSize: 14,
             fontWeight: 600,
             position: 'right',
@@ -141,7 +153,7 @@ export const MoneyFlowChart: React.FC<MoneyFlowChartProps> = ({
         },
       ],
     }
-  }, [filteredTransactions, accountMap, theme])
+  }, [filteredTransactions, accountMap])
 
   const hasFlowData = filteredTransactions.some((txn) => {
     const fromAccount = accountMap.get(txn.fromAccountId)

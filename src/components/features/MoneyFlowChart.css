@@ -3,6 +3,7 @@
   border: 1px solid var(--border-color);
   border-radius: 12px;
   padding: 20px;
+  box-shadow: var(--shadow-soft);
 }
 
 .money-flow-chart__header {
@@ -27,10 +28,4 @@
   font-size: 0.875rem;
   color: var(--text-secondary);
   margin: 0;
-}
-
-/* Dark theme */
-[data-theme='dark'] .money-flow-chart {
-  background: rgba(30, 30, 40, 0.8);
-  border-color: rgba(255, 255, 255, 0.1);
 }
