@@ -118,7 +118,7 @@ const AccountCard: React.FC<AccountCardProps> = ({
           )}
           {onToggleStatus && (
             <button
-              className="account-card__button account-card__button--edit"
+              className="account-card__button account-card__button--archive"
               onClick={() => onToggleStatus(account)}
             >
               {account.status === 'active' ? 'Archive' : 'Unarchive'}

@@ -72,13 +72,34 @@ export async function createSnapshot(): Promise<
     return calculationResult
   }
 
+  const today = formatDate(new Date(), 'yyyy-MM-dd')
+  const historyResult = await getNetWorthHistory({
+    startDate: today,
+    endDate: today,
+  })
+
+  if (!historyResult.success) {
+    return {
+      success: false,
+      error: {
+        code: 'STORAGE_ERROR',
+        message: 'Failed to load existing snapshots',
+        details: historyResult.error.message,
+      },
+    }
+  }
+
+  const existingTodaySnapshot = historyResult.data.find(
+    (item) => item.date === today
+  )
+
   const snapshot: NetWorthSnapshot = {
-    id: crypto.randomUUID(),
-    date: formatDate(new Date(), 'yyyy-MM-dd'),
+    id: existingTodaySnapshot?.id ?? crypto.randomUUID(),
+    date: today,
     totalAssets: calculationResult.data.totalAssets,
     totalLiabilities: calculationResult.data.totalLiabilities,
     netWorth: calculationResult.data.netWorth,
-    createdAt: new Date().toISOString(),
+    createdAt: existingTodaySnapshot?.createdAt ?? new Date().toISOString(),
   }
 
   const saveResult = await storageService.saveNetWorthSnapshot(snapshot)
@@ -132,8 +153,20 @@ export async function getNetWorthHistory(
     })
   }
 
+  const snapshotsByDate = new Map<string, NetWorthSnapshot>()
+
+  snapshots.forEach((snapshot) => {
+    const existing = snapshotsByDate.get(snapshot.date)
+
+    if (!existing || snapshot.createdAt > existing.createdAt) {
+      snapshotsByDate.set(snapshot.date, snapshot)
+    }
+  })
+
   // Sort by date ascending
-  const sorted = [...snapshots].sort((a, b) => a.date.localeCompare(b.date))
+  const sorted = [...snapshotsByDate.values()].sort((a, b) =>
+    a.date.localeCompare(b.date)
+  )
 
   return {
     success: true,

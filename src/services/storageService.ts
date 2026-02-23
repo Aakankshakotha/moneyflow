@@ -557,15 +557,13 @@ export class StorageService {
       const snapshotsResult = await this.getNetWorthSnapshots()
       const snapshots = snapshotsResult.success ? snapshotsResult.data : []
 
-      // Update or add snapshot (keyed by id)
-      const existingIndex = snapshots.findIndex((s) => s.id === snapshot.id)
-      if (existingIndex >= 0) {
-        snapshots[existingIndex] = snapshot
-      } else {
-        snapshots.push(snapshot)
-      }
+      // Keep exactly one snapshot per date, replacing any prior same-date record
+      const normalized = snapshots.filter(
+        (item) => item.date !== snapshot.date && item.id !== snapshot.id
+      )
+      normalized.push(snapshot)
 
-      this.setContainer(STORAGE_KEYS.NET_WORTH, snapshots)
+      this.setContainer(STORAGE_KEYS.NET_WORTH, normalized)
 
       return { success: true, data: snapshot }
     } catch (error) {

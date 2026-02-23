@@ -1,7 +1,11 @@
 import type { ReactNode } from 'react'
-import { useEffect, useId, useRef } from 'react'
-import { createPortal } from 'react-dom'
-import './Modal.css'
+import { useId } from 'react'
+import Dialog from '@mui/material/Dialog'
+import DialogTitle from '@mui/material/DialogTitle'
+import DialogContent from '@mui/material/DialogContent'
+import DialogActions from '@mui/material/DialogActions'
+import IconButton from '@mui/material/IconButton'
+import CloseIcon from '@mui/icons-material/Close'
 
 export interface ModalProps {
   isOpen: boolean
@@ -27,109 +31,56 @@ export function Modal({
   className = '',
 }: ModalProps) {
   const titleId = useId()
-  const modalRef = useRef<HTMLDivElement>(null)
-
-  // Handle escape key
-  useEffect(() => {
-    if (!isOpen || !closeOnEscape) return
-
-    const handleEscape = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') {
-        onClose()
-      }
-    }
-
-    document.addEventListener('keydown', handleEscape)
-    return () => document.removeEventListener('keydown', handleEscape)
-  }, [isOpen, onClose, closeOnEscape])
-
-  // Lock body scroll when modal is open
-  useEffect(() => {
-    if (isOpen) {
-      document.body.style.overflow = 'hidden'
-      return () => {
-        document.body.style.overflow = ''
-      }
-    }
-  }, [isOpen])
-
-  // Focus trap
-  useEffect(() => {
-    if (!isOpen || !modalRef.current) return
-
-    const modal = modalRef.current
-    const focusableElements = modal.querySelectorAll<HTMLElement>(
-      'button, [href], input, select, textarea, [tabindex]:not([tabindex=\"-1\"])'
-    )
-
-    const firstElement = focusableElements[0]
-    const lastElement = focusableElements[focusableElements.length - 1]
-
-    if (firstElement) {
-      firstElement.focus()
-    }
-
-    const handleTabKey = (e: KeyboardEvent) => {
-      if (e.key !== 'Tab') return
-
-      if (e.shiftKey) {
-        if (document.activeElement === firstElement) {
-          e.preventDefault()
-          lastElement?.focus()
-        }
-      } else {
-        if (document.activeElement === lastElement) {
-          e.preventDefault()
-          firstElement?.focus()
-        }
-      }
-    }
-
-    modal.addEventListener('keydown', handleTabKey as EventListener)
-    return () =>
-      modal.removeEventListener('keydown', handleTabKey as EventListener)
-  }, [isOpen])
-
-  if (!isOpen) return null
-
-  const handleBackdropClick = (e: React.MouseEvent<HTMLDivElement>) => {
-    if (e.target === e.currentTarget && closeOnBackdropClick) {
-      onClose()
-    }
-  }
 
   const modalClasses = ['modal-content', `modal-${size}`, className]
     .filter(Boolean)
     .join(' ')
 
-  const modal = (
-    <div className="modal-backdrop" onClick={handleBackdropClick}>
-      <div
-        ref={modalRef}
-        className={modalClasses}
-        role="dialog"
-        aria-modal="true"
-        aria-labelledby={titleId}
-        onClick={(e) => e.stopPropagation()}
-      >
-        <div className="modal-header">
-          <h2 id={titleId} className="modal-title">
-            {title}
-          </h2>
-          <button
-            type="button"
-            className="modal-close"
-            onClick={onClose}
-            aria-label="Close modal"
-          >
-            ×
-          </button>
-        </div>
-        <div className="modal-body">{children}</div>
-        {footer && <div className="modal-footer">{footer}</div>}
-      </div>
-    </div>
-  )
+  const maxWidth = size === 'sm' ? 'sm' : size === 'lg' ? 'lg' : 'md'
 
-  return createPortal(modal, document.body)
+  const handleDialogClose = (
+    _event: object,
+    reason: 'backdropClick' | 'escapeKeyDown'
+  ): void => {
+    if (reason === 'backdropClick' && !closeOnBackdropClick) return
+    if (reason === 'escapeKeyDown' && !closeOnEscape) return
+    onClose()
+  }
+
+  return (
+    <Dialog
+      open={isOpen}
+      onClose={handleDialogClose}
+      aria-labelledby={titleId}
+      maxWidth={maxWidth}
+      fullWidth
+      disableEscapeKeyDown={!closeOnEscape}
+      slotProps={{ backdrop: { className: 'modal-backdrop' } }}
+      PaperProps={{
+        className: modalClasses,
+        sx: {
+          borderRadius: 2,
+          border: '1px solid var(--border-color)',
+          backgroundColor: 'var(--card-background)',
+        },
+      }}
+    >
+      <DialogTitle id={titleId} className="modal-header" sx={{ pr: 6 }}>
+        <span className="modal-title">{title}</span>
+        <IconButton
+          type="button"
+          className="modal-close"
+          onClick={onClose}
+          aria-label="Close modal"
+          sx={{ position: 'absolute', right: 10, top: 10 }}
+        >
+          <CloseIcon fontSize="small" />
+        </IconButton>
+      </DialogTitle>
+      <DialogContent className="modal-body">{children}</DialogContent>
+      {footer && (
+        <DialogActions className="modal-footer">{footer}</DialogActions>
+      )}
+    </Dialog>
+  )
 }

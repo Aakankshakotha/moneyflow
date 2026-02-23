@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import {
-  NetWorthChart,
+  CashFlowTrendChart,
   MoneyFlowChart,
   ExpensesChart,
   RecentTransactionsTable,
@@ -9,7 +9,7 @@ import { MetricCard } from '@/components/common'
 import * as netWorthService from '@/services/netWorthService'
 import * as accountService from '@/services/accountService'
 import * as transactionService from '@/services/transactionService'
-import type { NetWorthCalculation, NetWorthSnapshot } from '@/types/netWorth'
+import type { NetWorthCalculation } from '@/types/netWorth'
 import type { Account } from '@/types/account'
 import type { TransactionWithAccounts } from '@/types/transaction'
 import './Dashboard.css'
@@ -21,7 +21,6 @@ const Dashboard: React.FC = () => {
   const [calculation, setCalculation] = useState<NetWorthCalculation | null>(
     null
   )
-  const [snapshots, setSnapshots] = useState<NetWorthSnapshot[]>([])
   const [accounts, setAccounts] = useState<Account[]>([])
   const [transactions, setTransactions] = useState<TransactionWithAccounts[]>(
     []
@@ -39,20 +38,15 @@ const Dashboard: React.FC = () => {
 
     try {
       // Load all dashboard data in parallel
-      const [calcResult, historyResult, accountsResult, transactionsResult] =
+      const [calcResult, accountsResult, transactionsResult] =
         await Promise.all([
           netWorthService.calculateNetWorth(),
-          netWorthService.getNetWorthHistory(),
           accountService.listAccounts(),
           transactionService.listTransactions(),
         ])
 
       if (calcResult.success) {
         setCalculation(calcResult.data)
-      }
-
-      if (historyResult.success) {
-        setSnapshots(historyResult.data)
       }
 
       if (accountsResult.success) {
@@ -198,9 +192,9 @@ const Dashboard: React.FC = () => {
         </div>
       </div>
 
-      {/* Net Worth History */}
+      {/* Income vs Expenses Trend */}
       <div className="dashboard-page__section">
-        <NetWorthChart snapshots={snapshots} loading={loading} />
+        <CashFlowTrendChart transactions={transactions} accounts={accounts} />
       </div>
 
       {/* Recent Transactions */}

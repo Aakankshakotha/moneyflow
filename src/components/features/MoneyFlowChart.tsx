@@ -2,7 +2,10 @@ import React, { useMemo, useState } from 'react'
 import ReactECharts from 'echarts-for-react'
 import type { Transaction } from '@/types/transaction'
 import type { Account } from '@/types/account'
-import { Select } from '@/components/common'
+import FormControl from '@mui/material/FormControl'
+import InputLabel from '@mui/material/InputLabel'
+import Select from '@mui/material/Select'
+import MenuItem from '@mui/material/MenuItem'
 import { formatCurrency } from '@/utils/currencyUtils'
 import './MoneyFlowChart.css'
 
@@ -11,16 +14,24 @@ interface MoneyFlowChartProps {
   accounts: Account[]
 }
 
-const getAccountColor = (
+const getNodeColor = (
   accountType: Account['type'],
+  paletteIndex: number,
+  palette: string[],
   getThemeVar: (name: string, fallback: string) => string
 ): string => {
-  if (accountType === 'income')
-    return getThemeVar('--chart-series-income', '#5fd6a1')
-  if (accountType === 'asset') return getThemeVar('--chart-series-1', '#88a3ff')
-  if (accountType === 'expense')
-    return getThemeVar('--chart-series-expense', '#f59a9a')
-  return getThemeVar('--chart-series-liability', '#f3c178')
+  const semanticColor =
+    accountType === 'income'
+      ? getThemeVar('--chart-series-income', '#4ade80')
+      : accountType === 'expense'
+        ? getThemeVar('--chart-series-expense', '#f87171')
+        : accountType === 'liability'
+          ? getThemeVar('--chart-series-liability', '#fdba74')
+          : getThemeVar('--chart-series-1', '#fb923c')
+
+  const paletteColor = palette[paletteIndex % palette.length]
+
+  return paletteColor || semanticColor
 }
 
 /**
@@ -62,6 +73,18 @@ export const MoneyFlowChart: React.FC<MoneyFlowChartProps> = ({
     const tooltipBorder = getThemeVar('--chart-tooltip-border', '#31425f')
     const tooltipText = getThemeVar('--chart-tooltip-text', '#e5e7eb')
     const labelColor = getThemeVar('--text-primary', '#e5e7eb')
+    const nodePalette = [
+      '#14d3b2',
+      '#8b5cf6',
+      '#f59e0b',
+      '#ff5a3c',
+      '#ff2f7d',
+      '#6366f1',
+      '#2ec4b6',
+      '#3b82f6',
+      getThemeVar('--chart-series-1', '#fb923c'),
+      getThemeVar('--chart-series-2', '#f97316'),
+    ]
 
     const flowMap = new Map<string, number>()
     const nodeMap = new Map<
@@ -69,9 +92,15 @@ export const MoneyFlowChart: React.FC<MoneyFlowChartProps> = ({
       { name: string; itemStyle: { color: string } }
     >()
 
-    const addNode = (name: string, color: string): void => {
+    const addNode = (name: string, accountType: Account['type']): void => {
       if (!nodeMap.has(name)) {
-        nodeMap.set(name, { name, itemStyle: { color } })
+        const nextColor = getNodeColor(
+          accountType,
+          nodeMap.size,
+          nodePalette,
+          getThemeVar
+        )
+        nodeMap.set(name, { name, itemStyle: { color: nextColor } })
       }
     }
 
@@ -80,8 +109,8 @@ export const MoneyFlowChart: React.FC<MoneyFlowChartProps> = ({
       const toAccount = accountMap.get(txn.toAccountId)
       if (!fromAccount || !toAccount) return
 
-      addNode(fromAccount.name, getAccountColor(fromAccount.type, getThemeVar))
-      addNode(toAccount.name, getAccountColor(toAccount.type, getThemeVar))
+      addNode(fromAccount.name, fromAccount.type)
+      addNode(toAccount.name, toAccount.type)
 
       const flowKey = `${fromAccount.name}->${toAccount.name}`
       flowMap.set(flowKey, (flowMap.get(flowKey) || 0) + txn.amount)
@@ -139,7 +168,7 @@ export const MoneyFlowChart: React.FC<MoneyFlowChartProps> = ({
           lineStyle: {
             color: 'gradient',
             curveness: 0.5,
-            opacity: 0.18,
+            opacity: 0.14,
           },
           label: {
             show: true,
@@ -173,67 +202,91 @@ export const MoneyFlowChart: React.FC<MoneyFlowChartProps> = ({
 
   return (
     <div className="money-flow-chart">
-      <div className="money-flow-chart__header">
-        <h3 className="money-flow-chart__title">
-          <span className="money-flow-chart__icon">🔄</span>
-          Money Flow
-        </h3>
-        <p className="money-flow-chart__subtitle">
-          Account-to-account money movement
-        </p>
-      </div>
-
-      <div
-        style={{
-          display: 'grid',
-          gap: '12px',
-          gridTemplateColumns: '1fr 1fr',
-          marginBottom: '16px',
-        }}
-      >
-        <Select
-          label="From Account"
-          value={fromFilter}
-          onChange={(e) => setFromFilter(e.target.value)}
-          options={accountOptions}
-        />
-        <Select
-          label="To Account"
-          value={toFilter}
-          onChange={(e) => setToFilter(e.target.value)}
-          options={accountOptions}
-        />
-      </div>
-
-      {hasFlowData ? (
-        <ReactECharts
-          option={chartOptions}
-          style={{ height: '450px', width: '100%', minHeight: '450px' }}
-          notMerge={true}
-          lazyUpdate={true}
-        />
-      ) : (
-        <div
-          style={{
-            height: '400px',
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'center',
-            justifyContent: 'center',
-            color: 'var(--text-secondary)',
-            textAlign: 'center',
-            padding: '2rem',
-          }}
-        >
-          <div style={{ fontSize: '3rem', marginBottom: '1rem' }}>💸</div>
-          <h4 style={{ marginBottom: '0.5rem', color: 'var(--text-primary)' }}>
-            No Money Flow Data Yet
-          </h4>
-          <p style={{ maxWidth: '500px', lineHeight: '1.6' }}>
-            Record transactions between accounts to visualize money movement.
+      <div className="money-flow-chart__top-row">
+        <div className="money-flow-chart__header">
+          <h3 className="money-flow-chart__title">
+            <span className="money-flow-chart__icon">🔄</span>
+            Money Flow
+          </h3>
+          <p className="money-flow-chart__subtitle">
+            Account-to-account money movement
           </p>
         </div>
-      )}
+
+        <div className="money-flow-chart__filters">
+          <FormControl
+            size="small"
+            className="money-flow-chart__filter-control"
+          >
+            <InputLabel id="money-flow-from-label">From</InputLabel>
+            <Select
+              labelId="money-flow-from-label"
+              label="From"
+              value={fromFilter}
+              onChange={(e) => setFromFilter(e.target.value)}
+            >
+              {accountOptions.map((option) => (
+                <MenuItem key={option.value} value={option.value}>
+                  {option.label}
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
+
+          <FormControl
+            size="small"
+            className="money-flow-chart__filter-control"
+          >
+            <InputLabel id="money-flow-to-label">To</InputLabel>
+            <Select
+              labelId="money-flow-to-label"
+              label="To"
+              value={toFilter}
+              onChange={(e) => setToFilter(e.target.value)}
+            >
+              {accountOptions.map((option) => (
+                <MenuItem key={option.value} value={option.value}>
+                  {option.label}
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
+        </div>
+      </div>
+
+      <div className="money-flow-chart__canvas">
+        {hasFlowData ? (
+          <ReactECharts
+            option={chartOptions}
+            style={{ height: '450px', width: '100%', minHeight: '450px' }}
+            notMerge={true}
+            lazyUpdate={true}
+          />
+        ) : (
+          <div
+            style={{
+              height: '400px',
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+              justifyContent: 'center',
+              color: 'var(--text-secondary)',
+              textAlign: 'center',
+              padding: '2rem',
+            }}
+          >
+            <div style={{ fontSize: '3rem', marginBottom: '1rem' }}>💸</div>
+            <h4
+              style={{ marginBottom: '0.5rem', color: 'var(--text-primary)' }}
+            >
+              No Money Flow Data Yet
+            </h4>
+            <p style={{ maxWidth: '500px', lineHeight: '1.6' }}>
+              Record transactions between accounts to visualize money movement.
+            </p>
+          </div>
+        )}
+      </div>
     </div>
   )
 }

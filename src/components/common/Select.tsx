@@ -1,5 +1,9 @@
-import { SelectHTMLAttributes, useId } from 'react'
-import './Select.css'
+import { SelectHTMLAttributes, useId, type FocusEvent } from 'react'
+import Box from '@mui/material/Box'
+import FormControl from '@mui/material/FormControl'
+import InputLabel from '@mui/material/InputLabel'
+import NativeSelect from '@mui/material/NativeSelect'
+import FormHelperText from '@mui/material/FormHelperText'
 
 export interface SelectOption {
   value: string
@@ -9,7 +13,7 @@ export interface SelectOption {
 
 export interface SelectProps extends Omit<
   SelectHTMLAttributes<HTMLSelectElement>,
-  'onChange'
+  'onChange' | 'color'
 > {
   label?: string
   options: SelectOption[]
@@ -39,51 +43,56 @@ export function Select({
   const selectId = id || generatedId
   const descriptionId =
     error || helperText ? `${selectId}-description` : undefined
+  const labelId = `${selectId}-label`
 
   return (
-    <div className={`select-container ${className}`.trim()}>
-      {label && (
-        <label htmlFor={selectId} className="select-label">
-          {label}
-          {required && <span className="select-required">*</span>}
-        </label>
-      )}
-      <select
-        id={selectId}
-        className={`select ${error ? 'select-error' : ''}`.trim()}
-        aria-describedby={descriptionId}
-        aria-invalid={error ? 'true' : undefined}
-        required={required}
-        disabled={disabled}
-        onChange={onChange}
-        onBlur={onBlur}
-        onFocus={onFocus}
-        value={value}
-        {...props}
-      >
-        <option value="" disabled>
-          {placeholder || 'Select an option...'}
-        </option>
-        {options.map((option) => (
-          <option
-            key={option.value}
-            value={option.value}
-            disabled={option.disabled}
-          >
-            {option.label}
+    <Box className={`select-container ${className}`.trim()}>
+      <FormControl fullWidth size="small" error={Boolean(error)}>
+        {label && (
+          <InputLabel htmlFor={selectId} id={labelId} shrink>
+            {label}
+            {required && <span className="select-required">*</span>}
+          </InputLabel>
+        )}
+        <NativeSelect
+          id={selectId}
+          aria-describedby={descriptionId}
+          aria-invalid={error ? 'true' : undefined}
+          required={required}
+          disabled={disabled}
+          onChange={onChange}
+          onBlur={(event) => {
+            onBlur?.(event as unknown as FocusEvent<HTMLSelectElement>)
+          }}
+          onFocus={(event) => {
+            onFocus?.(event as unknown as FocusEvent<HTMLSelectElement>)
+          }}
+          value={value}
+          inputProps={{
+            className: error ? 'select-error' : undefined,
+            'aria-label': label || placeholder || 'Select',
+          }}
+          {...props}
+        >
+          <option value="" disabled>
+            {placeholder || 'Select an option...'}
           </option>
-        ))}
-      </select>
-      {error && (
-        <div id={descriptionId} className="select-error-text">
-          {error}
-        </div>
-      )}
-      {helperText && !error && (
-        <div id={descriptionId} className="select-helper-text">
-          {helperText}
-        </div>
-      )}
-    </div>
+          {options.map((option) => (
+            <option
+              key={option.value}
+              value={option.value}
+              disabled={option.disabled}
+            >
+              {option.label}
+            </option>
+          ))}
+        </NativeSelect>
+        {(error || helperText) && (
+          <FormHelperText id={descriptionId}>
+            {error || helperText}
+          </FormHelperText>
+        )}
+      </FormControl>
+    </Box>
   )
 }

@@ -15,6 +15,10 @@
     "type-check": "tsc --noEmit"
   },
   "dependencies": {
+    "@emotion/react": "11.14.0",
+    "@emotion/styled": "11.14.1",
+    "@mui/icons-material": "7.3.8",
+    "@mui/material": "7.3.8",
     "date-fns": "4.1.0",
     "echarts": "6.0.0",
     "echarts-for-react": "3.0.6",

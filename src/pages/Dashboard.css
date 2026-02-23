@@ -7,6 +7,8 @@
 
 .dashboard-page__header {
   margin-bottom: 2rem;
+  width: 100%;
+  text-align: left;
 }
 
 .dashboard-page__title {
@@ -50,13 +52,20 @@
 /* Charts Grid */
 .dashboard-page__charts {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(500px, 1fr));
+  grid-template-columns: minmax(0, 1.65fr) minmax(0, 1fr);
   gap: 1.5rem;
   margin-bottom: 2rem;
+  align-items: stretch;
 }
 
 .dashboard-page__chart-col {
-  min-height: 400px;
+  min-height: 470px;
+  display: flex;
+}
+
+.dashboard-page__chart-col > * {
+  width: 100%;
+  height: 100%;
 }
 
 /* Sections */

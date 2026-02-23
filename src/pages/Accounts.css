@@ -14,7 +14,7 @@
 }
 
 .accounts-page__error {
-  color: #e74c3c;
+  color: var(--error-color);
   font-size: 1.125rem;
   margin-bottom: 1rem;
 }

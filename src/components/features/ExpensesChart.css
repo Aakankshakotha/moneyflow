@@ -1,13 +1,19 @@
 .expenses-chart {
   background: var(--card-background);
-  border: 1px solid var(--border-color);
+  border: none;
   border-radius: 12px;
   padding: 20px;
   box-shadow: var(--shadow-soft);
+  height: 100%;
+  box-sizing: border-box;
 }
 
 .expenses-chart__header {
   margin-bottom: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
 }
 
 .expenses-chart__title {
@@ -28,4 +34,5 @@
   font-size: 0.875rem;
   color: var(--text-secondary);
   margin: 0;
+  white-space: nowrap;
 }

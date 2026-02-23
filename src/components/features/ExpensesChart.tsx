@@ -25,11 +25,18 @@ export const ExpensesChart: React.FC<ExpensesChartProps> = ({
       rootStyles.getPropertyValue(name).trim() || fallback
 
     const palette = [
-      getThemeVar('--chart-series-1', '#5b7cfa'),
-      getThemeVar('--chart-series-2', '#7c8cf8'),
-      getThemeVar('--chart-series-3', '#6aa9ff'),
-      getThemeVar('--chart-series-4', '#36b6a8'),
-      getThemeVar('--chart-series-5', '#f59e8b'),
+      '#14b8a6',
+      '#8b5cf6',
+      '#f59e0b',
+      '#ec4899',
+      '#6366f1',
+      '#22c55e',
+      '#f97316',
+      '#06b6d4',
+      '#ef4444',
+      '#a855f7',
+      '#84cc16',
+      '#fb7185',
     ]
     const tooltipBg = getThemeVar('--chart-tooltip-bg', '#ffffff')
     const tooltipBorder = getThemeVar('--chart-tooltip-border', '#dbe4f0')
@@ -72,12 +79,23 @@ export const ExpensesChart: React.FC<ExpensesChartProps> = ({
       }
     })
 
-    // Convert to chart data format
-    const data = Array.from(expensesByCategory.values())
-      .map(({ name, amount }, index) => ({
+    const getColorIndex = (key: string): number => {
+      let hash = 0
+      for (let index = 0; index < key.length; index += 1) {
+        hash = (hash << 5) - hash + key.charCodeAt(index)
+        hash |= 0
+      }
+      return Math.abs(hash)
+    }
+
+    // Convert to chart data format with stable distinct colors per category key
+    const data = Array.from(expensesByCategory.entries())
+      .map(([categoryKey, { name, amount }]) => ({
         name,
         value: amount / 100, // Convert to dollars
-        itemStyle: { color: palette[index % palette.length] },
+        itemStyle: {
+          color: palette[getColorIndex(categoryKey) % palette.length],
+        },
       }))
       .sort((a, b) => b.value - a.value)
 
@@ -102,18 +120,24 @@ export const ExpensesChart: React.FC<ExpensesChartProps> = ({
       },
       legend: {
         orient: 'vertical',
-        right: 10,
+        right: 6,
         top: 'center',
+        itemWidth: 18,
+        itemHeight: 12,
+        itemGap: 14,
         textStyle: {
           color: legendText,
+          fontSize: 13,
         },
+        formatter: (name: string) =>
+          name.length > 18 ? `${name.slice(0, 18)}…` : name,
       },
       series: [
         {
           name: 'Expenses',
           type: 'pie',
-          radius: ['50%', '75%'],
-          center: ['40%', '50%'],
+          radius: ['40%', '64%'],
+          center: ['33%', '53%'],
           avoidLabelOverlap: false,
           itemStyle: {
             borderRadius: 8,
@@ -125,7 +149,7 @@ export const ExpensesChart: React.FC<ExpensesChartProps> = ({
           },
           emphasis: {
             label: {
-              show: true,
+              show: false,
               fontSize: 14,
               fontWeight: 'bold',
               color: legendText,
@@ -163,7 +187,7 @@ export const ExpensesChart: React.FC<ExpensesChartProps> = ({
       </div>
       <ReactECharts
         option={chartOptions}
-        style={{ height: '300px', width: '100%' }}
+        style={{ height: '450px', width: '100%', minHeight: '450px' }}
       />
     </div>
   )

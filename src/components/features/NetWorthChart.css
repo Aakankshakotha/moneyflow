@@ -35,6 +35,10 @@
   color: var(--text-muted);
 }
 
+.net-worth-chart__empty-action {
+  margin-top: 1rem;
+}
+
 @media (max-width: 640px) {
   .net-worth-chart {
     padding: 1.5rem;

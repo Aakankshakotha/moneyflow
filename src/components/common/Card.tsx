@@ -1,5 +1,7 @@
 import type { HTMLAttributes, ReactNode } from 'react'
-import './Card.css'
+import Paper from '@mui/material/Paper'
+import Box from '@mui/material/Box'
+import Typography from '@mui/material/Typography'
 
 export interface CardProps extends HTMLAttributes<HTMLElement> {
   children: ReactNode
@@ -30,15 +32,53 @@ export function Card({
     .join(' ')
 
   return (
-    <article className={classes} {...rest}>
+    <Paper
+      component="article"
+      elevation={0}
+      className={classes}
+      sx={{
+        border: '1px solid',
+        borderColor: 'var(--border-color)',
+        borderRadius: '0.5rem',
+        backgroundColor: 'var(--card-background)',
+      }}
+      {...rest}
+    >
       {title && (
-        <div className="card-header">
-          <h3 className="card-title">{title}</h3>
-          {subtitle && <p className="card-subtitle">{subtitle}</p>}
-        </div>
+        <Box
+          className="card-header"
+          sx={{ px: 3, py: 2, borderBottom: '1px solid var(--border-color)' }}
+        >
+          <Typography component="h3" className="card-title" variant="h6">
+            {title}
+          </Typography>
+          {subtitle && (
+            <Typography
+              className="card-subtitle"
+              variant="body2"
+              sx={{ color: 'var(--text-secondary)' }}
+            >
+              {subtitle}
+            </Typography>
+          )}
+        </Box>
       )}
-      <div className="card-body">{children}</div>
-      {footer && <div className="card-footer">{footer}</div>}
-    </article>
+      <Box className="card-body" sx={{ p: noPadding ? 0 : 3 }}>
+        {children}
+      </Box>
+      {footer && (
+        <Box
+          className="card-footer"
+          sx={{
+            px: 3,
+            py: 2,
+            borderTop: '1px solid var(--border-color)',
+            background: 'var(--background-secondary)',
+          }}
+        >
+          {footer}
+        </Box>
+      )}
+    </Paper>
   )
 }

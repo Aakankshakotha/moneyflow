@@ -13,20 +13,20 @@
   margin: 0 0 0.25rem 0;
   font-size: 1.25rem;
   font-weight: 600;
-  color: #1a1a1a;
+  color: var(--text-primary);
 }
 
 .account-card__parent {
   margin-bottom: 0.4rem;
   font-size: 0.8rem;
-  color: #6b7280;
+  color: var(--text-secondary);
 }
 
 .account-card__type {
   display: inline-block;
   padding: 0.25rem 0.5rem;
-  background-color: #f3f4f6;
-  color: #6b7280;
+  background-color: var(--badge-background);
+  color: var(--text-secondary);
   border-radius: 4px;
   font-size: 0.875rem;
   font-weight: 500;
@@ -41,13 +41,13 @@
 }
 
 .account-card__badge--active {
-  background-color: #d1fae5;
-  color: #059669;
+  background-color: var(--success-soft);
+  color: var(--success-color);
 }
 
 .account-card__badge--archived {
-  background-color: #fee2e2;
-  color: #dc2626;
+  background-color: var(--error-soft);
+  color: var(--error-color);
 }
 
 .account-card__balance {
@@ -55,13 +55,13 @@
   justify-content: space-between;
   align-items: center;
   padding: 0.75rem 0;
-  border-top: 1px solid #e5e7eb;
-  border-bottom: 1px solid #e5e7eb;
+  border-top: 1px solid var(--border-color);
+  border-bottom: 1px solid var(--border-color);
 }
 
 .account-card__balance-label {
   font-size: 0.875rem;
-  color: #6b7280;
+  color: var(--text-secondary);
 }
 
 .account-card__balance-amount {
@@ -71,12 +71,12 @@
 
 .account-card__balance-amount--asset,
 .account-card__balance-amount--income {
-  color: #27ae60;
+  color: var(--success-color);
 }
 
 .account-card__balance-amount--liability,
 .account-card__balance-amount--expense {
-  color: #e74c3c;
+  color: var(--error-color);
 }
 
 .account-card__actions {
@@ -97,19 +97,28 @@
 }
 
 .account-card__button--edit {
-  background-color: #3498db;
+  background-color: var(--primary-color);
   color: white;
 }
 
 .account-card__button--edit:hover {
-  background-color: #2980b9;
+  background-color: var(--primary-strong);
+}
+
+.account-card__button--archive {
+  background-color: var(--warning-color);
+  color: white;
+}
+
+.account-card__button--archive:hover {
+  filter: brightness(0.94);
 }
 
 .account-card__button--delete {
-  background-color: #e74c3c;
+  background-color: var(--error-color);
   color: white;
 }
 
 .account-card__button--delete:hover {
-  background-color: #c0392b;
+  filter: brightness(0.92);
 }

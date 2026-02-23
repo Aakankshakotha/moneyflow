@@ -9,7 +9,7 @@ import {
   Legend,
   ResponsiveContainer,
 } from 'recharts'
-import { Card } from '@/components/common'
+import { Button, Card } from '@/components/common'
 import { formatCurrency } from '@/utils/currencyUtils'
 import type { NetWorthSnapshot } from '@/types/netWorth'
 import './NetWorthChart.css'
@@ -17,6 +17,8 @@ import './NetWorthChart.css'
 interface NetWorthChartProps {
   snapshots: NetWorthSnapshot[]
   loading?: boolean
+  creatingSnapshot?: boolean
+  onCreateSnapshot?: () => void | Promise<void>
 }
 
 /**
@@ -25,6 +27,8 @@ interface NetWorthChartProps {
 const NetWorthChart: React.FC<NetWorthChartProps> = ({
   snapshots,
   loading = false,
+  creatingSnapshot = false,
+  onCreateSnapshot,
 }) => {
   const rootStyles = getComputedStyle(document.documentElement)
   const getThemeVar = (name: string, fallback: string): string =>
@@ -56,6 +60,16 @@ const NetWorthChart: React.FC<NetWorthChartProps> = ({
           <p className="net-worth-chart__empty-hint">
             Create snapshots to track your net worth over time
           </p>
+          {onCreateSnapshot && (
+            <Button
+              variant="primary"
+              onClick={onCreateSnapshot}
+              loading={creatingSnapshot}
+              className="net-worth-chart__empty-action"
+            >
+              Create Snapshot
+            </Button>
+          )}
         </div>
       </Card>
     )

@@ -1,0 +1,122 @@
+.cash-flow-trend-chart {
+  padding: 1.5rem;
+  box-shadow: var(--shadow-soft);
+}
+
+.cash-flow-trend-chart__header {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.75rem;
+  margin-bottom: 0.75rem;
+}
+
+.cash-flow-trend-chart__title {
+  font-size: 1.125rem;
+  font-weight: 600;
+  margin: 0;
+  color: var(--text-primary);
+}
+
+.cash-flow-trend-chart__subtitle {
+  margin: 0;
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+}
+
+.cash-flow-trend-chart__container {
+  margin-top: 0.5rem;
+}
+
+.cash-flow-trend-chart__details {
+  margin-top: 1rem;
+  border-top: 1px solid var(--border-color);
+  padding-top: 1rem;
+}
+
+.cash-flow-trend-chart__details-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  margin-bottom: 0.75rem;
+}
+
+.cash-flow-trend-chart__details-title {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.cash-flow-trend-chart__details-net {
+  margin: 0;
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+}
+
+.cash-flow-trend-chart__details-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1rem;
+}
+
+.cash-flow-trend-chart__detail-card {
+  background: var(--surface-elevated);
+  border: 1px solid var(--border-color);
+  border-radius: 0.75rem;
+  padding: 0.875rem;
+}
+
+.cash-flow-trend-chart__detail-heading {
+  margin: 0;
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.cash-flow-trend-chart__detail-total {
+  margin: 0.35rem 0 0;
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.cash-flow-trend-chart__detail-count {
+  margin: 0.15rem 0 0.6rem;
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+}
+
+.cash-flow-trend-chart__detail-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+}
+
+.cash-flow-trend-chart__detail-list li {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+}
+
+.cash-flow-trend-chart__empty {
+  min-height: 180px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-secondary);
+  font-size: 0.95rem;
+}
+
+@media (max-width: 900px) {
+  .cash-flow-trend-chart__details-grid {
+    grid-template-columns: 1fr;
+  }
+}
