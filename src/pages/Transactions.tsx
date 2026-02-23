@@ -1,5 +1,12 @@
 import React, { useState, useEffect } from 'react'
-import { Button, Select, Input } from '@/components/common'
+import { Button } from '@/components/common'
+import FormControl from '@mui/material/FormControl'
+import InputLabel from '@mui/material/InputLabel'
+import MuiSelect from '@mui/material/Select'
+import MenuItem from '@mui/material/MenuItem'
+import TextField from '@mui/material/TextField'
+import InputAdornment from '@mui/material/InputAdornment'
+import SearchIcon from '@mui/icons-material/Search'
 import {
   TransactionForm,
   TransactionTable,
@@ -255,67 +262,89 @@ const Transactions: React.FC = () => {
       <TransactionMetrics transactions={filteredTransactions} />
 
       <div className="transactions__filters">
-        <div className="transactions__filter-group">
-          <Input
-            type="text"
-            placeholder="Search by description, amount, or tag..."
-            value={searchTerm}
-            onChange={(e) => handleSearch(e.target.value)}
-          />
-        </div>
-        <div className="transactions__filter-row">
-          <Select
+        <TextField
+          size="small"
+          placeholder="Search by description, amount, or tag..."
+          value={searchTerm}
+          onChange={(e) => handleSearch(e.target.value)}
+          className="transactions__search"
+          slotProps={{
+            input: {
+              startAdornment: (
+                <InputAdornment position="start">
+                  <SearchIcon fontSize="small" />
+                </InputAdornment>
+              ),
+            },
+          }}
+        />
+        <FormControl size="small" className="transactions__filter-select">
+          <InputLabel id="date-filter-label">Period</InputLabel>
+          <MuiSelect
+            labelId="date-filter-label"
+            label="Period"
             value={dateFilter}
             onChange={(e) =>
               setDateFilter(
                 e.target.value as 'this-month' | 'this-week' | 'custom' | 'all'
               )
             }
-            options={[
-              { value: 'this-month', label: 'This Month' },
-              { value: 'this-week', label: 'This Week' },
-              { value: 'custom', label: 'Custom Range' },
-              { value: 'all', label: 'All Time' },
-            ]}
-          />
-          {dateFilter === 'custom' && (
-            <>
-              <Input
-                type="date"
-                value={customStartDate}
-                onChange={(e) => setCustomStartDate(e.target.value)}
-                placeholder="Start date"
-              />
-              <Input
-                type="date"
-                value={customEndDate}
-                onChange={(e) => setCustomEndDate(e.target.value)}
-                placeholder="End date"
-              />
-            </>
-          )}
-          <Select
+          >
+            <MenuItem value="this-month">This Month</MenuItem>
+            <MenuItem value="this-week">This Week</MenuItem>
+            <MenuItem value="custom">Custom Range</MenuItem>
+            <MenuItem value="all">All Time</MenuItem>
+          </MuiSelect>
+        </FormControl>
+        {dateFilter === 'custom' && (
+          <>
+            <TextField
+              size="small"
+              type="date"
+              label="From"
+              value={customStartDate}
+              onChange={(e) => setCustomStartDate(e.target.value)}
+              slotProps={{ inputLabel: { shrink: true } }}
+            />
+            <TextField
+              size="small"
+              type="date"
+              label="To"
+              value={customEndDate}
+              onChange={(e) => setCustomEndDate(e.target.value)}
+              slotProps={{ inputLabel: { shrink: true } }}
+            />
+          </>
+        )}
+        <FormControl size="small" className="transactions__filter-select">
+          <InputLabel id="source-filter-label">Source</InputLabel>
+          <MuiSelect
+            labelId="source-filter-label"
+            label="Source"
             value={accountFilter}
             onChange={(e) => setAccountFilter(e.target.value)}
-            options={[
-              { value: 'all', label: 'Source: All' },
-              { value: 'asset', label: 'Source: 💰 Asset' },
-              { value: 'income', label: 'Source: 📈 Income' },
-              { value: 'expense', label: 'Source: 💸 Expense' },
-              { value: 'liability', label: 'Source: 📊 Liability' },
-            ]}
-          />
-          <Select
+          >
+            <MenuItem value="all">All</MenuItem>
+            <MenuItem value="asset">Asset</MenuItem>
+            <MenuItem value="income">Income</MenuItem>
+            <MenuItem value="expense">Expense</MenuItem>
+            <MenuItem value="liability">Liability</MenuItem>
+          </MuiSelect>
+        </FormControl>
+        <FormControl size="small" className="transactions__filter-select">
+          <InputLabel id="type-filter-label">Type</InputLabel>
+          <MuiSelect
+            labelId="type-filter-label"
+            label="Type"
             value={typeFilter}
             onChange={(e) => setTypeFilter(e.target.value)}
-            options={[
-              { value: 'all', label: 'Type' },
-              { value: 'income', label: 'Income' },
-              { value: 'expense', label: 'Expense' },
-              { value: 'transfer', label: 'Transfer' },
-            ]}
-          />
-        </div>
+          >
+            <MenuItem value="all">All</MenuItem>
+            <MenuItem value="income">Income</MenuItem>
+            <MenuItem value="expense">Expense</MenuItem>
+            <MenuItem value="transfer">Transfer</MenuItem>
+          </MuiSelect>
+        </FormControl>
       </div>
 
       <div className="transactions__content">
