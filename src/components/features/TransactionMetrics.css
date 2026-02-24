@@ -8,7 +8,7 @@
 .transaction-metrics__card {
   background: var(--card-background);
   border: 1px solid var(--border-color);
-  border-radius: 8px;
+  border-radius: 12px;
   padding: 1.5rem;
   position: relative;
   overflow: hidden;

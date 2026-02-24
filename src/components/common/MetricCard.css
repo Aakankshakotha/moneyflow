@@ -23,11 +23,12 @@
 }
 
 .metric-card__title {
-  font-size: 0.875rem;
+  font-size: 0.8rem;
   color: var(--text-secondary);
-  font-weight: 500;
+  font-weight: 600;
   text-transform: uppercase;
-  letter-spacing: 0.5px;
+  letter-spacing: 0.8px;
+  text-align: left;
 }
 
 .metric-card__icon {
@@ -61,17 +62,21 @@
 }
 
 .metric-card__value {
-  font-size: 1.875rem;
+  font-size: 1.75rem;
   font-weight: 700;
   color: var(--text-primary);
-  margin: 4px 0;
+  margin: 12px 0 8px;
+  line-height: 1.2;
+  text-align: left;
+  word-break: break-word;
 }
 
 .metric-card__trend {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 6px;
   font-size: 0.875rem;
+  text-align: left;
 }
 
 .metric-card__trend-value {

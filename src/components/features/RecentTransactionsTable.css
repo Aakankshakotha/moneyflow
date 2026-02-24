@@ -57,11 +57,26 @@
   letter-spacing: 0.5px;
 }
 
+/* Indent TRANSACTION header to align with description text (after icon) */
+.recent-transactions__table th:first-child {
+  padding-left: 60px;
+}
+
+/* Right-align AMOUNT header to match amount values */
+.recent-transactions__table th:last-child {
+  text-align: right;
+}
+
+.recent-transactions__table td:last-child {
+  text-align: right;
+}
+
 .recent-transactions__table td {
   padding: 16px 8px;
   border-bottom: 1px solid var(--border-color-light);
   font-size: 0.875rem;
   color: var(--text-primary);
+  text-align: left;
 }
 
 .recent-transactions__table tbody tr:hover {
@@ -140,12 +155,14 @@
 }
 
 .text-right {
-  text-align: right;
+  text-align: left;
 }
 
 .amount {
   font-weight: 600;
   font-size: 0.9375rem;
+  text-align: right;
+  display: block;
 }
 
 .amount--positive {
@@ -181,8 +198,8 @@
 
 /* Dark theme */
 [data-theme='dark'] .recent-transactions {
-  background: rgba(30, 30, 40, 0.8);
-  border-color: rgba(255, 255, 255, 0.1);
+  background: var(--card-background);
+  border-color: var(--border-color);
 }
 
 [data-theme='dark'] .txn-icon {

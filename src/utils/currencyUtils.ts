@@ -32,9 +32,9 @@ export function centsToDollars(cents: number): number {
 export function formatCurrency(cents: number): string {
   const dollars = centsToDollars(cents)
 
-  return new Intl.NumberFormat('en-US', {
+  return new Intl.NumberFormat('en-IN', {
     style: 'currency',
-    currency: 'USD',
+    currency: 'INR',
     minimumFractionDigits: 2,
     maximumFractionDigits: 2,
   }).format(dollars)
@@ -49,7 +49,7 @@ export function formatCurrency(cents: number): string {
  */
 export function parseCurrency(currencyString: string): number | null {
   // Remove currency symbols, commas, and spaces
-  const cleaned = currencyString.replace(/[$,\s]/g, '')
+  const cleaned = currencyString.replace(/[₹$,\s]/g, '')
 
   // Try to parse as number
   const parsed = parseFloat(cleaned)

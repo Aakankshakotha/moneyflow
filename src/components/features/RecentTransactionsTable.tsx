@@ -88,7 +88,7 @@ export const RecentTransactionsTable: React.FC<
               <th>Category</th>
               <th>Account</th>
               <th>Status</th>
-              <th className="text-right">Amount</th>
+              <th>Amount</th>
             </tr>
           </thead>
           <tbody>
@@ -109,7 +109,7 @@ export const RecentTransactionsTable: React.FC<
                 <td>{getCategoryBadge(txn)}</td>
                 <td>{txn.fromAccount.name}</td>
                 <td>{getStatusBadge(txn)}</td>
-                <td className="text-right amount">
+                <td className="amount">
                   <span
                     className={
                       txn.toAccount.type === 'expense'

@@ -1,6 +1,6 @@
 .recurring-page {
   padding: 2rem;
-  max-width: 1200px;
+  max-width: 1400px;
   margin: 0 auto;
 }
 
@@ -13,13 +13,13 @@
 
 .recurring-page__header h1 {
   margin: 0;
-  font-size: 2rem;
+  font-size: 1.8rem;
   font-weight: 700;
-  color: var(--color-text-primary, #1a1a1a);
+  color: var(--text-primary);
 }
 
 .recurring-page__content {
-  margin-top: 2rem;
+  margin-top: 0;
 }
 
 .recurring-page__loading,

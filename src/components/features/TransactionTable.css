@@ -45,7 +45,7 @@
 
 .transaction-table__col-amount {
   width: 12%;
-  text-align: right;
+  text-align: left;
 }
 
 .transaction-table__col-actions {
@@ -175,7 +175,7 @@
 .transaction-table__amount {
   font-weight: 700;
   font-size: 0.9375rem;
-  text-align: right;
+  text-align: left;
   display: block;
 }
 
