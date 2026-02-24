@@ -9,6 +9,10 @@ import type {
   CreateRecurringDto,
 } from '@/types/recurring'
 import type { Account } from '@/types/account'
+import Box from '@mui/material/Box'
+import Typography from '@mui/material/Typography'
+import Alert from '@mui/material/Alert'
+import CircularProgress from '@mui/material/CircularProgress'
 import './Recurring.css'
 
 /**
@@ -144,32 +148,33 @@ const Recurring: React.FC = () => {
 
   if (loading) {
     return (
-      <div className="recurring-page">
-        <div className="recurring-page__loading">
-          Loading recurring transactions...
-        </div>
-      </div>
+      <Box className="recurring-page" sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+        <CircularProgress size={20} />
+        <Typography>Loading recurring transactions...</Typography>
+      </Box>
     )
   }
 
   if (error) {
     return (
-      <div className="recurring-page">
-        <div className="recurring-page__error">Error: {error}</div>
-      </div>
+      <Box className="recurring-page">
+        <Alert severity="error">Error: {error}</Alert>
+      </Box>
     )
   }
 
   return (
-    <div className="recurring-page">
-      <div className="recurring-page__header">
-        <h1>Recurring Transactions</h1>
+    <Box className="recurring-page">
+      <Box className="recurring-page__header">
+        <Typography component="h1" className="recurring-page__title">
+          Recurring Transactions
+        </Typography>
         <Button variant="primary" onClick={() => setIsFormOpen(true)}>
           New Recurring Transaction
         </Button>
-      </div>
+      </Box>
 
-      <div className="recurring-page__content">
+      <Box className="recurring-page__content">
         <RecurringList
           recurring={recurring}
           onProcess={handleProcess}
@@ -177,7 +182,7 @@ const Recurring: React.FC = () => {
           onResume={handleResume}
           onDelete={handleDelete}
         />
-      </div>
+      </Box>
 
       <RecurringForm
         isOpen={isFormOpen}
@@ -185,7 +190,7 @@ const Recurring: React.FC = () => {
         onSubmit={handleCreateRecurring}
         accounts={accounts}
       />
-    </div>
+    </Box>
   )
 }
 

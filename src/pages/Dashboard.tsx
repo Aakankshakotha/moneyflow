@@ -12,6 +12,10 @@ import * as transactionService from '@/services/transactionService'
 import type { NetWorthCalculation } from '@/types/netWorth'
 import type { Account } from '@/types/account'
 import type { TransactionWithAccounts } from '@/types/transaction'
+import Box from '@mui/material/Box'
+import Typography from '@mui/material/Typography'
+import Alert from '@mui/material/Alert'
+import CircularProgress from '@mui/material/CircularProgress'
 import './Dashboard.css'
 
 /**
@@ -37,7 +41,6 @@ const Dashboard: React.FC = () => {
     setError(null)
 
     try {
-      // Load all dashboard data in parallel
       const [calcResult, accountsResult, transactionsResult] =
         await Promise.all([
           netWorthService.calculateNetWorth(),
@@ -54,18 +57,13 @@ const Dashboard: React.FC = () => {
       }
 
       if (transactionsResult.success && accountsResult.success) {
-        // Enrich transactions with account details
         const accountMap = new Map(accountsResult.data.map((a) => [a.id, a]))
         const enrichedTransactions = transactionsResult.data
           .map((txn) => {
             const fromAccount = accountMap.get(txn.fromAccountId)
             const toAccount = accountMap.get(txn.toAccountId)
             if (fromAccount && toAccount) {
-              return {
-                ...txn,
-                fromAccount,
-                toAccount,
-              } as TransactionWithAccounts
+              return { ...txn, fromAccount, toAccount } as TransactionWithAccounts
             }
             return null
           })
@@ -79,12 +77,10 @@ const Dashboard: React.FC = () => {
     }
   }
 
-  // Calculate metrics
   const totalAssets = calculation?.totalAssets || 0
   const totalLiabilities = calculation?.totalLiabilities || 0
   const netWorth = calculation?.netWorth || 0
 
-  // Calculate cash flow (simplified: income - expenses)
   const accountMap = new Map(accounts.map((a) => [a.id, a]))
   const recentTransactions = transactions.filter((txn) => {
     const txnDate = new Date(txn.date)
@@ -111,68 +107,59 @@ const Dashboard: React.FC = () => {
 
   if (loading) {
     return (
-      <div className="dashboard-page">
-        <p>Loading dashboard...</p>
-      </div>
+      <Box className="dashboard-page" sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+        <CircularProgress size={20} />
+        <Typography>Loading dashboard...</Typography>
+      </Box>
     )
   }
 
   return (
-    <div className="dashboard-page">
-      <div className="dashboard-page__header">
-        <div>
-          <h1 className="dashboard-page__title">Financial Overview</h1>
-          <p className="dashboard-page__subtitle">
-            Welcome back, here's your money flow for{' '}
+    <Box className="dashboard-page">
+      <Box className="dashboard-page__header">
+        <Box>
+          <Typography component="h1" className="dashboard-page__title">
+            Financial Overview
+          </Typography>
+          <Typography component="p" className="dashboard-page__subtitle">
+            Welcome back, here’s your money flow for{' '}
             {new Date().toLocaleDateString('en-US', {
               month: 'long',
               year: 'numeric',
             })}
-          </p>
-        </div>
-      </div>
+          </Typography>
+        </Box>
+      </Box>
 
-      {error && <div className="dashboard-page__error-banner">{error}</div>}
+      {error && <Alert severity="error" sx={{ mb: 2 }}>{error}</Alert>}
 
       {/* Metrics Cards */}
-      <div className="dashboard-page__metrics">
+      <Box className="dashboard-page__metrics">
         <MetricCard
           title="Net Worth"
           value={netWorth}
-          icon={<span>💎</span>}
+          icon={<Box component="span">💎</Box>}
           color="blue"
-          trend={{
-            value: netWorth * 0.023,
-            direction: 'up',
-            period: 'vs last month',
-          }}
+          trend={{ value: netWorth * 0.023, direction: 'up', period: 'vs last month' }}
         />
         <MetricCard
           title="Total Assets"
           value={totalAssets}
-          icon={<span>💰</span>}
+          icon={<Box component="span">💰</Box>}
           color="green"
-          trend={{
-            value: totalAssets * 0.045,
-            direction: 'up',
-            period: 'vs last month',
-          }}
+          trend={{ value: totalAssets * 0.045, direction: 'up', period: 'vs last month' }}
         />
         <MetricCard
           title="Liabilities"
           value={totalLiabilities}
-          icon={<span>📉</span>}
+          icon={<Box component="span">📉</Box>}
           color="pink"
-          trend={{
-            value: totalLiabilities * 0.033,
-            direction: 'down',
-            period: 'vs last month',
-          }}
+          trend={{ value: totalLiabilities * 0.033, direction: 'down', period: 'vs last month' }}
         />
         <MetricCard
           title="Cash Flow"
           value={cashFlow}
-          icon={<span>📊</span>}
+          icon={<Box component="span">📊</Box>}
           color="purple"
           trend={{
             value: cashFlow * 0.12,
@@ -180,28 +167,28 @@ const Dashboard: React.FC = () => {
             period: 'vs last month',
           }}
         />
-      </div>
+      </Box>
 
       {/* Charts Grid */}
-      <div className="dashboard-page__charts">
-        <div className="dashboard-page__chart-col">
+      <Box className="dashboard-page__charts">
+        <Box className="dashboard-page__chart-col">
           <MoneyFlowChart transactions={transactions} accounts={accounts} />
-        </div>
-        <div className="dashboard-page__chart-col">
+        </Box>
+        <Box className="dashboard-page__chart-col">
           <ExpensesChart transactions={transactions} accounts={accounts} />
-        </div>
-      </div>
+        </Box>
+      </Box>
 
       {/* Income vs Expenses Trend */}
-      <div className="dashboard-page__section">
+      <Box className="dashboard-page__section">
         <CashFlowTrendChart transactions={transactions} accounts={accounts} />
-      </div>
+      </Box>
 
       {/* Recent Transactions */}
-      <div className="dashboard-page__section">
+      <Box className="dashboard-page__section">
         <RecentTransactionsTable transactions={transactions} limit={10} />
-      </div>
-    </div>
+      </Box>
+    </Box>
   )
 }
 

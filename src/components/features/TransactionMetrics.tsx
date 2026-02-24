@@ -1,6 +1,9 @@
 import React, { useMemo } from 'react'
 import { formatCurrency } from '@/utils/currencyUtils'
 import type { TransactionWithAccounts } from '@/types/transaction'
+import Box from '@mui/material/Box'
+import Typography from '@mui/material/Typography'
+import Paper from '@mui/material/Paper'
 import './TransactionMetrics.css'
 
 interface TransactionMetricsProps {
@@ -79,9 +82,12 @@ const TransactionMetrics: React.FC<TransactionMetricsProps> = ({
   const renderTrendIndicator = (change: number): JSX.Element => {
     if (Math.abs(change) < 0.1) {
       return (
-        <span className="transaction-metrics__trend transaction-metrics__trend--neutral">
+        <Typography
+          component="span"
+          className="transaction-metrics__trend transaction-metrics__trend--neutral"
+        >
           ─
-        </span>
+        </Typography>
       )
     }
 
@@ -92,9 +98,12 @@ const TransactionMetrics: React.FC<TransactionMetricsProps> = ({
       : 'transaction-metrics__trend--down'
 
     return (
-      <span className={`transaction-metrics__trend ${className}`}>
+      <Typography
+        component="span"
+        className={`transaction-metrics__trend ${className}`}
+      >
         {icon} {Math.abs(change).toFixed(1)}% vs last month
-      </span>
+      </Typography>
     )
   }
 
@@ -103,35 +112,35 @@ const TransactionMetrics: React.FC<TransactionMetricsProps> = ({
     .toUpperCase()
 
   return (
-    <div className="transaction-metrics">
-      <div className="transaction-metrics__card transaction-metrics__card--income">
-        <div className="transaction-metrics__header">
-          <span className="transaction-metrics__label">
+    <Box className="transaction-metrics">
+      <Paper elevation={0} className="transaction-metrics__card transaction-metrics__card--income">
+        <Box className="transaction-metrics__header">
+          <Typography component="span" className="transaction-metrics__label">
             TOTAL INCOME ({currentMonthName})
-          </span>
-        </div>
-        <div className="transaction-metrics__value">
+          </Typography>
+        </Box>
+        <Typography className="transaction-metrics__value">
           {formatCurrency(metrics.totalIncome)}
-        </div>
-        <div className="transaction-metrics__footer">
+        </Typography>
+        <Box className="transaction-metrics__footer">
           {renderTrendIndicator(metrics.incomeChange)}
-        </div>
-      </div>
+        </Box>
+      </Paper>
 
-      <div className="transaction-metrics__card transaction-metrics__card--expenses">
-        <div className="transaction-metrics__header">
-          <span className="transaction-metrics__label">
+      <Paper elevation={0} className="transaction-metrics__card transaction-metrics__card--expenses">
+        <Box className="transaction-metrics__header">
+          <Typography component="span" className="transaction-metrics__label">
             TOTAL EXPENSES ({currentMonthName})
-          </span>
-        </div>
-        <div className="transaction-metrics__value">
+          </Typography>
+        </Box>
+        <Typography className="transaction-metrics__value">
           -{formatCurrency(metrics.totalExpenses)}
-        </div>
-        <div className="transaction-metrics__footer">
+        </Typography>
+        <Box className="transaction-metrics__footer">
           {renderTrendIndicator(metrics.expenseChange)}
-        </div>
-      </div>
-    </div>
+        </Box>
+      </Paper>
+    </Box>
   )
 }
 

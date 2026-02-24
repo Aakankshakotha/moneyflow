@@ -5,6 +5,8 @@ import type {
   RecurringTransactionWithAccounts,
   RecurringStatus,
 } from '@/types/recurring'
+import Box from '@mui/material/Box'
+import Typography from '@mui/material/Typography'
 import './RecurringList.css'
 
 interface RecurringListProps {
@@ -50,17 +52,17 @@ const RecurringList: React.FC<RecurringListProps> = ({
   const pausedCount = recurring.filter((r) => r.status === 'paused').length
 
   return (
-    <div className="recurring-list">
-      <div className="recurring-list__filters">
-        <div className="recurring-list__search">
+    <Box className="recurring-list">
+      <Box className="recurring-list__filters">
+        <Box className="recurring-list__search">
           <Input
             type="text"
             placeholder="Search recurring transactions..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
           />
-        </div>
-        <div className="recurring-list__status-filter">
+        </Box>
+        <Box className="recurring-list__status-filter">
           <Select
             value={statusFilter}
             onChange={(e) =>
@@ -72,25 +74,25 @@ const RecurringList: React.FC<RecurringListProps> = ({
               { value: 'paused', label: `Paused (${pausedCount})` },
             ]}
           />
-        </div>
-      </div>
+        </Box>
+      </Box>
 
       {filteredRecurring.length === 0 ? (
-        <div className="recurring-list__empty">
+        <Box className="recurring-list__empty">
           {recurring.length === 0 ? (
             <>
-              <p>No recurring transactions yet</p>
-              <p className="recurring-list__empty-hint">
+              <Typography>No recurring transactions yet</Typography>
+              <Typography className="recurring-list__empty-hint">
                 Create your first recurring transaction to automate regular
                 transfers
-              </p>
+              </Typography>
             </>
           ) : (
-            <p>No recurring transactions match your search</p>
+            <Typography>No recurring transactions match your search</Typography>
           )}
-        </div>
+        </Box>
       ) : (
-        <div className="recurring-list__items">
+        <Box className="recurring-list__items">
           {filteredRecurring.map((r) => (
             <RecurringCard
               key={r.id}
@@ -101,9 +103,9 @@ const RecurringList: React.FC<RecurringListProps> = ({
               onDelete={onDelete}
             />
           ))}
-        </div>
+        </Box>
       )}
-    </div>
+    </Box>
   )
 }
 

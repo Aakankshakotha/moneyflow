@@ -1,8 +1,11 @@
 import React from 'react'
-import { Card } from '@/components/common'
+import { Card, Button } from '@/components/common'
 import { formatCurrency } from '@/utils/currencyUtils'
 import { formatDate } from '@/utils/dateUtils'
 import type { RecurringTransactionWithAccounts } from '@/types/recurring'
+import Box from '@mui/material/Box'
+import Typography from '@mui/material/Typography'
+import Chip from '@mui/material/Chip'
 import './RecurringCard.css'
 
 interface RecurringCardProps {
@@ -33,82 +36,101 @@ const RecurringCard: React.FC<RecurringCardProps> = ({
   const frequencyLabel =
     FREQUENCY_LABELS[recurring.frequency] || recurring.frequency
 
+  const statusColors: Record<string, { bg: string; color: string }> = {
+    active: { bg: 'rgba(34,197,94,0.1)', color: '#22c55e' },
+    paused: { bg: 'rgba(251,146,60,0.1)', color: '#fb923c' },
+  }
+  const statusColor = statusColors[recurring.status] ?? { bg: 'rgba(107,114,128,0.1)', color: '#6b7280' }
+
   return (
     <Card className="recurring-card">
-      <div className="recurring-card__main">
-        <div className="recurring-card__left">
-          <div className="recurring-card__flow">
-            <span className="recurring-card__account from">
+      <Box className="recurring-card__main">
+        <Box className="recurring-card__left">
+          <Box className="recurring-card__flow">
+            <Typography component="span" className="recurring-card__account from">
               {recurring.fromAccountName}
-            </span>
-            <span className="recurring-card__arrow">→</span>
-            <span className="recurring-card__account to">
+            </Typography>
+            <Typography component="span" className="recurring-card__arrow">→</Typography>
+            <Typography component="span" className="recurring-card__account to">
               {recurring.toAccountName}
-            </span>
-          </div>
-          <div className="recurring-card__description">
+            </Typography>
+          </Box>
+          <Typography className="recurring-card__description">
             {recurring.description}
-          </div>
-          <div className="recurring-card__meta">
-            <span className="recurring-card__frequency">{frequencyLabel}</span>
+          </Typography>
+          <Box className="recurring-card__meta">
+            <Typography component="span" className="recurring-card__frequency">
+              {frequencyLabel}
+            </Typography>
             {recurring.lastProcessedDate && (
-              <span className="recurring-card__last-processed">
+              <Typography component="span" className="recurring-card__last-processed">
                 Last: {formatDate(new Date(recurring.lastProcessedDate))}
-              </span>
+              </Typography>
             )}
-          </div>
-        </div>
+          </Box>
+        </Box>
 
-        <div className="recurring-card__right">
-          <div className="recurring-card__amount">
+        <Box className="recurring-card__right">
+          <Typography className="recurring-card__amount">
             {formatCurrency(recurring.amount)}
-          </div>
-          <span
+          </Typography>
+          <Chip
+            label={recurring.status}
+            size="small"
             className={`recurring-card__status recurring-card__status--${recurring.status}`}
-          >
-            {recurring.status}
-          </span>
-        </div>
-      </div>
+            sx={{
+              backgroundColor: statusColor.bg,
+              color: statusColor.color,
+              fontWeight: 500,
+              fontSize: '0.75rem',
+              textTransform: 'capitalize',
+            }}
+          />
+        </Box>
+      </Box>
 
-      <div className="recurring-card__actions">
+      <Box className="recurring-card__actions">
         {onProcess && recurring.status === 'active' && (
-          <button
-            type="button"
+          <Button
+            variant="primary"
+            size="sm"
             className="recurring-card__button recurring-card__button--process"
             onClick={() => onProcess(recurring.id)}
           >
             Process Now
-          </button>
+          </Button>
         )}
         {onPause && recurring.status === 'active' && (
-          <button
-            type="button"
+          <Button
+            variant="secondary"
+            size="sm"
             className="recurring-card__button recurring-card__button--pause"
             onClick={() => onPause(recurring.id)}
           >
             Pause
-          </button>
+          </Button>
         )}
         {onResume && recurring.status === 'paused' && (
-          <button
-            type="button"
+          <Button
+            variant="secondary"
+            size="sm"
             className="recurring-card__button recurring-card__button--resume"
             onClick={() => onResume(recurring.id)}
           >
             Resume
-          </button>
+          </Button>
         )}
         {onDelete && (
-          <button
-            type="button"
+          <Button
+            variant="danger"
+            size="sm"
             className="recurring-card__button recurring-card__button--delete"
             onClick={() => onDelete(recurring.id)}
           >
             Delete
-          </button>
+          </Button>
         )}
-      </div>
+      </Box>
     </Card>
   )
 }

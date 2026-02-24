@@ -1,8 +1,10 @@
 import React from 'react'
-import { Input, Select } from '@/components/common'
+import { Input, Select, Button } from '@/components/common'
 import TransactionCard from './TransactionCard'
 import { TRANSACTION_CATEGORIES, CATEGORY_GROUPS } from '@/constants/categories'
 import type { TransactionWithAccounts } from '@/types/transaction'
+import Box from '@mui/material/Box'
+import Typography from '@mui/material/Typography'
 import './TransactionList.css'
 
 interface TransactionListProps {
@@ -70,28 +72,28 @@ const TransactionList: React.FC<TransactionListProps> = ({
 
   if (transactions.length === 0 && !searchTerm && !categoryFilter) {
     return (
-      <div className="transaction-list__empty">
-        <p>No transactions yet</p>
-        <p className="transaction-list__empty-hint">
+      <Box className="transaction-list__empty">
+        <Typography>No transactions yet</Typography>
+        <Typography className="transaction-list__empty-hint">
           Record your first transaction to start tracking your money flow
-        </p>
-      </div>
+        </Typography>
+      </Box>
     )
   }
 
   return (
-    <div className="transaction-list">
-      <div className="transaction-list__filters">
-        <div className="transaction-list__search">
+    <Box className="transaction-list">
+      <Box className="transaction-list__filters">
+        <Box className="transaction-list__search">
           <Input
             type="text"
             value={searchTerm}
             onChange={handleSearchChange}
             placeholder="Search transactions..."
           />
-        </div>
+        </Box>
 
-        <div className="transaction-list__category-filter">
+        <Box className="transaction-list__category-filter">
           <Select
             value={categoryFilter}
             onChange={handleCategoryChange}
@@ -104,42 +106,48 @@ const TransactionList: React.FC<TransactionListProps> = ({
             ]}
             placeholder="Filter by category"
           />
-        </div>
+        </Box>
 
         {onToggleGrouping && (
-          <button
+          <Button
+            variant="secondary"
+            size="sm"
             className={`transaction-list__group-toggle ${groupByCategory ? 'active' : ''}`}
             onClick={onToggleGrouping}
-            type="button"
-            title={
-              groupByCategory ? 'Ungroup transactions' : 'Group by category'
-            }
+            title={groupByCategory ? 'Ungroup transactions' : 'Group by category'}
           >
             {groupByCategory ? '📋 List' : '📁 Group'}
-          </button>
+          </Button>
         )}
       </div>
 
       {transactions.length === 0 ? (
-        <div className="transaction-list__empty">
-          <p>No transactions found matching "{searchTerm}"</p>
-        </div>
+        <Box className="transaction-list__empty">
+          <Typography>No transactions found matching "{searchTerm}"</Typography>
+        </Box>
       ) : (
-        <div className="transaction-list__groups">
+        <Box className="transaction-list__groups">
           {groupedTransactions.map(({ group, transactions: groupTxns }) => (
-            <div key={group || 'all'} className="transaction-list__group">
+            <Box key={group || 'all'} className="transaction-list__group">
               {group && groupByCategory && (
-                <h3 className="transaction-list__group-header">
+                <Typography
+                  variant="h6"
+                  component="h3"
+                  className="transaction-list__group-header"
+                >
                   {CATEGORY_GROUPS[group as keyof typeof CATEGORY_GROUPS]
                     ?.icon || '📋'}{' '}
                   {CATEGORY_GROUPS[group as keyof typeof CATEGORY_GROUPS]
                     ?.label || 'Uncategorized'}
-                  <span className="transaction-list__group-count">
+                  <Typography
+                    component="span"
+                    className="transaction-list__group-count"
+                  >
                     {groupTxns.length}
-                  </span>
-                </h3>
+                  </Typography>
+                </Typography>
               )}
-              <div className="transaction-list__items">
+              <Box className="transaction-list__items">
                 {groupTxns.map((transaction) => (
                   <TransactionCard
                     key={transaction.id}
@@ -147,12 +155,12 @@ const TransactionList: React.FC<TransactionListProps> = ({
                     onDelete={onDelete}
                   />
                 ))}
-              </div>
-            </div>
+              </Box>
+            </Box>
           ))}
-        </div>
+        </Box>
       )}
-    </div>
+    </Box>
   )
 }
 

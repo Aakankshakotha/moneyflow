@@ -1,7 +1,10 @@
 import React from 'react'
 import type { Account } from '@/types/account'
-import { Card } from '@/components/common'
+import { Card, Button } from '@/components/common'
 import { formatCurrency } from '@/utils/currencyUtils'
+import Box from '@mui/material/Box'
+import Typography from '@mui/material/Typography'
+import Chip from '@mui/material/Chip'
 import './AccountCard.css'
 
 interface AccountCardProps {
@@ -26,34 +29,15 @@ const AccountCard: React.FC<AccountCardProps> = ({
     accountData: Account
   ): { label: string; value: number; tone: string } => {
     if (accountData.type === 'income') {
-      return {
-        label: 'Total Inflow:',
-        value: Math.abs(accountData.balance),
-        tone: 'income',
-      }
+      return { label: 'Total Inflow:', value: Math.abs(accountData.balance), tone: 'income' }
     }
-
     if (accountData.type === 'expense') {
-      return {
-        label: 'Total Spent:',
-        value: Math.abs(accountData.balance),
-        tone: 'expense',
-      }
+      return { label: 'Total Spent:', value: Math.abs(accountData.balance), tone: 'expense' }
     }
-
     if (accountData.type === 'liability') {
-      return {
-        label: 'Balance:',
-        value: accountData.balance,
-        tone: 'liability',
-      }
+      return { label: 'Balance:', value: accountData.balance, tone: 'liability' }
     }
-
-    return {
-      label: 'Balance:',
-      value: accountData.balance,
-      tone: 'asset',
-    }
+    return { label: 'Balance:', value: accountData.balance, tone: 'asset' }
   }
 
   const getTypeLabel = (type: string): string => {
@@ -66,73 +50,83 @@ const AccountCard: React.FC<AccountCardProps> = ({
     return labels[type] || type
   }
 
-  const getStatusBadge = (status: string): JSX.Element => {
-    return status === 'active' ? (
-      <span className="account-card__badge account-card__badge--active">
-        Active
-      </span>
-    ) : (
-      <span className="account-card__badge account-card__badge--archived">
-        Archived
-      </span>
-    )
-  }
-
   const amountDisplay = getAmountDisplay(account)
 
   return (
     <Card className="account-card">
-      <div className="account-card__header">
-        <div>
-          <h3 className="account-card__name">{account.name}</h3>
+      <Box className="account-card__header">
+        <Box>
+          <Typography variant="h6" component="h3" className="account-card__name">
+            {account.name}
+          </Typography>
           {parentName && (
-            <div className="account-card__parent">
+            <Typography variant="body2" className="account-card__parent">
               Sub-account of {parentName}
-            </div>
+            </Typography>
           )}
-          <span className="account-card__type">
+          <Typography component="span" className="account-card__type">
             {getTypeLabel(account.type)}
-          </span>
-        </div>
-        {getStatusBadge(account.status)}
-      </div>
-      <div className="account-card__balance">
-        <span className="account-card__balance-label">
+          </Typography>
+        </Box>
+        <Chip
+          label={account.status === 'active' ? 'Active' : 'Archived'}
+          size="small"
+          className={`account-card__badge account-card__badge--${account.status}`}
+          sx={{
+            backgroundColor:
+              account.status === 'active'
+                ? 'rgba(34,197,94,0.1)'
+                : 'rgba(107,114,128,0.1)',
+            color: account.status === 'active' ? '#22c55e' : '#6b7280',
+            fontWeight: 500,
+            fontSize: '0.75rem',
+          }}
+        />
+      </Box>
+      <Box className="account-card__balance">
+        <Typography component="span" className="account-card__balance-label">
           {amountDisplay.label}
-        </span>
-        <span
+        </Typography>
+        <Typography
+          component="span"
           className={`account-card__balance-amount account-card__balance-amount--${amountDisplay.tone}`}
         >
           {formatCurrency(amountDisplay.value)}
-        </span>
-      </div>
+        </Typography>
+      </Box>
       {(onEdit || onToggleStatus || onDelete) && (
-        <div className="account-card__actions">
+        <Box className="account-card__actions">
           {onEdit && (
-            <button
+            <Button
+              variant="secondary"
+              size="sm"
               className="account-card__button account-card__button--edit"
               onClick={() => onEdit(account)}
             >
               Edit
-            </button>
+            </Button>
           )}
           {onToggleStatus && (
-            <button
+            <Button
+              variant="secondary"
+              size="sm"
               className="account-card__button account-card__button--archive"
               onClick={() => onToggleStatus(account)}
             >
               {account.status === 'active' ? 'Archive' : 'Unarchive'}
-            </button>
+            </Button>
           )}
           {onDelete && (
-            <button
+            <Button
+              variant="danger"
+              size="sm"
               className="account-card__button account-card__button--delete"
               onClick={() => onDelete(account)}
             >
               Delete
-            </button>
+            </Button>
           )}
-        </div>
+        </Box>
       )}
     </Card>
   )
