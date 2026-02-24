@@ -6,7 +6,6 @@ import Typography from '@mui/material/Typography'
 import IconButton from '@mui/material/IconButton'
 import LightModeIcon from '@mui/icons-material/LightMode'
 import DarkModeIcon from '@mui/icons-material/DarkMode'
-import './Navigation.css'
 
 /**
  * Main navigation component
@@ -16,11 +15,22 @@ const Navigation: React.FC = () => {
   const { theme, toggleTheme } = useTheme()
 
   return (
-    <nav className="navigation">
-      <Box className="navigation__brand">
+    <Box
+      component="nav"
+      sx={{
+        backgroundColor: 'var(--card-background)',
+        color: 'var(--text-primary)',
+        padding: '1rem 2rem',
+        display: 'flex',
+        alignItems: 'center',
+        gap: '2rem',
+        boxShadow: 'var(--shadow-soft)',
+        borderBottom: '1px solid var(--border-color)',
+      }}
+    >
+      <Box>
         <Typography
           component="span"
-          className="navigation__brand-title"
           sx={{
             fontSize: '1.5rem',
             fontWeight: 600,
@@ -31,15 +41,39 @@ const Navigation: React.FC = () => {
           MoneyFlow
         </Typography>
       </Box>
-      <Box component="ul" className="navigation__links">
+      <Box
+        component="ul"
+        sx={{
+          listStyle: 'none',
+          m: 0,
+          p: 0,
+          display: 'flex',
+          gap: '2rem',
+          flex: 1,
+          '& a': {
+            color: 'var(--text-secondary)',
+            textDecoration: 'none',
+            fontSize: '1rem',
+            fontWeight: 500,
+            padding: '0.5rem 1rem',
+            borderRadius: '4px',
+            transition: 'background-color 0.2s, color 0.2s',
+            '&:hover': {
+              backgroundColor: 'var(--hover-background)',
+              color: 'var(--text-primary)',
+            },
+            '&.active': {
+              backgroundColor: 'var(--primary-color)',
+              color: '#ffffff',
+            },
+          },
+          '& li': { m: 0 },
+        }}
+      >
         <Box component="li">
           <NavLink
             to="/"
-            className={({ isActive }) =>
-              isActive
-                ? 'navigation__link navigation__link--active'
-                : 'navigation__link'
-            }
+            className={({ isActive }) => (isActive ? 'active' : '')}
             end
           >
             Dashboard
@@ -48,11 +82,7 @@ const Navigation: React.FC = () => {
         <Box component="li">
           <NavLink
             to="/accounts"
-            className={({ isActive }) =>
-              isActive
-                ? 'navigation__link navigation__link--active'
-                : 'navigation__link'
-            }
+            className={({ isActive }) => (isActive ? 'active' : '')}
           >
             Accounts
           </NavLink>
@@ -60,11 +90,7 @@ const Navigation: React.FC = () => {
         <Box component="li">
           <NavLink
             to="/transactions"
-            className={({ isActive }) =>
-              isActive
-                ? 'navigation__link navigation__link--active'
-                : 'navigation__link'
-            }
+            className={({ isActive }) => (isActive ? 'active' : '')}
           >
             Transactions
           </NavLink>
@@ -72,22 +98,28 @@ const Navigation: React.FC = () => {
         <Box component="li">
           <NavLink
             to="/recurring"
-            className={({ isActive }) =>
-              isActive
-                ? 'navigation__link navigation__link--active'
-                : 'navigation__link'
-            }
+            className={({ isActive }) => (isActive ? 'active' : '')}
           >
             Recurring
           </NavLink>
         </Box>
       </Box>
       <IconButton
-        className="navigation__theme-toggle"
         onClick={toggleTheme}
         aria-label="Toggle theme"
         size="small"
-        sx={{ width: 40, height: 40, fontSize: '1.25rem' }}
+        sx={{
+          width: 40,
+          height: 40,
+          fontSize: '1.25rem',
+          backgroundColor: 'var(--button-background)',
+          border: '1px solid var(--border-color)',
+          borderRadius: '8px',
+          '&:hover': {
+            backgroundColor: 'var(--button-hover-background)',
+            transform: 'scale(1.05)',
+          },
+        }}
       >
         {theme === 'light' ? (
           <DarkModeIcon fontSize="small" />
@@ -95,7 +127,7 @@ const Navigation: React.FC = () => {
           <LightModeIcon fontSize="small" />
         )}
       </IconButton>
-    </nav>
+    </Box>
   )
 }
 

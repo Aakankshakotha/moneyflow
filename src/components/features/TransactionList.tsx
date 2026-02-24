@@ -5,7 +5,6 @@ import { TRANSACTION_CATEGORIES, CATEGORY_GROUPS } from '@/constants/categories'
 import type { TransactionWithAccounts } from '@/types/transaction'
 import Box from '@mui/material/Box'
 import Typography from '@mui/material/Typography'
-import './TransactionList.css'
 
 interface TransactionListProps {
   transactions: TransactionWithAccounts[]
@@ -72,9 +71,18 @@ const TransactionList: React.FC<TransactionListProps> = ({
 
   if (transactions.length === 0 && !searchTerm && !categoryFilter) {
     return (
-      <Box className="transaction-list__empty">
+      <Box
+        sx={{
+          textAlign: 'center',
+          py: '4rem',
+          px: '2rem',
+          color: 'var(--text-secondary)',
+        }}
+      >
         <Typography>No transactions yet</Typography>
-        <Typography className="transaction-list__empty-hint">
+        <Typography
+          sx={{ fontSize: '0.875rem', color: 'var(--text-secondary)' }}
+        >
           Record your first transaction to start tracking your money flow
         </Typography>
       </Box>
@@ -82,9 +90,16 @@ const TransactionList: React.FC<TransactionListProps> = ({
   }
 
   return (
-    <Box className="transaction-list">
-      <Box className="transaction-list__filters">
-        <Box className="transaction-list__search">
+    <Box sx={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+      <Box
+        sx={{
+          display: 'flex',
+          gap: '1rem',
+          alignItems: 'flex-end',
+          flexWrap: 'wrap',
+        }}
+      >
+        <Box sx={{ flex: 1, minWidth: '200px' }}>
           <Input
             type="text"
             value={searchTerm}
@@ -93,7 +108,7 @@ const TransactionList: React.FC<TransactionListProps> = ({
           />
         </Box>
 
-        <Box className="transaction-list__category-filter">
+        <Box sx={{ minWidth: '180px' }}>
           <Select
             value={categoryFilter}
             onChange={handleCategoryChange}
@@ -112,28 +127,58 @@ const TransactionList: React.FC<TransactionListProps> = ({
           <Button
             variant="secondary"
             size="sm"
-            className={`transaction-list__group-toggle ${groupByCategory ? 'active' : ''}`}
+            style={
+              groupByCategory
+                ? {
+                    backgroundColor: 'var(--primary-color)',
+                    color: '#fff',
+                    border: 'none',
+                  }
+                : {}
+            }
             onClick={onToggleGrouping}
-            title={groupByCategory ? 'Ungroup transactions' : 'Group by category'}
+            title={
+              groupByCategory ? 'Ungroup transactions' : 'Group by category'
+            }
           >
             {groupByCategory ? '📋 List' : '📁 Group'}
           </Button>
         )}
-      </div>
+      </Box>
 
       {transactions.length === 0 ? (
-        <Box className="transaction-list__empty">
+        <Box
+          sx={{
+            textAlign: 'center',
+            py: '4rem',
+            px: '2rem',
+            color: 'var(--text-secondary)',
+          }}
+        >
           <Typography>No transactions found matching "{searchTerm}"</Typography>
         </Box>
       ) : (
-        <Box className="transaction-list__groups">
+        <Box sx={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
           {groupedTransactions.map(({ group, transactions: groupTxns }) => (
-            <Box key={group || 'all'} className="transaction-list__group">
+            <Box
+              key={group || 'all'}
+              sx={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}
+            >
               {group && groupByCategory && (
                 <Typography
                   variant="h6"
                   component="h3"
-                  className="transaction-list__group-header"
+                  sx={{
+                    fontSize: '1.125rem',
+                    fontWeight: 600,
+                    color: 'var(--text-primary)',
+                    m: 0,
+                    pb: '0.5rem',
+                    borderBottom: '2px solid var(--border-color)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '0.5rem',
+                  }}
                 >
                   {CATEGORY_GROUPS[group as keyof typeof CATEGORY_GROUPS]
                     ?.icon || '📋'}{' '}
@@ -141,13 +186,21 @@ const TransactionList: React.FC<TransactionListProps> = ({
                     ?.label || 'Uncategorized'}
                   <Typography
                     component="span"
-                    className="transaction-list__group-count"
+                    sx={{
+                      fontSize: '0.875rem',
+                      backgroundColor: 'var(--background-secondary)',
+                      px: '0.5rem',
+                      borderRadius: '0.25rem',
+                      ml: 'auto',
+                    }}
                   >
                     {groupTxns.length}
                   </Typography>
                 </Typography>
               )}
-              <Box className="transaction-list__items">
+              <Box
+                sx={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}
+              >
                 {groupTxns.map((transaction) => (
                   <TransactionCard
                     key={transaction.id}

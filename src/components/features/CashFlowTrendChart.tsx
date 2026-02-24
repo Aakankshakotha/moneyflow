@@ -14,7 +14,8 @@ import type { Transaction } from '@/types/transaction'
 import { Card } from '@/components/common'
 import { formatCurrency } from '@/utils/currencyUtils'
 import { categoryService } from '@/services/categoryService'
-import './CashFlowTrendChart.css'
+import Box from '@mui/material/Box'
+import Typography from '@mui/material/Typography'
 
 interface CashFlowTrendChartProps {
   transactions: Transaction[]
@@ -201,31 +202,31 @@ const CashFlowTrendChart: React.FC<CashFlowTrendChartProps> = ({
 
   if (!hasData) {
     return (
-      <Card className="cash-flow-trend-chart">
-        <div className="cash-flow-trend-chart__header">
-          <h2 className="cash-flow-trend-chart__title">
+      <Card sx={{ p: '1.5rem' }}>
+        <Box sx={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', gap: '0.75rem', mb: '0.75rem' }}>
+          <Typography variant="h5" component="h2" sx={{ fontSize: '1.125rem', fontWeight: 600, m: 0, color: 'var(--text-primary)' }}>
             Income vs Expenses Trend
-          </h2>
-          <p className="cash-flow-trend-chart__subtitle">Last 6 months</p>
-        </div>
-        <div className="cash-flow-trend-chart__empty">
+          </Typography>
+          <Typography sx={{ m: 0, fontSize: '0.875rem', color: 'var(--text-secondary)' }}>Last 6 months</Typography>
+        </Box>
+        <Box sx={{ minHeight: '180px', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--text-secondary)', fontSize: '0.95rem' }}>
           No income/expense transactions yet
-        </div>
+        </Box>
       </Card>
     )
   }
 
   return (
-    <Card className="cash-flow-trend-chart">
-      <div className="cash-flow-trend-chart__header">
-        <h2 className="cash-flow-trend-chart__title">
+    <Card sx={{ p: '1.5rem' }}>
+      <Box sx={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', gap: '0.75rem', mb: '0.75rem' }}>
+        <Typography variant="h5" component="h2" sx={{ fontSize: '1.125rem', fontWeight: 600, m: 0, color: 'var(--text-primary)' }}>
           Income vs Expenses Trend
-        </h2>
-        <p className="cash-flow-trend-chart__subtitle">
+        </Typography>
+        <Typography sx={{ m: 0, fontSize: '0.875rem', color: 'var(--text-secondary)' }}>
           Last 6 months • Click a month bar for details
-        </p>
-      </div>
-      <div className="cash-flow-trend-chart__container">
+        </Typography>
+      </Box>
+      <Box sx={{ mt: '0.5rem' }}>
         <ResponsiveContainer width="100%" height={360}>
           <BarChart data={chartData}>
             <CartesianGrid strokeDasharray="3 3" stroke={chartGrid} />
@@ -274,78 +275,44 @@ const CashFlowTrendChart: React.FC<CashFlowTrendChartProps> = ({
             />
           </BarChart>
         </ResponsiveContainer>
-      </div>
+      </Box>
       {selectedMonthDetails && (
-        <div
-          className="cash-flow-trend-chart__details"
+        <Box
           role="region"
           aria-live="polite"
+          sx={{ mt: '1rem', borderTop: '1px solid var(--border-color)', pt: '1rem' }}
         >
-          <div className="cash-flow-trend-chart__details-header">
-            <h3 className="cash-flow-trend-chart__details-title">
+          <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '0.75rem', mb: '0.75rem' }}>
+            <Typography variant="h6" component="h3" sx={{ m: 0, fontSize: '1rem', fontWeight: 600, color: 'var(--text-primary)' }}>
               Details for {selectedMonthDetails.monthLabel}
-            </h3>
-            <p className="cash-flow-trend-chart__details-net">
+            </Typography>
+            <Typography sx={{ m: 0, fontSize: '0.9rem', color: 'var(--text-secondary)' }}>
               Net: {formatCurrency(selectedMonthDetails.net)}
-            </p>
-          </div>
+            </Typography>
+          </Box>
 
-          <div className="cash-flow-trend-chart__details-grid">
-            <div className="cash-flow-trend-chart__detail-card">
-              <h4 className="cash-flow-trend-chart__detail-heading">Income</h4>
-              <p className="cash-flow-trend-chart__detail-total">
-                {formatCurrency(selectedMonthDetails.income)}
-              </p>
-              <p className="cash-flow-trend-chart__detail-count">
-                {selectedMonthDetails.incomeCount} transactions
-              </p>
-              <ul className="cash-flow-trend-chart__detail-list">
-                {selectedMonthDetails.incomeCategories.length > 0 ? (
-                  selectedMonthDetails.incomeCategories.map((item) => (
-                    <li
-                      key={`${selectedMonthDetails.monthLabel}-income-${item.name}`}
-                    >
-                      <span>{item.name}</span>
-                      <span>{formatCurrency(item.amount)}</span>
-                    </li>
-                  ))
-                ) : (
-                  <li>
-                    <span>No income categories</span>
-                  </li>
-                )}
-              </ul>
-            </div>
-
-            <div className="cash-flow-trend-chart__detail-card">
-              <h4 className="cash-flow-trend-chart__detail-heading">
-                Expenses
-              </h4>
-              <p className="cash-flow-trend-chart__detail-total">
-                {formatCurrency(selectedMonthDetails.expenses)}
-              </p>
-              <p className="cash-flow-trend-chart__detail-count">
-                {selectedMonthDetails.expenseCount} transactions
-              </p>
-              <ul className="cash-flow-trend-chart__detail-list">
-                {selectedMonthDetails.expenseCategories.length > 0 ? (
-                  selectedMonthDetails.expenseCategories.map((item) => (
-                    <li
-                      key={`${selectedMonthDetails.monthLabel}-expense-${item.name}`}
-                    >
-                      <span>{item.name}</span>
-                      <span>{formatCurrency(item.amount)}</span>
-                    </li>
-                  ))
-                ) : (
-                  <li>
-                    <span>No expense categories</span>
-                  </li>
-                )}
-              </ul>
-            </div>
-          </div>
-        </div>
+          <Box sx={{ display: 'grid', gridTemplateColumns: 'repeat(2, minmax(0, 1fr))', gap: '1rem' }}>
+            {([{ label: 'Income', total: selectedMonthDetails.income, count: selectedMonthDetails.incomeCount, items: selectedMonthDetails.incomeCategories, emptyMsg: 'No income categories' }, { label: 'Expenses', total: selectedMonthDetails.expenses, count: selectedMonthDetails.expenseCount, items: selectedMonthDetails.expenseCategories, emptyMsg: 'No expense categories' }] as const).map((col) => (
+              <Box key={col.label} sx={{ backgroundColor: 'var(--surface-elevated)', border: '1px solid var(--border-color)', borderRadius: '0.75rem', p: '0.875rem' }}>
+                <Typography variant="h6" component="h4" sx={{ m: 0, fontSize: '0.95rem', fontWeight: 600, color: 'var(--text-primary)' }}>{col.label}</Typography>
+                <Typography sx={{ m: '0.35rem 0 0', fontSize: '1rem', fontWeight: 700, color: 'var(--text-primary)' }}>{formatCurrency(col.total)}</Typography>
+                <Typography sx={{ m: '0.15rem 0 0.6rem', fontSize: '0.8rem', color: 'var(--text-secondary)' }}>{col.count} transactions</Typography>
+                <Box component="ul" sx={{ listStyle: 'none', m: 0, p: 0, display: 'flex', flexDirection: 'column', gap: '0.45rem' }}>
+                  {col.items.length > 0 ? (
+                    col.items.map((item) => (
+                      <Box component="li" key={`${selectedMonthDetails.monthLabel}-${col.label}-${item.name}`} sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '0.75rem', fontSize: '0.85rem', color: 'var(--text-secondary)' }}>
+                        <span>{item.name}</span>
+                        <span>{formatCurrency(item.amount)}</span>
+                      </Box>
+                    ))
+                  ) : (
+                    <Box component="li" sx={{ fontSize: '0.85rem', color: 'var(--text-secondary)' }}><span>{col.emptyMsg}</span></Box>
+                  )}
+                </Box>
+              </Box>
+            ))}
+          </Box>
+        </Box>
       )}
     </Card>
   )

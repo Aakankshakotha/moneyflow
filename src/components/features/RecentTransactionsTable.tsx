@@ -13,7 +13,6 @@ import TableCell from '@mui/material/TableCell'
 import Chip from '@mui/material/Chip'
 import Button from '@mui/material/Button'
 import FilterListIcon from '@mui/icons-material/FilterList'
-import './RecentTransactionsTable.css'
 
 interface RecentTransactionsTableProps {
   transactions: TransactionWithAccounts[]
@@ -27,7 +26,9 @@ export const RecentTransactionsTable: React.FC<
     .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
     .slice(0, limit)
 
-  const getCategoryChip = (transaction: TransactionWithAccounts): JSX.Element => {
+  const getCategoryChip = (
+    transaction: TransactionWithAccounts
+  ): JSX.Element => {
     if (transaction.category) {
       const category = categoryService.getCategoryById(transaction.category)
       if (category) {
@@ -92,9 +93,31 @@ export const RecentTransactionsTable: React.FC<
   }
 
   return (
-    <Box className="recent-transactions">
-      <Box className="recent-transactions__header">
-        <Typography variant="h6" className="recent-transactions__title">
+    <Box
+      sx={{
+        backgroundColor: 'var(--card-background)',
+        border: '1px solid var(--border-color)',
+        borderRadius: '0.75rem',
+        overflow: 'hidden',
+      }}
+    >
+      <Box
+        sx={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          p: '1.25rem 1.5rem',
+          borderBottom: '1px solid var(--border-color)',
+        }}
+      >
+        <Typography
+          variant="h6"
+          sx={{
+            fontWeight: 600,
+            fontSize: '1rem',
+            color: 'var(--text-primary)',
+          }}
+        >
           Recent Transactions
         </Typography>
         <Button
@@ -106,14 +129,17 @@ export const RecentTransactionsTable: React.FC<
             textTransform: 'none',
             borderColor: 'var(--border-color)',
             color: 'var(--text-primary)',
-            '&:hover': { borderColor: 'var(--primary-color)', color: 'var(--primary-color)' },
+            '&:hover': {
+              borderColor: 'var(--primary-color)',
+              color: 'var(--primary-color)',
+            },
           }}
         >
           Filter
         </Button>
       </Box>
 
-      <Box className="recent-transactions__table">
+      <Box sx={{ overflowX: 'auto' }}>
         <Table>
           <TableHead>
             <TableRow>
@@ -129,13 +155,45 @@ export const RecentTransactionsTable: React.FC<
             {recentTransactions.map((txn) => (
               <TableRow key={txn.id} hover>
                 <TableCell>
-                  <Box className="txn-info">
-                    <Box className="txn-icon">
+                  <Box
+                    sx={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '0.75rem',
+                    }}
+                  >
+                    <Box
+                      sx={{
+                        width: '2.25rem',
+                        height: '2.25rem',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        backgroundColor: 'var(--background-secondary)',
+                        borderRadius: '50%',
+                        flexShrink: 0,
+                      }}
+                    >
                       {txn.toAccount.type === 'expense' ? '💰' : '📈'}
                     </Box>
-                    <Box className="txn-details">
-                      <Typography className="txn-description">{txn.description}</Typography>
-                      <Typography className="txn-sub">{txn.fromAccount.name}</Typography>
+                    <Box>
+                      <Typography
+                        sx={{
+                          fontSize: '0.875rem',
+                          fontWeight: 500,
+                          color: 'var(--text-primary)',
+                        }}
+                      >
+                        {txn.description}
+                      </Typography>
+                      <Typography
+                        sx={{
+                          fontSize: '0.75rem',
+                          color: 'var(--text-secondary)',
+                        }}
+                      >
+                        {txn.fromAccount.name}
+                      </Typography>
                     </Box>
                   </Box>
                 </TableCell>
@@ -146,11 +204,14 @@ export const RecentTransactionsTable: React.FC<
                 <TableCell align="right">
                   <Typography
                     component="span"
-                    className={
-                      txn.toAccount.type === 'expense'
-                        ? 'amount amount--negative'
-                        : 'amount amount--positive'
-                    }
+                    sx={{
+                      fontSize: '0.9rem',
+                      fontWeight: 600,
+                      color:
+                        txn.toAccount.type === 'expense'
+                          ? '#ef4444'
+                          : '#10b981',
+                    }}
                   >
                     {txn.toAccount.type === 'expense' ? '-' : '+'}
                     {formatCurrency(txn.amount)}
@@ -162,7 +223,14 @@ export const RecentTransactionsTable: React.FC<
         </Table>
       </Box>
 
-      <Box className="recent-transactions__footer">
+      <Box
+        sx={{
+          p: '1rem 1.5rem',
+          display: 'flex',
+          justifyContent: 'center',
+          borderTop: '1px solid var(--border-color)',
+        }}
+      >
         <Button
           variant="outlined"
           className="view-all-btn"
@@ -172,7 +240,10 @@ export const RecentTransactionsTable: React.FC<
             color: 'var(--text-primary)',
             px: 3,
             py: 1.25,
-            '&:hover': { borderColor: 'var(--primary-color)', color: 'var(--primary-color)' },
+            '&:hover': {
+              borderColor: 'var(--primary-color)',
+              color: 'var(--primary-color)',
+            },
           }}
         >
           View All Transactions

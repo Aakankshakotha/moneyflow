@@ -12,7 +12,8 @@ import {
 import { Button, Card } from '@/components/common'
 import { formatCurrency } from '@/utils/currencyUtils'
 import type { NetWorthSnapshot } from '@/types/netWorth'
-import './NetWorthChart.css'
+import Box from '@mui/material/Box'
+import Typography from '@mui/material/Typography'
 
 interface NetWorthChartProps {
   snapshots: NetWorthSnapshot[]
@@ -45,32 +46,32 @@ const NetWorthChart: React.FC<NetWorthChartProps> = ({
 
   if (loading) {
     return (
-      <Card className="net-worth-chart">
-        <div className="net-worth-chart__loading">Loading chart...</div>
+      <Card sx={{ p: '2rem' }}>
+        <Box sx={{ textAlign: 'center', py: '4rem', px: '2rem', color: 'var(--text-secondary)' }}>Loading chart...</Box>
       </Card>
     )
   }
 
   if (snapshots.length === 0) {
     return (
-      <Card className="net-worth-chart">
-        <h2 className="net-worth-chart__title">Net Worth Trend</h2>
-        <div className="net-worth-chart__empty">
-          <p>No snapshot history available</p>
-          <p className="net-worth-chart__empty-hint">
+      <Card sx={{ p: '2rem' }}>
+        <Typography variant="h5" component="h2" sx={{ fontSize: '1.25rem', fontWeight: 600, m: 0, mb: '1.5rem', color: 'var(--text-primary)' }}>Net Worth Trend</Typography>
+        <Box sx={{ textAlign: 'center', py: '4rem', px: '2rem', color: 'var(--text-secondary)' }}>
+          <Typography sx={{ m: '0.5rem 0' }}>No snapshot history available</Typography>
+          <Typography sx={{ fontSize: '0.875rem', color: 'var(--text-secondary)', m: '0.5rem 0' }}>
             Create snapshots to track your net worth over time
-          </p>
+          </Typography>
           {onCreateSnapshot && (
             <Button
               variant="primary"
               onClick={onCreateSnapshot}
               loading={creatingSnapshot}
-              className="net-worth-chart__empty-action"
+              style={{ marginTop: '1rem' }}
             >
               Create Snapshot
             </Button>
           )}
-        </div>
+        </Box>
       </Card>
     )
   }
@@ -84,9 +85,9 @@ const NetWorthChart: React.FC<NetWorthChartProps> = ({
   }))
 
   return (
-    <Card className="net-worth-chart">
-      <h2 className="net-worth-chart__title">Net Worth Trend</h2>
-      <div className="net-worth-chart__container">
+    <Card sx={{ p: '2rem' }}>
+      <Typography variant="h5" component="h2" sx={{ fontSize: '1.25rem', fontWeight: 600, m: 0, mb: '1.5rem', color: 'var(--text-primary)' }}>Net Worth Trend</Typography>
+      <Box sx={{ mt: '1rem' }}>
         <ResponsiveContainer width="100%" height={400}>
           <LineChart data={chartData}>
             <CartesianGrid strokeDasharray="3 3" stroke={chartGrid} />
@@ -157,7 +158,7 @@ const NetWorthChart: React.FC<NetWorthChartProps> = ({
             />
           </LineChart>
         </ResponsiveContainer>
-      </div>
+      </Box>
     </Card>
   )
 }

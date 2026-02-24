@@ -8,7 +8,7 @@ import type {
 } from '@/types/account'
 import { Input, Select, Button, Modal } from '@/components/common'
 import { dollarsToCents, centsToDollars } from '@/utils/currencyUtils'
-import './AccountForm.css'
+import Box from '@mui/material/Box'
 
 interface AccountFormProps {
   isOpen: boolean
@@ -134,7 +134,11 @@ const AccountForm: React.FC<AccountFormProps> = ({
     }))
 
   const modalContent = (
-    <form onSubmit={handleSubmit} className="account-form">
+    <Box
+      component="form"
+      onSubmit={handleSubmit}
+      sx={{ display: 'flex', flexDirection: 'column', gap: 1.5, pt: 1 }}
+    >
       <Input
         label="Account Name"
         value={name}
@@ -196,15 +200,24 @@ const AccountForm: React.FC<AccountFormProps> = ({
         />
       )}
 
-      <div className="account-form__actions">
+      <Box
+        sx={{
+          display: 'flex',
+          gap: 1,
+          justifyContent: 'flex-end',
+          mt: 1,
+          pt: 1,
+          borderTop: '1px solid var(--border-color)',
+        }}
+      >
         <Button type="button" variant="secondary" onClick={handleClose}>
           Cancel
         </Button>
         <Button type="submit" variant="primary">
           {isEdit ? 'Update Account' : 'Create Account'}
         </Button>
-      </div>
-    </form>
+      </Box>
+    </Box>
   )
 
   return (

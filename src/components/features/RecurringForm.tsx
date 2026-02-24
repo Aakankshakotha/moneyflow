@@ -3,7 +3,8 @@ import { Modal, Button, Input, Select } from '@/components/common'
 import { formatCurrency } from '@/utils/currencyUtils'
 import type { CreateRecurringDto, RecurrenceFrequency } from '@/types/recurring'
 import type { Account } from '@/types/account'
-import './RecurringForm.css'
+import Box from '@mui/material/Box'
+import Typography from '@mui/material/Typography'
 
 interface RecurringFormProps {
   isOpen: boolean
@@ -120,8 +121,24 @@ const RecurringForm: React.FC<RecurringFormProps> = ({
       title="New Recurring Transaction"
       size="md"
     >
-      <form onSubmit={handleSubmit} className="recurring-form">
-        {error && <div className="recurring-form__error">{error}</div>}
+      <Box
+        component="form"
+        onSubmit={handleSubmit}
+        sx={{ display: 'flex', flexDirection: 'column', gap: 1.5 }}
+      >
+        {error && (
+          <Box
+            sx={{
+              p: '0.75rem',
+              backgroundColor: '#fee2e2',
+              color: 'var(--error-color)',
+              borderRadius: '0.375rem',
+              fontSize: '0.875rem',
+            }}
+          >
+            {error}
+          </Box>
+        )}
 
         <Select
           label="From Account"
@@ -135,9 +152,12 @@ const RecurringForm: React.FC<RecurringFormProps> = ({
         />
 
         {selectedFromAccount && (
-          <div className="recurring-form__balance">
+          <Typography
+            variant="body2"
+            sx={{ mt: -1, mb: 0.5, color: 'var(--text-secondary)', pl: 0.5 }}
+          >
             Available: {formatCurrency(selectedFromAccount.balance)}
-          </div>
+          </Typography>
         )}
 
         <Select
@@ -152,9 +172,12 @@ const RecurringForm: React.FC<RecurringFormProps> = ({
         />
 
         {selectedToAccount && (
-          <div className="recurring-form__balance">
+          <Typography
+            variant="body2"
+            sx={{ mt: -1, mb: 0.5, color: 'var(--text-secondary)', pl: 0.5 }}
+          >
             Current: {formatCurrency(selectedToAccount.balance)}
-          </div>
+          </Typography>
         )}
 
         <Input
@@ -185,7 +208,9 @@ const RecurringForm: React.FC<RecurringFormProps> = ({
           required
         />
 
-        <div className="recurring-form__actions">
+        <Box
+          sx={{ display: 'flex', justifyContent: 'flex-end', gap: 1, mt: 0.5 }}
+        >
           <Button
             type="button"
             variant="secondary"
@@ -197,8 +222,8 @@ const RecurringForm: React.FC<RecurringFormProps> = ({
           <Button type="submit" variant="primary" disabled={submitting}>
             {submitting ? 'Creating...' : 'Create Recurring Transaction'}
           </Button>
-        </div>
-      </form>
+        </Box>
+      </Box>
     </Modal>
   )
 }

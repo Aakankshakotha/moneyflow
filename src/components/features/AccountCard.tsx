@@ -5,7 +5,6 @@ import { formatCurrency } from '@/utils/currencyUtils'
 import Box from '@mui/material/Box'
 import Typography from '@mui/material/Typography'
 import Chip from '@mui/material/Chip'
-import './AccountCard.css'
 
 interface AccountCardProps {
   account: Account
@@ -29,13 +28,25 @@ const AccountCard: React.FC<AccountCardProps> = ({
     accountData: Account
   ): { label: string; value: number; tone: string } => {
     if (accountData.type === 'income') {
-      return { label: 'Total Inflow:', value: Math.abs(accountData.balance), tone: 'income' }
+      return {
+        label: 'Total Inflow:',
+        value: Math.abs(accountData.balance),
+        tone: 'income',
+      }
     }
     if (accountData.type === 'expense') {
-      return { label: 'Total Spent:', value: Math.abs(accountData.balance), tone: 'expense' }
+      return {
+        label: 'Total Spent:',
+        value: Math.abs(accountData.balance),
+        tone: 'expense',
+      }
     }
     if (accountData.type === 'liability') {
-      return { label: 'Balance:', value: accountData.balance, tone: 'liability' }
+      return {
+        label: 'Balance:',
+        value: accountData.balance,
+        tone: 'liability',
+      }
     }
     return { label: 'Balance:', value: accountData.balance, tone: 'asset' }
   }
@@ -50,28 +61,69 @@ const AccountCard: React.FC<AccountCardProps> = ({
     return labels[type] || type
   }
 
+  const toneColor: Record<string, string> = {
+    asset: 'var(--success-color)',
+    income: 'var(--success-color)',
+    liability: 'var(--error-color)',
+    expense: 'var(--error-color)',
+  }
+
   const amountDisplay = getAmountDisplay(account)
 
   return (
-    <Card className="account-card">
-      <Box className="account-card__header">
+    <Card sx={{ mb: 1 }} hoverable>
+      <Box
+        sx={{
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'flex-start',
+          mb: 1,
+        }}
+      >
         <Box>
-          <Typography variant="h6" component="h3" className="account-card__name">
+          <Typography
+            variant="h6"
+            component="h3"
+            sx={{
+              m: 0,
+              mb: '0.25rem',
+              fontWeight: 600,
+              color: 'var(--text-primary)',
+            }}
+          >
             {account.name}
           </Typography>
           {parentName && (
-            <Typography variant="body2" className="account-card__parent">
+            <Typography
+              variant="body2"
+              sx={{
+                mb: '0.4rem',
+                fontSize: '0.8rem',
+                color: 'var(--text-secondary)',
+              }}
+            >
               Sub-account of {parentName}
             </Typography>
           )}
-          <Typography component="span" className="account-card__type">
+          <Typography
+            component="span"
+            sx={{
+              display: 'inline-block',
+              px: '0.5rem',
+              py: '0.25rem',
+              backgroundColor: 'var(--badge-background)',
+              color: 'var(--text-secondary)',
+              borderRadius: '4px',
+              fontSize: '0.875rem',
+              fontWeight: 500,
+            }}
+          >
             {getTypeLabel(account.type)}
           </Typography>
         </Box>
         <Chip
           label={account.status === 'active' ? 'Active' : 'Archived'}
           size="small"
-          className={`account-card__badge account-card__badge--${account.status}`}
           sx={{
             backgroundColor:
               account.status === 'active'
@@ -83,24 +135,39 @@ const AccountCard: React.FC<AccountCardProps> = ({
           }}
         />
       </Box>
-      <Box className="account-card__balance">
-        <Typography component="span" className="account-card__balance-label">
+      <Box
+        sx={{
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          py: '0.75rem',
+          borderTop: '1px solid var(--border-color)',
+          borderBottom: '1px solid var(--border-color)',
+        }}
+      >
+        <Typography
+          component="span"
+          sx={{ fontSize: '0.875rem', color: 'var(--text-secondary)' }}
+        >
           {amountDisplay.label}
         </Typography>
         <Typography
           component="span"
-          className={`account-card__balance-amount account-card__balance-amount--${amountDisplay.tone}`}
+          sx={{
+            fontSize: '1.5rem',
+            fontWeight: 700,
+            color: toneColor[amountDisplay.tone] ?? 'var(--text-primary)',
+          }}
         >
           {formatCurrency(amountDisplay.value)}
         </Typography>
       </Box>
       {(onEdit || onToggleStatus || onDelete) && (
-        <Box className="account-card__actions">
+        <Box sx={{ display: 'flex', gap: '0.5rem', mt: 1 }}>
           {onEdit && (
             <Button
               variant="secondary"
               size="sm"
-              className="account-card__button account-card__button--edit"
               onClick={() => onEdit(account)}
             >
               Edit
@@ -110,7 +177,6 @@ const AccountCard: React.FC<AccountCardProps> = ({
             <Button
               variant="secondary"
               size="sm"
-              className="account-card__button account-card__button--archive"
               onClick={() => onToggleStatus(account)}
             >
               {account.status === 'active' ? 'Archive' : 'Unarchive'}
@@ -120,7 +186,6 @@ const AccountCard: React.FC<AccountCardProps> = ({
             <Button
               variant="danger"
               size="sm"
-              className="account-card__button account-card__button--delete"
               onClick={() => onDelete(account)}
             >
               Delete

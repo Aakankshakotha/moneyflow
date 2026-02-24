@@ -1,12 +1,13 @@
 import React, { useState, useEffect } from 'react'
 import { Button } from '@/components/common'
 import FormControl from '@mui/material/FormControl'
-import InputLabel from '@mui/material/InputLabel'
 import MuiSelect from '@mui/material/Select'
 import MenuItem from '@mui/material/MenuItem'
 import TextField from '@mui/material/TextField'
 import InputAdornment from '@mui/material/InputAdornment'
 import SearchIcon from '@mui/icons-material/Search'
+import Box from '@mui/material/Box'
+import Typography from '@mui/material/Typography'
 import {
   TransactionForm,
   TransactionTable,
@@ -19,7 +20,7 @@ import type {
   CreateTransactionDto,
 } from '@/types/transaction'
 import type { Account } from '@/types/account'
-import './Transactions.css'
+
 
 /**
  * Transactions page - record and view transactions
@@ -229,45 +230,45 @@ const Transactions: React.FC = () => {
 
   if (loading) {
     return (
-      <div className="transactions">
-        <div className="transactions__header">
-          <h1>Transactions</h1>
-        </div>
-        <div className="transactions__loading">Loading transactions...</div>
-      </div>
+      <Box sx={{ p: '2rem', maxWidth: '1400px', margin: '0 auto' }}>
+        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: '2rem' }}>
+          <Typography variant="h4" component="h1" sx={{ m: 0, fontSize: '1.8rem', fontWeight: 700, color: 'var(--text-primary)' }}>Transactions</Typography>
+        </Box>
+        <Box sx={{ color: 'var(--text-secondary)' }}>Loading transactions...</Box>
+      </Box>
     )
   }
 
   if (error) {
     return (
-      <div className="transactions">
-        <div className="transactions__header">
-          <h1>Transactions</h1>
-        </div>
-        <div className="transactions__error">{error}</div>
-      </div>
+      <Box sx={{ p: '2rem', maxWidth: '1400px', margin: '0 auto' }}>
+        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: '2rem' }}>
+          <Typography variant="h4" component="h1" sx={{ m: 0, fontSize: '1.8rem', fontWeight: 700, color: 'var(--text-primary)' }}>Transactions</Typography>
+        </Box>
+        <Box sx={{ color: 'var(--error-color)' }}>{error}</Box>
+      </Box>
     )
   }
 
   return (
-    <div className="transactions">
-      <div className="transactions__header">
-        <h1>Transactions</h1>
-        <div className="transactions__header-actions">
+    <Box sx={{ p: '2rem', maxWidth: '1400px', margin: '0 auto' }}>
+      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: '2rem' }}>
+        <Typography variant="h4" component="h1" sx={{ m: 0, fontSize: '1.8rem', fontWeight: 700, color: 'var(--text-primary)' }}>Transactions</Typography>
+        <Box sx={{ display: 'flex', gap: '0.75rem', alignItems: 'center' }}>
           <Button variant="secondary">Export CSV</Button>
           <Button onClick={() => setIsFormOpen(true)}>Add Transaction</Button>
-        </div>
-      </div>
+        </Box>
+      </Box>
 
       <TransactionMetrics transactions={filteredTransactions} />
 
-      <div className="transactions__filters">
+      <Box sx={{ backgroundColor: 'var(--card-background)', border: '1px solid var(--border-color)', borderRadius: '8px', p: '1rem 1.25rem', mb: '1rem', display: 'flex', alignItems: 'center', gap: '0.75rem', flexWrap: 'wrap' }}>
         <TextField
           size="small"
           placeholder="Search by description, amount, or tag..."
           value={searchTerm}
           onChange={(e) => handleSearch(e.target.value)}
-          className="transactions__search"
+          sx={{ flex: 1.5, minWidth: '200px' }}
           slotProps={{
             input: {
               startAdornment: (
@@ -278,8 +279,7 @@ const Transactions: React.FC = () => {
             },
           }}
         />
-        <FormControl size="small" className="transactions__filter-select">
-          <InputLabel id="date-filter-label">Period</InputLabel>
+        <FormControl size="small" sx={{ minWidth: '130px' }}>
           <MuiSelect
             labelId="date-filter-label"
             label="Period"
@@ -316,8 +316,7 @@ const Transactions: React.FC = () => {
             />
           </>
         )}
-        <FormControl size="small" className="transactions__filter-select">
-          <InputLabel id="source-filter-label">Source</InputLabel>
+        <FormControl size="small" sx={{ minWidth: '130px' }}>
           <MuiSelect
             labelId="source-filter-label"
             label="Source"
@@ -331,8 +330,7 @@ const Transactions: React.FC = () => {
             <MenuItem value="liability">Liability</MenuItem>
           </MuiSelect>
         </FormControl>
-        <FormControl size="small" className="transactions__filter-select">
-          <InputLabel id="type-filter-label">Type</InputLabel>
+        <FormControl size="small" sx={{ minWidth: '130px' }}>
           <MuiSelect
             labelId="type-filter-label"
             label="Type"
@@ -345,14 +343,14 @@ const Transactions: React.FC = () => {
             <MenuItem value="transfer">Transfer</MenuItem>
           </MuiSelect>
         </FormControl>
-      </div>
+      </Box>
 
-      <div className="transactions__content">
+      <Box sx={{ mt: '1rem' }}>
         <TransactionTable
           transactions={filteredTransactions}
           onDelete={handleDeleteTransaction}
         />
-      </div>
+      </Box>
 
       <TransactionForm
         isOpen={isFormOpen}
@@ -360,7 +358,7 @@ const Transactions: React.FC = () => {
         onSubmit={handleCreateTransaction}
         accounts={accounts}
       />
-    </div>
+    </Box>
   )
 }
 

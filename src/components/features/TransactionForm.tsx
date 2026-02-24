@@ -8,8 +8,8 @@ import {
 } from '@/constants/categories'
 import type { CreateTransactionDto } from '@/types/transaction'
 import type { Account } from '@/types/account'
-import './TransactionForm.css'
-import './TransactionFormFlowPreview.css'
+import Box from '@mui/material/Box'
+import Typography from '@mui/material/Typography'
 
 interface TransactionFormProps {
   isOpen: boolean
@@ -218,66 +218,63 @@ const TransactionForm: React.FC<TransactionFormProps> = ({
 
   return (
     <Modal isOpen={isOpen} onClose={handleClose} title="Add Transaction">
-      <form onSubmit={handleSubmit} className="transaction-form">
+      <Box component="form" onSubmit={handleSubmit} sx={{ display: 'flex', flexDirection: 'column', gap: 0 }}>
         {/* Tab Navigation */}
-        <div className="transaction-form__tabs">
-          <button
-            type="button"
-            className={`transaction-form__tab ${
-              entryMode === 'expense' ? 'active' : ''
-            }`}
-            onClick={() => setEntryMode('expense')}
-          >
-            Expense
-          </button>
-          <button
-            type="button"
-            className={`transaction-form__tab ${
-              entryMode === 'income' ? 'active' : ''
-            }`}
-            onClick={() => setEntryMode('income')}
-          >
-            Income
-          </button>
-          <button
-            type="button"
-            className={`transaction-form__tab ${
-              entryMode === 'transfer' ? 'active' : ''
-            }`}
-            onClick={() => setEntryMode('transfer')}
-          >
-            Transfer
-          </button>
-        </div>
+        <Box sx={{ display: 'flex', mx: '-1.5rem', mt: '-1.5rem', borderBottom: '2px solid var(--border-color)' }}>
+          {(['expense', 'income', 'transfer'] as const).map((mode) => (
+            <Box
+              key={mode}
+              component="button"
+              type="button"
+              onClick={() => setEntryMode(mode)}
+              sx={{
+                flex: 1,
+                p: '1rem',
+                background: 'transparent',
+                border: 'none',
+                borderBottom: entryMode === mode ? '3px solid var(--primary-color)' : '3px solid transparent',
+                fontSize: '0.9375rem',
+                fontWeight: 600,
+                color: entryMode === mode ? 'var(--primary-color)' : 'var(--text-secondary)',
+                cursor: 'pointer',
+                transition: 'all 0.2s',
+                textTransform: 'capitalize',
+                '&:hover': { backgroundColor: 'var(--hover-background)', color: 'var(--text-primary)' },
+              }}
+            >
+              {mode.charAt(0).toUpperCase() + mode.slice(1)}
+            </Box>
+          ))}
+        </Box>
 
-        <div className="transaction-form__content">
+        <Box sx={{ display: 'flex', flexDirection: 'column', gap: '1.5rem', py: '1.5rem' }}>
           {/* Flow Preview */}
           {primaryAccountId &&
             secondaryAccountId &&
             amount &&
             parseFloat(amount) > 0 && (
-              <div className={`transaction-form__flow-preview ${entryMode}`}>
-                <div className="transaction-form__flow-preview-title">
+              <Box sx={{ backgroundColor: 'var(--card-background)', border: '1px solid var(--border-color)', borderRadius: '8px', p: '1rem', my: '0.5rem' }}>
+                <Typography sx={{ fontSize: '0.75rem', fontWeight: 600, color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '0.05em', mb: '0.75rem' }}>
                   Flow Preview
-                </div>
-                <div className="transaction-form__flow-diagram">
-                  <div className="transaction-form__flow-account">
-                    <div className="transaction-form__flow-account-type">
+                </Typography>
+                <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '1rem' }}>
+                  <Box sx={{ flex: 1, p: '0.75rem', backgroundColor: 'var(--background-secondary)', border: '1px solid var(--border-color)', borderRadius: '6px', textAlign: 'center' }}>
+                    <Typography sx={{ fontSize: '0.625rem', fontWeight: 600, color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '0.05em', mb: '0.25rem' }}>
                       {entryMode === 'expense'
                         ? 'From Asset'
                         : entryMode === 'income'
                           ? 'From Income'
                           : 'From'}
-                    </div>
-                    <div className="transaction-form__flow-account-name">
+                    </Typography>
+                    <Typography sx={{ fontSize: '0.875rem', fontWeight: 600, color: 'var(--text-primary)', mb: '0.25rem' }}>
                       {entryMode === 'expense'
                         ? secondaryConfig.accounts.find(
                             (a) => a.id === secondaryAccountId
                           )?.name || 'Asset'
                         : primaryAccounts.find((a) => a.id === primaryAccountId)
                             ?.name || 'Account'}
-                    </div>
-                    <div className="transaction-form__flow-account-balance">
+                    </Typography>
+                    <Typography sx={{ fontSize: '0.75rem', color: 'var(--text-secondary)' }}>
                       {formatCurrency(
                         entryMode === 'expense'
                           ? secondaryConfig.accounts.find(
@@ -287,31 +284,31 @@ const TransactionForm: React.FC<TransactionFormProps> = ({
                               (a) => a.id === primaryAccountId
                             )?.balance || 0
                       )}
-                    </div>
-                  </div>
-                  <div className="transaction-form__flow-arrow">
-                    <div className="transaction-form__flow-arrow-icon">→</div>
-                    <div className="transaction-form__flow-arrow-amount">
+                    </Typography>
+                  </Box>
+                  <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', color: 'var(--text-secondary)', flexShrink: 0 }}>
+                    <Typography sx={{ fontSize: '1.5rem', color: entryMode === 'income' ? '#10b981' : entryMode === 'expense' ? '#ef4444' : '#3b82f6' }}>→</Typography>
+                    <Typography sx={{ fontSize: '0.75rem', fontWeight: 600, color: 'var(--primary-color)', mt: '0.25rem' }}>
                       {formatCurrency(Math.round(parseFloat(amount) * 100))}
-                    </div>
-                  </div>
-                  <div className="transaction-form__flow-account">
-                    <div className="transaction-form__flow-account-type">
+                    </Typography>
+                  </Box>
+                  <Box sx={{ flex: 1, p: '0.75rem', backgroundColor: 'var(--background-secondary)', border: '1px solid var(--border-color)', borderRadius: '6px', textAlign: 'center' }}>
+                    <Typography sx={{ fontSize: '0.625rem', fontWeight: 600, color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '0.05em', mb: '0.25rem' }}>
                       {entryMode === 'expense'
                         ? 'To Expense'
                         : entryMode === 'income'
                           ? 'To Asset'
                           : 'To'}
-                    </div>
-                    <div className="transaction-form__flow-account-name">
+                    </Typography>
+                    <Typography sx={{ fontSize: '0.875rem', fontWeight: 600, color: 'var(--text-primary)', mb: '0.25rem' }}>
                       {entryMode === 'expense'
                         ? primaryAccounts.find((a) => a.id === primaryAccountId)
                             ?.name || 'Expense'
                         : secondaryConfig.accounts.find(
                             (a) => a.id === secondaryAccountId
                           )?.name || 'Account'}
-                    </div>
-                    <div className="transaction-form__flow-account-balance">
+                    </Typography>
+                    <Typography sx={{ fontSize: '0.75rem', color: 'var(--text-secondary)' }}>
                       {formatCurrency(
                         entryMode === 'expense'
                           ? primaryAccounts.find(
@@ -321,10 +318,10 @@ const TransactionForm: React.FC<TransactionFormProps> = ({
                               (a) => a.id === secondaryAccountId
                             )?.balance || 0
                       )}
-                    </div>
-                  </div>
-                </div>
-              </div>
+                    </Typography>
+                  </Box>
+                </Box>
+              </Box>
             )}
 
           <Select
@@ -351,9 +348,9 @@ const TransactionForm: React.FC<TransactionFormProps> = ({
           {displayAccount &&
             displayAccount.type !== 'income' &&
             displayAccount.type !== 'expense' && (
-              <div className="transaction-form__balance">
+              <Typography sx={{ mt: '-1rem', mb: '0.5rem', fontSize: '0.875rem', color: 'var(--text-secondary)', pl: '0.25rem' }}>
                 Available: {formatCurrency(displayAccount.balance)}
-              </div>
+              </Typography>
             )}
 
           {primaryAccountId && (
@@ -390,35 +387,42 @@ const TransactionForm: React.FC<TransactionFormProps> = ({
           />
 
           {suggestedCategories.length > 0 && (
-            <div className="transaction-form__suggestions">
-              <label className="transaction-form__suggestions-label">
+            <Box sx={{ mt: '-0.5rem', p: '0.75rem', backgroundColor: '#f9fafb', borderRadius: '0.375rem' }}>
+              <Typography component="label" sx={{ display: 'block', fontSize: '0.75rem', fontWeight: 600, color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '0.05em', mb: '0.5rem' }}>
                 Suggested:
-              </label>
-              <div className="transaction-form__suggestions-list">
+              </Typography>
+              <Box sx={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
                 {suggestedCategories.slice(0, 3).map((catId) => {
                   const cat = TRANSACTION_CATEGORIES.find((c) => c.id === catId)
                   if (!cat) return null
                   return (
-                    <button
+                    <Box
                       key={catId}
+                      component="button"
                       type="button"
-                      className={`transaction-form__suggestion ${category === catId ? 'active' : ''}`}
                       onClick={() => setCategory(catId)}
-                      style={{
-                        backgroundColor:
-                          category === catId ? cat.color : `${cat.color}20`,
+                      sx={{
+                        p: '0.375rem 0.75rem',
+                        border: 'none',
+                        borderRadius: '0.25rem',
+                        fontSize: '0.8125rem',
+                        fontWeight: category === catId ? 600 : 500,
+                        cursor: 'pointer',
+                        transition: 'all 0.2s',
+                        backgroundColor: category === catId ? cat.color : `${cat.color}20`,
                         color: category === catId ? '#fff' : cat.color,
+                        '&:hover': { transform: 'translateY(-1px)', boxShadow: '0 2px 4px rgba(0,0,0,0.1)' },
                       }}
                     >
                       {cat.name}
-                    </button>
+                    </Box>
                   )
                 })}
-              </div>
-            </div>
+              </Box>
+            </Box>
           )}
 
-          <div className="transaction-form__category-select">
+          <Box sx={{ mt: '-0.5rem' }}>
             <Select
               label="Category (Optional)"
               value={category}
@@ -444,12 +448,12 @@ const TransactionForm: React.FC<TransactionFormProps> = ({
             value={date}
             onChange={(e) => setDate(e.target.value)}
             required
-          />
+          </Box>
 
-          {error && <div className="transaction-form__error">{error}</div>}
-        </div>
+          {error && <Box sx={{ p: '0.75rem', backgroundColor: '#fee2e2', color: 'var(--error-color)', borderRadius: '0.375rem', fontSize: '0.875rem' }}>{error}</Box>}
+        </Box>
 
-        <div className="transaction-form__actions">
+        <Box sx={{ display: 'flex', justifyContent: 'flex-end', gap: '1rem', mt: '0.5rem' }}>
           <Button
             type="button"
             variant="secondary"
@@ -461,8 +465,8 @@ const TransactionForm: React.FC<TransactionFormProps> = ({
           <Button type="submit" disabled={submitting}>
             {submitting ? 'Recording...' : 'Record Transaction'}
           </Button>
-        </div>
-      </form>
+        </Box>
+      </Box>
     </Modal>
   )
 }

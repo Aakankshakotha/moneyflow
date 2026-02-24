@@ -2,7 +2,8 @@ import React from 'react'
 import type { Account, AccountType, AccountStatus } from '@/types/account'
 import AccountCard from './AccountCard'
 import { Select } from '@/components/common'
-import './AccountList.css'
+import Box from '@mui/material/Box'
+import Typography from '@mui/material/Typography'
 
 interface AccountListProps {
   accounts: Account[]
@@ -114,8 +115,19 @@ const AccountList: React.FC<AccountListProps> = ({
   }
 
   return (
-    <div className="account-list">
-      <div className="account-list__filters">
+    <Box sx={{ width: '100%' }}>
+      <Box
+        sx={{
+          display: 'grid',
+          gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
+          gap: '1rem',
+          mb: 2,
+          p: '1rem',
+          backgroundColor: 'var(--background-secondary)',
+          border: '1px solid var(--border-color)',
+          borderRadius: '8px',
+        }}
+      >
         <Select
           label="Filter by Type"
           value={filterType}
@@ -138,20 +150,58 @@ const AccountList: React.FC<AccountListProps> = ({
             { value: 'archived', label: 'Archived' },
           ]}
         />
-      </div>
+      </Box>
 
       {accounts.length === 0 ? (
-        <div className="account-list__empty">
-          <p>No accounts found. Create your first account to get started!</p>
-        </div>
+        <Box
+          sx={{
+            textAlign: 'center',
+            padding: '3rem 1rem',
+            backgroundColor: 'var(--background-secondary)',
+            border: '1px solid var(--border-color)',
+            borderRadius: '8px',
+            color: 'var(--text-secondary)',
+          }}
+        >
+          <Typography>
+            No accounts found. Create your first account to get started!
+          </Typography>
+        </Box>
       ) : (
-        <div className="account-list__groups">
+        <Box sx={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
           {Object.entries(groupedAccounts).map(([type, typeAccounts]) => (
-            <div key={type} className="account-list__group">
-              <h2 className="account-list__group-title">
+            <Box
+              key={type}
+              sx={{
+                padding: '1.5rem',
+                backgroundColor: 'var(--card-background)',
+                border: '1px solid var(--border-color)',
+                borderRadius: '8px',
+                boxShadow: 'var(--shadow-soft)',
+              }}
+            >
+              <Typography
+                variant="h5"
+                component="h2"
+                sx={{
+                  m: 0,
+                  mb: 1,
+                  fontSize: '1.5rem',
+                  fontWeight: 600,
+                  color: 'var(--text-primary)',
+                  borderBottom: '2px solid var(--primary-color)',
+                  pb: '0.5rem',
+                }}
+              >
                 {typeLabels[type] || type}
-              </h2>
-              <div className="account-list__cards">
+              </Typography>
+              <Box
+                sx={{
+                  display: 'grid',
+                  gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))',
+                  gap: '1rem',
+                }}
+              >
                 {orderedAccountsForType(typeAccounts).map((account) => (
                   <AccountCard
                     key={account.id}
@@ -166,12 +216,12 @@ const AccountList: React.FC<AccountListProps> = ({
                     onDelete={onDelete}
                   />
                 ))}
-              </div>
-            </div>
+              </Box>
+            </Box>
           ))}
-        </div>
+        </Box>
       )}
-    </div>
+    </Box>
   )
 }
 

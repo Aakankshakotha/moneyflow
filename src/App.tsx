@@ -8,7 +8,6 @@ import Dashboard from './pages/Dashboard'
 import Accounts from './pages/Accounts'
 import Transactions from './pages/Transactions'
 import Recurring from './pages/Recurring'
-import './App.css'
 
 /**
  * Main application component
@@ -19,9 +18,16 @@ const App: React.FC = () => {
     <ThemeProvider>
       <MuiAppThemeProvider>
         <Router>
-          <Box component="div" className="app">
+          <Box
+            component="div"
+            sx={{
+              minHeight: '100vh',
+              display: 'flex',
+              flexDirection: 'column',
+            }}
+          >
             <Navigation />
-            <Box component="main" className="app__content">
+            <Box component="main" sx={{ flex: 1, width: '100%', minWidth: 0 }}>
               <Routes>
                 <Route path="/" element={<Dashboard />} />
                 <Route path="/accounts" element={<Accounts />} />

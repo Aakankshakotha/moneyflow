@@ -13,7 +13,6 @@ import TableCell from '@mui/material/TableCell'
 import Chip from '@mui/material/Chip'
 import IconButton from '@mui/material/IconButton'
 import CloseIcon from '@mui/icons-material/Close'
-import './TransactionTable.css'
 
 interface TransactionTableProps {
   transactions: TransactionWithAccounts[]
@@ -41,9 +40,18 @@ const TransactionTable: React.FC<TransactionTableProps> = ({
 
   if (transactions.length === 0) {
     return (
-      <Box className="transaction-table__empty">
+      <Box
+        sx={{
+          textAlign: 'center',
+          py: '4rem',
+          px: '2rem',
+          color: 'var(--text-secondary)',
+        }}
+      >
         <Typography>No transactions found</Typography>
-        <Typography className="transaction-table__empty-hint">
+        <Typography
+          sx={{ fontSize: '0.875rem', color: 'var(--text-secondary)' }}
+        >
           Try adjusting your filters or record a new transaction
         </Typography>
       </Box>
@@ -51,36 +59,152 @@ const TransactionTable: React.FC<TransactionTableProps> = ({
   }
 
   return (
-    <Box className="transaction-table">
-      <Table className="transaction-table__table">
-        <TableHead className="transaction-table__header">
+    <Box
+      sx={{
+        backgroundColor: 'var(--card-background)',
+        border: '1px solid var(--border-color)',
+        borderRadius: '0.5rem',
+        overflow: 'hidden',
+      }}
+    >
+      <Table>
+        <TableHead sx={{ backgroundColor: 'var(--background-secondary)' }}>
           <TableRow>
-            <TableCell className="transaction-table__col-date">DATE &amp; DESCRIPTION</TableCell>
-            <TableCell className="transaction-table__col-category">CATEGORY</TableCell>
-            <TableCell className="transaction-table__col-source">SOURCE (DEBIT)</TableCell>
-            <TableCell className="transaction-table__col-dest">DEST (DEBIT)</TableCell>
-            <TableCell className="transaction-table__col-type">TYPE</TableCell>
-            <TableCell className="transaction-table__col-amount">AMOUNT</TableCell>
-            <TableCell className="transaction-table__col-actions">ACTIONS</TableCell>
+            <TableCell
+              sx={{
+                width: '25%',
+                fontWeight: 600,
+                fontSize: '0.75rem',
+                letterSpacing: '0.05em',
+                color: 'var(--text-secondary)',
+                textTransform: 'uppercase',
+              }}
+            >
+              DATE &amp; DESCRIPTION
+            </TableCell>
+            <TableCell
+              sx={{
+                width: '12%',
+                fontWeight: 600,
+                fontSize: '0.75rem',
+                letterSpacing: '0.05em',
+                color: 'var(--text-secondary)',
+                textTransform: 'uppercase',
+              }}
+            >
+              CATEGORY
+            </TableCell>
+            <TableCell
+              sx={{
+                width: '16%',
+                fontWeight: 600,
+                fontSize: '0.75rem',
+                letterSpacing: '0.05em',
+                color: 'var(--text-secondary)',
+                textTransform: 'uppercase',
+              }}
+            >
+              SOURCE (DEBIT)
+            </TableCell>
+            <TableCell
+              sx={{
+                width: '16%',
+                fontWeight: 600,
+                fontSize: '0.75rem',
+                letterSpacing: '0.05em',
+                color: 'var(--text-secondary)',
+                textTransform: 'uppercase',
+              }}
+            >
+              DEST (DEBIT)
+            </TableCell>
+            <TableCell
+              sx={{
+                width: '10%',
+                fontWeight: 600,
+                fontSize: '0.75rem',
+                letterSpacing: '0.05em',
+                color: 'var(--text-secondary)',
+                textTransform: 'uppercase',
+              }}
+            >
+              TYPE
+            </TableCell>
+            <TableCell
+              sx={{
+                width: '12%',
+                fontWeight: 600,
+                fontSize: '0.75rem',
+                letterSpacing: '0.05em',
+                color: 'var(--text-secondary)',
+                textTransform: 'uppercase',
+              }}
+            >
+              AMOUNT
+            </TableCell>
+            <TableCell
+              sx={{
+                width: '9%',
+                fontWeight: 600,
+                fontSize: '0.75rem',
+                letterSpacing: '0.05em',
+                color: 'var(--text-secondary)',
+                textTransform: 'uppercase',
+              }}
+            >
+              ACTIONS
+            </TableCell>
           </TableRow>
         </TableHead>
-        <TableBody className="transaction-table__body">
+        <TableBody>
           {transactions.map((txn) => {
             const category = txn.category ? getCategoryById(txn.category) : null
             const type = getTransactionType(txn)
 
             return (
-              <TableRow key={txn.id} className="transaction-table__row" hover>
-                <TableCell className="transaction-table__cell transaction-table__cell-date">
-                  <Box className="transaction-table__date-container">
-                    <Box className="transaction-table__icon">
-                      {type === 'income' ? '💰' : type === 'expense' ? '🛍️' : '🔄'}
+              <TableRow key={txn.id} hover>
+                <TableCell>
+                  <Box
+                    sx={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '0.75rem',
+                    }}
+                  >
+                    <Box
+                      sx={{
+                        width: '2rem',
+                        height: '2rem',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        backgroundColor: 'var(--background-secondary)',
+                        borderRadius: '50%',
+                        flexShrink: 0,
+                      }}
+                    >
+                      {type === 'income'
+                        ? '💰'
+                        : type === 'expense'
+                          ? '🛍️'
+                          : '🔄'}
                     </Box>
                     <Box>
-                      <Typography className="transaction-table__description">
+                      <Typography
+                        sx={{
+                          fontSize: '0.875rem',
+                          fontWeight: 500,
+                          color: 'var(--text-primary)',
+                        }}
+                      >
                         {txn.description}
                       </Typography>
-                      <Typography className="transaction-table__date">
+                      <Typography
+                        sx={{
+                          fontSize: '0.75rem',
+                          color: 'var(--text-secondary)',
+                        }}
+                      >
                         {formatDate(new Date(txn.date), 'MMM dd, yyyy')} •{' '}
                         {new Date(txn.date).toLocaleTimeString('en-US', {
                           hour: '2-digit',
@@ -90,12 +214,11 @@ const TransactionTable: React.FC<TransactionTableProps> = ({
                     </Box>
                   </Box>
                 </TableCell>
-                <TableCell className="transaction-table__cell transaction-table__cell-category">
+                <TableCell>
                   {category ? (
                     <Chip
                       label={category.name}
                       size="small"
-                      className="transaction-table__category-badge"
                       sx={{
                         backgroundColor: `${category.color}20`,
                         color: category.color,
@@ -104,50 +227,124 @@ const TransactionTable: React.FC<TransactionTableProps> = ({
                       }}
                     />
                   ) : (
-                    <Typography className="transaction-table__no-category">—</Typography>
+                    <Typography sx={{ color: 'var(--text-secondary)' }}>
+                      —
+                    </Typography>
                   )}
                 </TableCell>
-                <TableCell className="transaction-table__cell transaction-table__cell-source">
-                  <Box className="transaction-table__account">
-                    <Typography component="span" className="transaction-table__account-prefix">CR</Typography>
-                    <Typography component="span" className="transaction-table__account-name">
+                <TableCell>
+                  <Box
+                    sx={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '0.25rem',
+                    }}
+                  >
+                    <Typography
+                      component="span"
+                      sx={{
+                        fontSize: '0.65rem',
+                        fontWeight: 700,
+                        color: 'var(--text-secondary)',
+                        textTransform: 'uppercase',
+                        letterSpacing: '0.05em',
+                      }}
+                    >
+                      CR
+                    </Typography>
+                    <Typography
+                      component="span"
+                      sx={{
+                        fontSize: '0.875rem',
+                        color: 'var(--text-primary)',
+                      }}
+                    >
                       {txn.fromAccount.name}
                     </Typography>
                   </Box>
                 </TableCell>
-                <TableCell className="transaction-table__cell transaction-table__cell-dest">
-                  <Box className="transaction-table__account">
-                    <Typography component="span" className="transaction-table__account-prefix">DR</Typography>
-                    <Typography component="span" className="transaction-table__account-name">
+                <TableCell>
+                  <Box
+                    sx={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '0.25rem',
+                    }}
+                  >
+                    <Typography
+                      component="span"
+                      sx={{
+                        fontSize: '0.65rem',
+                        fontWeight: 700,
+                        color: 'var(--text-secondary)',
+                        textTransform: 'uppercase',
+                        letterSpacing: '0.05em',
+                      }}
+                    >
+                      DR
+                    </Typography>
+                    <Typography
+                      component="span"
+                      sx={{
+                        fontSize: '0.875rem',
+                        color: 'var(--text-primary)',
+                      }}
+                    >
                       {txn.toAccount.name}
                     </Typography>
                   </Box>
                 </TableCell>
-                <TableCell className="transaction-table__cell transaction-table__cell-type">
+                <TableCell>
                   <Chip
                     label={type.toUpperCase()}
                     size="small"
-                    className={`transaction-table__type-badge transaction-table__type-badge--${type}`}
-                    sx={{ fontWeight: 600, fontSize: '0.7rem' }}
+                    sx={{
+                      fontWeight: 600,
+                      fontSize: '0.7rem',
+                      backgroundColor:
+                        type === 'income'
+                          ? 'rgba(16,185,129,0.1)'
+                          : type === 'expense'
+                            ? 'rgba(239,68,68,0.1)'
+                            : 'rgba(59,130,246,0.1)',
+                      color:
+                        type === 'income'
+                          ? '#10b981'
+                          : type === 'expense'
+                            ? '#ef4444'
+                            : '#3b82f6',
+                    }}
                   />
                 </TableCell>
-                <TableCell className="transaction-table__cell transaction-table__cell-amount">
+                <TableCell>
                   <Typography
                     component="span"
-                    className={`transaction-table__amount transaction-table__amount--${type}`}
+                    sx={{
+                      fontSize: '0.9rem',
+                      fontWeight: 600,
+                      color:
+                        type === 'income'
+                          ? '#10b981'
+                          : type === 'expense'
+                            ? '#ef4444'
+                            : 'var(--text-primary)',
+                    }}
                   >
                     {type === 'expense' ? '-' : ''}
                     {formatCurrency(txn.amount)}
                   </Typography>
                 </TableCell>
-                <TableCell className="transaction-table__cell transaction-table__cell-actions">
+                <TableCell>
                   {onDelete && (
                     <IconButton
-                      className="transaction-table__delete-btn"
                       onClick={() => onDelete(txn)}
                       title="Delete transaction"
                       size="small"
                       aria-label="Delete transaction"
+                      sx={{
+                        color: 'var(--text-secondary)',
+                        '&:hover': { color: 'var(--error-color)' },
+                      }}
                     >
                       <CloseIcon fontSize="small" />
                     </IconButton>

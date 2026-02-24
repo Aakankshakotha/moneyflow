@@ -9,7 +9,6 @@ import Typography from '@mui/material/Typography'
 import Chip from '@mui/material/Chip'
 import IconButton from '@mui/material/IconButton'
 import CloseIcon from '@mui/icons-material/Close'
-import './TransactionCard.css'
 
 interface TransactionCardProps {
   transaction: TransactionWithAccounts
@@ -50,7 +49,11 @@ const TransactionCard: React.FC<TransactionCardProps> = ({
   }
 
   const transactionType = getTransactionType()
-  const typeLabels = { income: 'INCOME', expense: 'EXPENSE', transfer: 'TRANSFER' }
+  const typeLabels = {
+    income: 'INCOME',
+    expense: 'EXPENSE',
+    transfer: 'TRANSFER',
+  }
 
   const typeColors: Record<string, { bg: string; color: string }> = {
     income: { bg: 'rgba(34,197,94,0.1)', color: '#22c55e' },
@@ -59,31 +62,105 @@ const TransactionCard: React.FC<TransactionCardProps> = ({
   }
 
   return (
-    <Card className="transaction-card">
-      <Box className="transaction-card__main">
-        <Box className="transaction-card__left">
-          <Typography className="transaction-card__date">
+    <Card
+      noPadding
+      sx={{
+        px: '1rem',
+        py: '0.75rem',
+        borderLeft: '3px solid transparent',
+        '&:hover': { backgroundColor: 'var(--hover-background)' },
+      }}
+    >
+      <Box
+        sx={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          gap: '1rem',
+        }}
+      >
+        <Box
+          sx={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: '1rem',
+            flex: 1,
+            minWidth: 0,
+          }}
+        >
+          <Typography
+            sx={{
+              fontSize: '0.75rem',
+              color: 'var(--text-secondary)',
+              minWidth: '65px',
+            }}
+          >
             {formatDate(new Date(transaction.date), 'MMM dd')}
           </Typography>
-          <Box className="transaction-card__flow">
-            <Typography component="span" className="transaction-card__account from">
+          <Box
+            sx={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '0.5rem',
+              minWidth: 0,
+              flex: 1,
+            }}
+          >
+            <Typography
+              component="span"
+              sx={{
+                fontSize: '0.875rem',
+                fontWeight: 500,
+                color: 'var(--text-primary)',
+                whiteSpace: 'nowrap',
+                overflow: 'hidden',
+                textOverflow: 'ellipsis',
+              }}
+            >
               {transaction.fromAccount.name}
             </Typography>
-            <Typography component="span" className="transaction-card__arrow">→</Typography>
-            <Typography component="span" className="transaction-card__account to">
+            <Typography
+              component="span"
+              sx={{
+                fontSize: '1rem',
+                color: 'var(--text-secondary)',
+                flexShrink: 0,
+              }}
+            >
+              →
+            </Typography>
+            <Typography
+              component="span"
+              sx={{
+                fontSize: '0.875rem',
+                fontWeight: 500,
+                color: 'var(--text-primary)',
+                whiteSpace: 'nowrap',
+                overflow: 'hidden',
+                textOverflow: 'ellipsis',
+              }}
+            >
               {transaction.toAccount.name}
             </Typography>
           </Box>
-          <Typography className="transaction-card__description">
+          <Typography
+            sx={{
+              fontSize: '0.8125rem',
+              color: 'var(--text-secondary)',
+              whiteSpace: 'nowrap',
+              overflow: 'hidden',
+              textOverflow: 'ellipsis',
+              flex: 1,
+            }}
+          >
             {transaction.description}
           </Typography>
         </Box>
 
-        <Box className="transaction-card__right">
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
           <Chip
             label={typeLabels[transactionType]}
             size="small"
-            className={`transaction-card__type transaction-card__type--${transactionType}`}
             sx={{
               backgroundColor: typeColors[transactionType].bg,
               color: typeColors[transactionType].color,
@@ -95,7 +172,6 @@ const TransactionCard: React.FC<TransactionCardProps> = ({
             <Chip
               label={category.name}
               size="small"
-              className="transaction-card__category"
               sx={{
                 backgroundColor: `${category.color}20`,
                 color: category.color,
@@ -103,15 +179,25 @@ const TransactionCard: React.FC<TransactionCardProps> = ({
               }}
             />
           )}
-          <Typography className="transaction-card__amount">
+          <Typography
+            sx={{
+              fontSize: '0.9375rem',
+              fontWeight: 600,
+              color: 'var(--text-primary)',
+              whiteSpace: 'nowrap',
+            }}
+          >
             {formatCurrency(transaction.amount)}
           </Typography>
           {onDelete && (
             <IconButton
-              className="transaction-card__delete"
               onClick={handleDelete}
               size="small"
               aria-label="Delete transaction"
+              sx={{
+                color: 'var(--text-secondary)',
+                '&:hover': { color: 'var(--error-color)' },
+              }}
             >
               <CloseIcon fontSize="small" />
             </IconButton>

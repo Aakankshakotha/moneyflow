@@ -19,7 +19,8 @@ import { Button } from '@/components/common'
 import { formatCurrency } from '@/utils/currencyUtils'
 import * as accountService from '@/services/accountService'
 import * as transactionService from '@/services/transactionService'
-import './Accounts.css'
+import Box from '@mui/material/Box'
+import Typography from '@mui/material/Typography'
 
 /**
  * Accounts page - manage accounts (assets, liabilities, income, expenses)
@@ -351,33 +352,33 @@ const Accounts: React.FC = () => {
 
   if (loading) {
     return (
-      <div className="accounts-page">
-        <p>Loading accounts...</p>
-      </div>
+      <Box sx={{ p: '2rem', maxWidth: '1440px', margin: '0 auto' }}>
+        <Typography>Loading accounts...</Typography>
+      </Box>
     )
   }
 
   if (error) {
     return (
-      <div className="accounts-page">
-        <p className="accounts-page__error">{error}</p>
+      <Box sx={{ p: '2rem', maxWidth: '1440px', margin: '0 auto' }}>
+        <Typography sx={{ color: 'var(--error-color)', fontSize: '1.125rem', mb: '1rem' }}>{error}</Typography>
         <Button onClick={loadAccounts}>Retry</Button>
-      </div>
+      </Box>
     )
   }
 
   return (
-    <div className="accounts-page">
-      <div className="accounts-page__header">
-        <div>
-          <h1 className="accounts-page__title">Accounts</h1>
-          <p className="accounts-page__subtitle">
+    <Box sx={{ p: '2rem', maxWidth: '1440px', margin: '0 auto' }}>
+      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '1rem', mb: '1.5rem' }}>
+        <Box>
+          <Typography variant="h4" component="h1" sx={{ m: 0, fontSize: '1.8rem', fontWeight: 700, color: 'var(--text-primary)' }}>Accounts</Typography>
+          <Typography sx={{ m: '0.35rem 0 0', color: 'var(--text-secondary)', fontSize: '0.92rem' }}>
             Manage your financial buckets: Assets, Liabilities, Income, and
             Expenses.
-          </p>
-        </div>
+          </Typography>
+        </Box>
 
-        <div className="accounts-page__header-actions">
+        <Box sx={{ display: 'flex', gap: '0.75rem', alignItems: 'center' }}>
           <FormControl size="small" sx={{ minWidth: 140 }}>
             <InputLabel id="graph-range-label">Graph Range</InputLabel>
             <MuiSelect
@@ -394,32 +395,32 @@ const Accounts: React.FC = () => {
             </MuiSelect>
           </FormControl>
           <Button onClick={() => setIsFormOpen(true)}>Add Account</Button>
-        </div>
-      </div>
+        </Box>
+      </Box>
 
-      <div className="accounts-page__metrics">
-        <div className="accounts-page__metric-card">
-          <p className="accounts-page__metric-label">Net Worth</p>
-          <p className="accounts-page__metric-value">
+      <Box sx={{ display: 'grid', gridTemplateColumns: 'repeat(3, minmax(0, 1fr))', gap: '1rem', mb: '1.25rem' }}>
+        <Box sx={{ backgroundColor: 'var(--card-background)', border: '1px solid var(--border-color)', borderRadius: '12px', p: '1rem 1.15rem', boxShadow: 'var(--shadow-soft)' }}>
+          <Typography sx={{ m: 0, color: 'var(--text-secondary)', fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.04em' }}>Net Worth</Typography>
+          <Typography sx={{ m: '0.35rem 0 0', color: 'var(--text-primary)', fontSize: '1.75rem', fontWeight: 700 }}>
             {formatCurrency(netWorth)}
-          </p>
-        </div>
-        <div className="accounts-page__metric-card">
-          <p className="accounts-page__metric-label">Total Assets</p>
-          <p className="accounts-page__metric-value">
+          </Typography>
+        </Box>
+        <Box sx={{ backgroundColor: 'var(--card-background)', border: '1px solid var(--border-color)', borderRadius: '12px', p: '1rem 1.15rem', boxShadow: 'var(--shadow-soft)' }}>
+          <Typography sx={{ m: 0, color: 'var(--text-secondary)', fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.04em' }}>Total Assets</Typography>
+          <Typography sx={{ m: '0.35rem 0 0', color: 'var(--text-primary)', fontSize: '1.75rem', fontWeight: 700 }}>
             {formatCurrency(totalAssets)}
-          </p>
-        </div>
-        <div className="accounts-page__metric-card">
-          <p className="accounts-page__metric-label">Total Liabilities</p>
-          <p className="accounts-page__metric-value">
+          </Typography>
+        </Box>
+        <Box sx={{ backgroundColor: 'var(--card-background)', border: '1px solid var(--border-color)', borderRadius: '12px', p: '1rem 1.15rem', boxShadow: 'var(--shadow-soft)' }}>
+          <Typography sx={{ m: 0, color: 'var(--text-secondary)', fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.04em' }}>Total Liabilities</Typography>
+          <Typography sx={{ m: '0.35rem 0 0', color: 'var(--text-primary)', fontSize: '1.75rem', fontWeight: 700 }}>
             {formatCurrency(totalLiabilities)}
-          </p>
-        </div>
-      </div>
+          </Typography>
+        </Box>
+      </Box>
 
-      <div className="accounts-page__layout">
-        <div className="accounts-page__left-pane">
+      <Box sx={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1.7fr) minmax(340px, 0.9fr)', gap: '1rem' }}>
+        <Box sx={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
           {sections.map((section) => {
             const sectionAccounts = activeAccounts.filter(
               (account) => account.type === section.type
@@ -441,21 +442,19 @@ const Accounts: React.FC = () => {
             }[section.type]
 
             return (
-              <section key={section.type} className="accounts-page__section">
-                <header className="accounts-page__section-header">
-                  <h2 className="accounts-page__group-title">
-                    <span
-                      className={`accounts-page__group-dot accounts-page__group-dot--${section.dotClass}`}
-                    />
+              <Box component="section" key={section.type} sx={{ display: 'flex', flexDirection: 'column', gap: '0.6rem' }}>
+                <Box component="header" sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', p: '0 0.25rem' }}>
+                  <Typography variant="h6" component="h2" sx={{ m: 0, display: 'flex', alignItems: 'center', gap: '0.55rem', color: 'var(--primary-color)', fontSize: '1.15rem', fontWeight: 700 }}>
+                    <Box component="span" sx={{ width: '8px', height: '8px', borderRadius: '50%', backgroundColor: section.dotClass === 'asset' ? '#10b981' : section.dotClass === 'liability' ? '#ef4444' : section.dotClass === 'income' ? '#3b82f6' : '#f59e0b', display: 'inline-block' }} />
                     {section.label}
-                  </h2>
-                  <span className="accounts-page__group-total">
+                  </Typography>
+                  <Typography component="span" sx={{ color: 'var(--primary-color)', fontSize: '0.9rem', fontWeight: 600, letterSpacing: '0.03em' }}>
                     {formatCurrency(sectionTotal)}
-                  </span>
-                </header>
+                  </Typography>
+                </Box>
 
-                <div className="accounts-page__group">
-                  <div className="accounts-page__rows">
+                <Box sx={{ backgroundColor: 'var(--card-background)', border: '1px solid var(--border-color)', borderRadius: '12px', overflow: 'hidden' }}>
+                  <Box sx={{ display: 'flex', flexDirection: 'column' }}>
                     {sectionAccounts.map((account) =>
                       (() => {
                         const trendValues =
@@ -468,39 +467,52 @@ const Accounts: React.FC = () => {
                         const isUpward = trendEnd >= trendStart
 
                         return (
-                          <button
+                          <Box
                             key={account.id}
+                            component="button"
                             type="button"
-                            className={`accounts-page__row ${
-                              selectedAccountId === account.id
-                                ? 'accounts-page__row--active'
-                                : ''
-                            }`}
+                            sx={{
+                              border: 'none',
+                              borderBottom: '1px solid var(--border-color)',
+                              backgroundColor: selectedAccountId === account.id ? 'rgba(249,115,22,0.15)' : 'transparent',
+                              boxShadow: selectedAccountId === account.id ? 'inset 4px 0 0 var(--primary-color)' : 'none',
+                              color: 'inherit',
+                              width: '100%',
+                              display: 'flex',
+                              alignItems: 'center',
+                              gap: '1rem',
+                              p: '1rem 1.25rem',
+                              textAlign: 'left',
+                              cursor: 'pointer',
+                              transition: 'background 0.15s ease',
+                              '&:last-child': { borderBottom: 'none' },
+                              '&:hover': { backgroundColor: 'rgba(249,115,22,0.1)' },
+                            }}
                             onClick={() =>
                               setSelectedAccountId((prev) =>
                                 prev === account.id ? null : account.id
                               )
                             }
                           >
-                            <div className="accounts-page__row-icon">
+                            <Box sx={{ width: '40px', height: '40px', borderRadius: '10px', backgroundColor: 'var(--background-secondary)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, color: 'var(--text-secondary)' }}>
                               <SectionIcon fontSize="small" />
-                            </div>
-                            <div className="accounts-page__row-main">
-                              <p className="accounts-page__row-name">
+                            </Box>
+                            <Box sx={{ flex: 1, minWidth: 0 }}>
+                              <Typography sx={{ m: 0, color: 'var(--text-primary)', fontWeight: 600, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
                                 {account.name}
-                              </p>
-                              <p className="accounts-page__row-meta">
+                              </Typography>
+                              <Typography sx={{ m: '0.2rem 0 0', color: 'var(--text-secondary)', fontSize: '0.78rem' }}>
                                 {account.parentAccountId
                                   ? `Sub-account of ${accountMap.get(account.parentAccountId)?.name || 'Unknown'}`
                                   : section.label.slice(0, -1)}
-                              </p>
-                            </div>
-                            <div className="accounts-page__row-right">
-                              <p className="accounts-page__row-amount">
+                              </Typography>
+                            </Box>
+                            <Box sx={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+                              <Typography sx={{ m: 0, color: 'var(--text-primary)', fontWeight: 700 }}>
                                 {formatCurrency(Math.abs(account.balance))}
-                              </p>
+                              </Typography>
                               <svg
-                                className="accounts-page__row-sparkline"
+                                style={{ width: '86px', height: '24px', opacity: 0.95 }}
                                 viewBox="0 0 86 24"
                                 preserveAspectRatio="none"
                                 aria-hidden="true"
@@ -518,35 +530,37 @@ const Accounts: React.FC = () => {
                                   strokeLinejoin="round"
                                 />
                               </svg>
-                            </div>
-                          </button>
+                            </Box>
+                          </Box>
                         )
                       })()
                     )}
-                  </div>
-                </div>
-              </section>
+                  </Box>
+                </Box>
+              </Box>
             )
           })}
-        </div>
+        </Box>
 
-        <aside className="accounts-page__right-pane">
+        <Box component="aside" sx={{ display: 'flex', flexDirection: 'column', gap: '0.85rem', minWidth: 0 }}>
           {selectedAccount ? (
             <>
-              <div className="accounts-page__detail-card">
-                <div className="accounts-page__detail-header">
-                  <p className="accounts-page__detail-type">
+              <Box sx={{ backgroundColor: 'var(--card-background)', border: '1px solid var(--border-color)', borderRadius: '12px', p: '1rem', minWidth: 0, wordBreak: 'break-word' }}>
+                <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '0.65rem' }}>
+                  <Typography sx={{ m: 0, color: 'var(--text-secondary)', fontSize: '0.75rem', letterSpacing: '0.04em' }}>
                     {selectedAccount.type.toUpperCase()}
-                  </p>
-                  <div className="accounts-page__detail-actions">
+                  </Typography>
+                  <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: '0.4rem' }}>
                     <button
                       type="button"
+                      style={{ background: 'var(--button-background)', color: 'var(--text-primary)', border: '1px solid var(--border-color)', borderRadius: '8px', padding: '0.3rem 0.55rem', fontSize: '0.72rem', cursor: 'pointer' }}
                       onClick={() => handleEditAccount(selectedAccount)}
                     >
                       Edit
                     </button>
                     <button
                       type="button"
+                      style={{ background: 'var(--button-background)', color: 'var(--text-primary)', border: '1px solid var(--border-color)', borderRadius: '8px', padding: '0.3rem 0.55rem', fontSize: '0.72rem', cursor: 'pointer' }}
                       onClick={() => handleToggleAccountStatus(selectedAccount)}
                     >
                       {selectedAccount.status === 'active'
@@ -555,49 +569,50 @@ const Accounts: React.FC = () => {
                     </button>
                     <button
                       type="button"
+                      style={{ background: 'var(--button-background)', color: 'var(--text-primary)', border: '1px solid var(--border-color)', borderRadius: '8px', padding: '0.3rem 0.55rem', fontSize: '0.72rem', cursor: 'pointer' }}
                       onClick={() => handleDeleteAccount(selectedAccount)}
                     >
                       Delete
                     </button>
-                  </div>
-                </div>
+                  </Box>
+                </Box>
 
-                <h3 className="accounts-page__detail-name">
+                <Typography variant="h6" component="h3" sx={{ m: '0.7rem 0 0', fontSize: '1.4rem', color: 'var(--text-primary)' }}>
                   {selectedAccount.name}
-                </h3>
-                <p className="accounts-page__detail-balance">
+                </Typography>
+                <Typography sx={{ m: '0.45rem 0 0', fontSize: '1.9rem', fontWeight: 700, color: 'var(--text-primary)' }}>
                   {formatCurrency(Math.abs(selectedAccount.balance))}
-                </p>
-                <p className="accounts-page__detail-status">
+                </Typography>
+                <Typography sx={{ m: '0.45rem 0 0', color: 'var(--success-color)', fontSize: '0.82rem', fontWeight: 600 }}>
                   {selectedAccount.status === 'active'
                     ? 'Connected'
                     : 'Archived'}
-                </p>
-              </div>
+                </Typography>
+              </Box>
 
-              <div className="accounts-page__flow-card">
-                <p className="accounts-page__flow-title">
+              <Box sx={{ backgroundColor: 'var(--card-background)', border: '1px solid var(--border-color)', borderRadius: '12px', p: '1rem', minWidth: 0 }}>
+                <Typography sx={{ m: '0 0 0.75rem', color: 'var(--text-secondary)', fontSize: '0.78rem', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
                   {rangeConfig.label} Flow
-                </p>
-                <div className="accounts-page__flow-values">
-                  <div>
-                    <p className="accounts-page__flow-label">In</p>
-                    <p className="accounts-page__flow-in">
+                </Typography>
+                <Box sx={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.8rem' }}>
+                  <Box>
+                    <Typography sx={{ m: 0, color: 'var(--text-secondary)', fontSize: '0.75rem' }}>In</Typography>
+                    <Typography sx={{ m: '0.25rem 0 0', fontSize: '1.1rem', fontWeight: 700, color: 'var(--success-color)' }}>
                       +{formatCurrency(monthlyInflow)}
-                    </p>
-                  </div>
-                  <div>
-                    <p className="accounts-page__flow-label">Out</p>
-                    <p className="accounts-page__flow-out">
+                    </Typography>
+                  </Box>
+                  <Box>
+                    <Typography sx={{ m: 0, color: 'var(--text-secondary)', fontSize: '0.75rem' }}>Out</Typography>
+                    <Typography sx={{ m: '0.25rem 0 0', fontSize: '1.1rem', fontWeight: 700, color: 'var(--error-color)' }}>
                       -{formatCurrency(monthlyOutflow)}
-                    </p>
-                  </div>
-                </div>
-              </div>
+                    </Typography>
+                  </Box>
+                </Box>
+              </Box>
 
-              <div className="accounts-page__history-card">
-                <p className="accounts-page__history-title">History</p>
-                <div className="accounts-page__history-list">
+              <Box sx={{ backgroundColor: 'var(--card-background)', border: '1px solid var(--border-color)', borderRadius: '12px', p: '1rem', minWidth: 0 }}>
+                <Typography sx={{ m: '0 0 0.75rem', color: 'var(--text-secondary)', fontSize: '0.78rem', textTransform: 'uppercase', letterSpacing: '0.04em' }}>History</Typography>
+                <Box sx={{ display: 'flex', flexDirection: 'column', gap: '0.7rem' }}>
                   {recentSelectedTransactions.length > 0 ? (
                     recentSelectedTransactions.map((transaction) => {
                       const isInflow =
@@ -607,52 +622,48 @@ const Accounts: React.FC = () => {
                         : transaction.toAccountId
 
                       return (
-                        <div
+                        <Box
                           key={transaction.id}
-                          className="accounts-page__history-item"
+                          sx={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: '0.8rem' }}
                         >
-                          <div>
-                            <p className="accounts-page__history-description">
+                          <Box>
+                            <Typography sx={{ m: 0, color: 'var(--text-primary)', fontSize: '0.87rem', fontWeight: 600 }}>
                               {transaction.description}
-                            </p>
-                            <p className="accounts-page__history-meta">
+                            </Typography>
+                            <Typography sx={{ m: '0.2rem 0 0', color: 'var(--text-secondary)', fontSize: '0.74rem' }}>
                               {new Date(transaction.date).toLocaleDateString()}{' '}
                               •{' '}
                               {accountMap.get(oppositeAccountId)?.name ||
                                 'Unknown'}
-                            </p>
-                          </div>
-                          <p
-                            className={`accounts-page__history-amount ${
-                              isInflow
-                                ? 'accounts-page__history-amount--in'
-                                : 'accounts-page__history-amount--out'
-                            }`}
+                            </Typography>
+                          </Box>
+                          <Typography
+                            sx={{ m: 0, fontSize: '0.88rem', fontWeight: 700, color: isInflow ? 'var(--success-color)' : 'var(--error-color)', whiteSpace: 'nowrap' }}
                           >
                             {isInflow ? '+' : '-'}
                             {formatCurrency(transaction.amount)}
-                          </p>
-                        </div>
+                          </Typography>
+                        </Box>
                       )
                     })
                   ) : (
-                    <p className="accounts-page__history-empty">
+                    <Typography sx={{ m: 0, color: 'var(--text-secondary)', fontSize: '0.85rem' }}>
                       No recent activity for this account.
-                    </p>
+                    </Typography>
                   )}
-                </div>
-              </div>
+                </Box>
+              </Box>
             </>
           ) : (
-            <div className="accounts-page__empty-state">
-              <p>
+            <Box sx={{ backgroundColor: 'var(--card-background)', border: '1px solid var(--border-color)', borderRadius: '12px', p: '1rem' }}>
+              <Typography>
                 No accounts available yet. Add your first account to get
                 started.
-              </p>
-            </div>
+              </Typography>
+            </Box>
           )}
-        </aside>
-      </div>
+        </Box>
+      </Box>
 
       <AccountForm
         isOpen={isFormOpen}
@@ -661,7 +672,7 @@ const Accounts: React.FC = () => {
         accounts={accounts}
         account={editingAccount || undefined}
       />
-    </div>
+    </Box>
   )
 }
 

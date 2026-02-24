@@ -13,7 +13,7 @@ import Box from '@mui/material/Box'
 import Typography from '@mui/material/Typography'
 import Alert from '@mui/material/Alert'
 import CircularProgress from '@mui/material/CircularProgress'
-import './Recurring.css'
+
 
 /**
  * Recurring page - manage recurring transactions
@@ -148,7 +148,7 @@ const Recurring: React.FC = () => {
 
   if (loading) {
     return (
-      <Box className="recurring-page" sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+      <Box sx={{ padding: '2rem', maxWidth: '1400px', margin: '0 auto', display: 'flex', alignItems: 'center', gap: 2 }}>
         <CircularProgress size={20} />
         <Typography>Loading recurring transactions...</Typography>
       </Box>
@@ -157,16 +157,16 @@ const Recurring: React.FC = () => {
 
   if (error) {
     return (
-      <Box className="recurring-page">
+      <Box sx={{ padding: '2rem', maxWidth: '1400px', margin: '0 auto' }}>
         <Alert severity="error">Error: {error}</Alert>
       </Box>
     )
   }
 
   return (
-    <Box className="recurring-page">
-      <Box className="recurring-page__header">
-        <Typography component="h1" className="recurring-page__title">
+    <Box sx={{ padding: '2rem', maxWidth: '1400px', margin: '0 auto' }}>
+      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: '2rem' }}>
+        <Typography component="h1" sx={{ fontSize: '1.8rem', fontWeight: 700, m: 0, color: 'var(--text-primary)' }}>
           Recurring Transactions
         </Typography>
         <Button variant="primary" onClick={() => setIsFormOpen(true)}>
@@ -174,7 +174,7 @@ const Recurring: React.FC = () => {
         </Button>
       </Box>
 
-      <Box className="recurring-page__content">
+      <Box sx={{ mt: 0 }}>
         <RecurringList
           recurring={recurring}
           onProcess={handleProcess}

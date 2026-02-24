@@ -7,7 +7,6 @@ import type {
 } from '@/types/recurring'
 import Box from '@mui/material/Box'
 import Typography from '@mui/material/Typography'
-import './RecurringList.css'
 
 interface RecurringListProps {
   recurring: RecurringTransactionWithAccounts[]
@@ -52,9 +51,16 @@ const RecurringList: React.FC<RecurringListProps> = ({
   const pausedCount = recurring.filter((r) => r.status === 'paused').length
 
   return (
-    <Box className="recurring-list">
-      <Box className="recurring-list__filters">
-        <Box className="recurring-list__search">
+    <Box sx={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+      <Box
+        sx={{
+          display: 'flex',
+          gap: '1rem',
+          alignItems: 'flex-end',
+          flexWrap: 'wrap',
+        }}
+      >
+        <Box sx={{ flex: 1, minWidth: '200px' }}>
           <Input
             type="text"
             placeholder="Search recurring transactions..."
@@ -62,7 +68,7 @@ const RecurringList: React.FC<RecurringListProps> = ({
             onChange={(e) => setSearchQuery(e.target.value)}
           />
         </Box>
-        <Box className="recurring-list__status-filter">
+        <Box sx={{ minWidth: '180px' }}>
           <Select
             value={statusFilter}
             onChange={(e) =>
@@ -78,11 +84,20 @@ const RecurringList: React.FC<RecurringListProps> = ({
       </Box>
 
       {filteredRecurring.length === 0 ? (
-        <Box className="recurring-list__empty">
+        <Box
+          sx={{
+            textAlign: 'center',
+            py: '4rem',
+            px: '2rem',
+            color: 'var(--text-secondary)',
+          }}
+        >
           {recurring.length === 0 ? (
             <>
               <Typography>No recurring transactions yet</Typography>
-              <Typography className="recurring-list__empty-hint">
+              <Typography
+                sx={{ fontSize: '0.875rem', color: 'var(--text-secondary)' }}
+              >
                 Create your first recurring transaction to automate regular
                 transfers
               </Typography>
@@ -92,7 +107,7 @@ const RecurringList: React.FC<RecurringListProps> = ({
           )}
         </Box>
       ) : (
-        <Box className="recurring-list__items">
+        <Box sx={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
           {filteredRecurring.map((r) => (
             <RecurringCard
               key={r.id}

@@ -8,6 +8,7 @@ import Select from '@mui/material/Select'
 import MenuItem from '@mui/material/MenuItem'
 import { formatCurrency } from '@/utils/currencyUtils'
 import './MoneyFlowChart.css'
+import { Box, Typography } from '@mui/material'
 
 interface MoneyFlowChartProps {
   transactions: Transaction[]
@@ -201,23 +202,61 @@ export const MoneyFlowChart: React.FC<MoneyFlowChartProps> = ({
   ]
 
   return (
-    <div className="money-flow-chart">
-      <div className="money-flow-chart__top-row">
-        <div className="money-flow-chart__header">
-          <h3 className="money-flow-chart__title">
-            <span className="money-flow-chart__icon">🔄</span>
-            Money Flow
-          </h3>
-          <p className="money-flow-chart__subtitle">
-            Account-to-account money movement
-          </p>
-        </div>
-
-        <div className="money-flow-chart__filters">
-          <FormControl
-            size="small"
-            className="money-flow-chart__filter-control"
+    <Box
+      sx={{
+        backgroundColor: 'var(--card-background)',
+        border: '1px solid var(--border-color)',
+        borderRadius: '12px',
+        p: '20px',
+        boxShadow: 'var(--shadow-soft)',
+        height: '100%',
+        boxSizing: 'border-box',
+      }}
+    >
+      <Box
+        sx={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          gap: '1rem',
+          mb: '16px',
+        }}
+      >
+        <Box>
+          <Typography
+            variant="h6"
+            component="h3"
+            sx={{
+              fontSize: '1.125rem',
+              fontWeight: 600,
+              color: 'var(--text-primary)',
+              m: '0 0 4px',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '8px',
+            }}
           >
+            <Typography component="span" sx={{ fontSize: '1.25rem' }}>
+              🔄
+            </Typography>
+            Money Flow
+          </Typography>
+          <Typography
+            sx={{ fontSize: '0.875rem', color: 'var(--text-secondary)', m: 0 }}
+          >
+            Account-to-account money movement
+          </Typography>
+        </Box>
+
+        <Box
+          sx={{
+            display: 'flex',
+            gap: '12px',
+            alignItems: 'center',
+            flexShrink: 0,
+          }}
+        >
+          <FormControl size="small" sx={{ width: '180px' }}>
             <InputLabel id="money-flow-from-label">From</InputLabel>
             <Select
               labelId="money-flow-from-label"
@@ -233,10 +272,7 @@ export const MoneyFlowChart: React.FC<MoneyFlowChartProps> = ({
             </Select>
           </FormControl>
 
-          <FormControl
-            size="small"
-            className="money-flow-chart__filter-control"
-          >
+          <FormControl size="small" sx={{ width: '180px' }}>
             <InputLabel id="money-flow-to-label">To</InputLabel>
             <Select
               labelId="money-flow-to-label"
@@ -251,10 +287,12 @@ export const MoneyFlowChart: React.FC<MoneyFlowChartProps> = ({
               ))}
             </Select>
           </FormControl>
-        </div>
-      </div>
+        </Box>
+      </Box>
 
-      <div className="money-flow-chart__canvas">
+      <Box
+        sx={{ border: '1px solid var(--border-color)', borderRadius: '12px' }}
+      >
         {hasFlowData ? (
           <ReactECharts
             option={chartOptions}
@@ -286,8 +324,8 @@ export const MoneyFlowChart: React.FC<MoneyFlowChartProps> = ({
             </p>
           </div>
         )}
-      </div>
-    </div>
+      </Box>
+    </Box>
   )
 }
 

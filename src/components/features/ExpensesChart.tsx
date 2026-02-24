@@ -4,7 +4,8 @@ import type { Transaction } from '@/types/transaction'
 import type { Account } from '@/types/account'
 import { formatCurrency } from '@/utils/currencyUtils'
 import { categoryService } from '@/services/categoryService'
-import './ExpensesChart.css'
+import Box from '@mui/material/Box'
+import Typography from '@mui/material/Typography'
 
 interface ExpensesChartProps {
   transactions: Transaction[]
@@ -175,20 +176,20 @@ export const ExpensesChart: React.FC<ExpensesChartProps> = ({
   }, [transactions, accounts])
 
   return (
-    <div className="expenses-chart">
-      <div className="expenses-chart__header">
-        <h3 className="expenses-chart__title">
-          <span className="expenses-chart__icon">📊</span>
+    <Box sx={{ backgroundColor: 'var(--card-background)', border: 'none', borderRadius: '12px', p: '20px', boxShadow: 'var(--shadow-soft)', height: '100%', boxSizing: 'border-box' }}>
+      <Box sx={{ mb: '8px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '1rem' }}>
+        <Typography variant="h6" component="h3" sx={{ fontSize: '1.125rem', fontWeight: 600, color: 'var(--text-primary)', m: '0 0 4px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <Typography component="span" sx={{ fontSize: '1.25rem' }}>📊</Typography>
           Expenses
-        </h3>
-        <p className="expenses-chart__subtitle">
+        </Typography>
+        <Typography sx={{ fontSize: '0.875rem', color: 'var(--text-secondary)', m: 0, whiteSpace: 'nowrap' }}>
           Total: {formatCurrency(totalExpenses)}
-        </p>
-      </div>
+        </Typography>
+      </Box>
       <ReactECharts
         option={chartOptions}
         style={{ height: '450px', width: '100%', minHeight: '450px' }}
       />
-    </div>
+    </Box>
   )
 }
