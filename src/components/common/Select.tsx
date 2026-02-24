@@ -13,7 +13,7 @@ export interface SelectOption {
 
 export interface SelectProps extends Omit<
   SelectHTMLAttributes<HTMLSelectElement>,
-  'onChange' | 'color'
+  'onChange' | 'color' | 'size'
 > {
   label?: string
   options: SelectOption[]
@@ -37,8 +37,7 @@ export function Select({
   onBlur,
   onFocus,
   value,
-  ...props
-}: SelectProps) {
+}: SelectProps): JSX.Element {
   const generatedId = useId()
   const selectId = id || generatedId
   const descriptionId =
@@ -72,7 +71,6 @@ export function Select({
             className: error ? 'select-error' : undefined,
             'aria-label': label || placeholder || 'Select',
           }}
-          {...props}
         >
           <option value="" disabled>
             {placeholder || 'Select an option...'}

@@ -440,7 +440,7 @@ const TransactionForm: React.FC<TransactionFormProps> = ({
               ])}
               placeholder="Select a category"
             />
-          </div>
+          </Box>
 
           <Input
             label="Date"
@@ -448,7 +448,7 @@ const TransactionForm: React.FC<TransactionFormProps> = ({
             value={date}
             onChange={(e) => setDate(e.target.value)}
             required
-          </Box>
+          />
 
           {error && <Box sx={{ p: '0.75rem', backgroundColor: '#fee2e2', color: 'var(--error-color)', borderRadius: '0.375rem', fontSize: '0.875rem' }}>{error}</Box>}
         </Box>

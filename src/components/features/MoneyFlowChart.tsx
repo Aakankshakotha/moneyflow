@@ -7,7 +7,6 @@ import InputLabel from '@mui/material/InputLabel'
 import Select from '@mui/material/Select'
 import MenuItem from '@mui/material/MenuItem'
 import { formatCurrency } from '@/utils/currencyUtils'
-import './MoneyFlowChart.css'
 import { Box, Typography } from '@mui/material'
 
 interface MoneyFlowChartProps {

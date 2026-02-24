@@ -25,27 +25,37 @@ export function Input({
   value,
   defaultValue,
   ...rest
-}: InputProps) {
+}: InputProps): JSX.Element {
   const generatedId = useId()
   const id = providedId || generatedId
   const errorId = error ? `${id}-error` : undefined
   const helperId = helperText ? `${id}-helper` : undefined
   const describedBy = [errorId, helperId].filter(Boolean).join(' ') || undefined
 
-  const containerClasses = ['input-container', className]
-    .filter(Boolean)
-    .join(' ')
-
-  const inputClasses = ['input', error && 'input-error']
-    .filter(Boolean)
-    .join(' ')
-
   return (
-    <Box className={containerClasses}>
+    <Box
+      sx={{ display: 'flex', flexDirection: 'column', gap: '0.25rem' }}
+      className={className || undefined}
+    >
       {label && (
-        <label htmlFor={id} className="input-label">
+        <label
+          htmlFor={id}
+          style={{
+            display: 'block',
+            fontSize: '0.875rem',
+            fontWeight: 500,
+            color: 'var(--text-secondary)',
+            marginBottom: '0.25rem',
+          }}
+        >
           {label}
-          {required && <span className="input-required">*</span>}
+          {required && (
+            <span
+              style={{ color: 'var(--error-color)', marginLeft: '0.15rem' }}
+            >
+              *
+            </span>
+          )}
         </label>
       )}
       <InputBase
@@ -61,7 +71,7 @@ export function Input({
         fullWidth
         inputProps={{
           ...rest,
-          className: inputClasses,
+          className: error ? 'input-error' : undefined,
           'aria-invalid': error ? 'true' : undefined,
           'aria-describedby': describedBy,
         }}
