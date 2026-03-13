@@ -13,6 +13,9 @@ export interface DashboardMetrics {
   income: number
   expenses: number
   cashFlow: number
+  lastMonthIncome: number
+  lastMonthExpenses: number
+  lastMonthCashFlow: number
 }
 
 export interface UseDashboardDataReturn {
@@ -81,23 +84,41 @@ export const useDashboardData = (): UseDashboardDataReturn => {
   const netWorth = calculation?.netWorth ?? 0
 
   const accountMap = new Map(accounts.map((a) => [a.id, a]))
-  const thirtyDaysAgo = new Date()
-  thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30)
-  const recentTransactions = transactions.filter(
-    (txn) => new Date(txn.date) >= thirtyDaysAgo
+
+  const now = new Date()
+  const thisMonthStart = new Date(now.getFullYear(), now.getMonth(), 1)
+  const lastMonthStart = new Date(now.getFullYear(), now.getMonth() - 1, 1)
+  const lastMonthEnd = new Date(now.getFullYear(), now.getMonth(), 1)
+
+  const thisMonthTransactions = transactions.filter(
+    (txn) => new Date(txn.date) >= thisMonthStart
   )
+  const lastMonthTransactions = transactions.filter((txn) => {
+    const d = new Date(txn.date)
+    return d >= lastMonthStart && d < lastMonthEnd
+  })
 
   // Income accounts are sources — money flows FROM them INTO asset/liability accounts.
-  const income = recentTransactions
+  const income = thisMonthTransactions
     .filter((txn) => accountMap.get(txn.fromAccountId)?.type === 'income')
     .reduce((sum, txn) => sum + txn.amount, 0)
 
   // Expense accounts are destinations — money flows FROM asset/liability INTO them.
-  const expenses = recentTransactions
+  const expenses = thisMonthTransactions
     .filter((txn) => accountMap.get(txn.toAccountId)?.type === 'expense')
     .reduce((sum, txn) => sum + txn.amount, 0)
 
   const cashFlow = income - expenses
+
+  const lastMonthIncome = lastMonthTransactions
+    .filter((txn) => accountMap.get(txn.fromAccountId)?.type === 'income')
+    .reduce((sum, txn) => sum + txn.amount, 0)
+
+  const lastMonthExpenses = lastMonthTransactions
+    .filter((txn) => accountMap.get(txn.toAccountId)?.type === 'expense')
+    .reduce((sum, txn) => sum + txn.amount, 0)
+
+  const lastMonthCashFlow = lastMonthIncome - lastMonthExpenses
 
   return {
     calculation,
@@ -110,6 +131,9 @@ export const useDashboardData = (): UseDashboardDataReturn => {
       income,
       expenses,
       cashFlow,
+      lastMonthIncome,
+      lastMonthExpenses,
+      lastMonthCashFlow,
     },
     loading,
     error,

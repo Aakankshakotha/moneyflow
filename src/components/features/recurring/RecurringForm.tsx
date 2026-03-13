@@ -102,18 +102,24 @@ const RecurringForm: React.FC<RecurringFormProps> = ({
     }
   }
 
-  const selectedFromAccount = accounts.find((a) => a.id === fromAccountId)
-  const selectedToAccount = accounts.find((a) => a.id === toAccountId)
+  const activeAccounts = accounts.filter((a) => a.status === 'active')
+  const selectedFromAccount = activeAccounts.find((a) => a.id === fromAccountId)
+  const selectedToAccount = activeAccounts.find((a) => a.id === toAccountId)
 
-  const fromAccountOptions = accounts.map((account) => ({
-    value: account.id,
-    label: `${account.name} (${formatCurrency(account.balance)})`,
-  }))
+  // Income accounts can only be sources; expense accounts can only be destinations
+  const fromAccountOptions = activeAccounts
+    .filter((a) => a.type !== 'expense')
+    .map((account) => ({
+      value: account.id,
+      label: `${account.name} (${formatCurrency(account.balance)})`,
+    }))
 
-  const toAccountOptions = accounts.map((account) => ({
-    value: account.id,
-    label: `${account.name} (${formatCurrency(account.balance)})`,
-  }))
+  const toAccountOptions = activeAccounts
+    .filter((a) => a.type !== 'income')
+    .map((account) => ({
+      value: account.id,
+      label: `${account.name} (${formatCurrency(account.balance)})`,
+    }))
 
   return (
     <Modal
@@ -152,7 +158,7 @@ const RecurringForm: React.FC<RecurringFormProps> = ({
           required
         />
 
-        {selectedFromAccount && (
+        {selectedFromAccount && selectedFromAccount.type !== 'income' && (
           <Typography
             variant="body2"
             sx={{ mt: -1, mb: 0.5, color: 'text.secondary', pl: 0.5 }}
@@ -172,7 +178,7 @@ const RecurringForm: React.FC<RecurringFormProps> = ({
           required
         />
 
-        {selectedToAccount && (
+        {selectedToAccount && selectedToAccount.type !== 'expense' && (
           <Typography
             variant="body2"
             sx={{ mt: -1, mb: 0.5, color: 'text.secondary', pl: 0.5 }}

@@ -47,8 +47,8 @@ export function getModeConfig(
     income: {
       primaryLabel: 'Income Account',
       primaryAccounts: activeAccounts.filter((acc) => acc.type === 'income'),
-      secondaryLabel: 'Deposit To (Asset / Credit Card)',
-      secondaryAccounts: assetOrLiabilityAccounts,
+      secondaryLabel: 'Deposit To',
+      secondaryAccounts: activeAccounts.filter((acc) => acc.type === 'asset'),
       secondaryPlaceholder: 'Select where to deposit the income',
       flowFromLabel: 'From Income',
       flowToLabel: 'To Account',
@@ -60,7 +60,9 @@ export function getModeConfig(
     },
     transfer: {
       primaryLabel: 'From Account',
-      primaryAccounts: activeAccounts.filter((acc) => acc.type !== 'expense'),
+      primaryAccounts: activeAccounts.filter(
+        (acc) => acc.type !== 'expense' && acc.type !== 'income'
+      ),
       secondaryLabel: 'To Account',
       secondaryAccounts: activeAccounts.filter(
         (acc) => acc.id !== primaryAccountId && acc.type !== 'income'

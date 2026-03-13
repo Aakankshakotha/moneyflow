@@ -241,18 +241,12 @@ export const AccountDetailPanel: React.FC<AccountDetailPanelProps> = ({
         >
           {rangeLabel} Flow
         </Typography>
-        <Box
-          sx={{
-            display: 'grid',
-            gridTemplateColumns: '1fr 1fr',
-            gap: '0.8rem',
-          }}
-        >
+        {selectedAccount.type === 'income' ? (
           <Box>
             <Typography
               sx={{ m: 0, color: 'text.secondary', fontSize: '0.75rem' }}
             >
-              In
+              Earned
             </Typography>
             <Typography
               sx={{
@@ -262,14 +256,15 @@ export const AccountDetailPanel: React.FC<AccountDetailPanelProps> = ({
                 color: 'success.main',
               }}
             >
-              +{formatCurrency(monthlyInflow)}
+              +{formatCurrency(monthlyOutflow)}
             </Typography>
           </Box>
+        ) : selectedAccount.type === 'expense' ? (
           <Box>
             <Typography
               sx={{ m: 0, color: 'text.secondary', fontSize: '0.75rem' }}
             >
-              Out
+              Spent
             </Typography>
             <Typography
               sx={{
@@ -279,10 +274,53 @@ export const AccountDetailPanel: React.FC<AccountDetailPanelProps> = ({
                 color: 'error.main',
               }}
             >
-              -{formatCurrency(monthlyOutflow)}
+              -{formatCurrency(monthlyInflow)}
             </Typography>
           </Box>
-        </Box>
+        ) : (
+          <Box
+            sx={{
+              display: 'grid',
+              gridTemplateColumns: '1fr 1fr',
+              gap: '0.8rem',
+            }}
+          >
+            <Box>
+              <Typography
+                sx={{ m: 0, color: 'text.secondary', fontSize: '0.75rem' }}
+              >
+                In
+              </Typography>
+              <Typography
+                sx={{
+                  m: '0.25rem 0 0',
+                  fontSize: '1.1rem',
+                  fontWeight: 700,
+                  color: 'success.main',
+                }}
+              >
+                +{formatCurrency(monthlyInflow)}
+              </Typography>
+            </Box>
+            <Box>
+              <Typography
+                sx={{ m: 0, color: 'text.secondary', fontSize: '0.75rem' }}
+              >
+                Out
+              </Typography>
+              <Typography
+                sx={{
+                  m: '0.25rem 0 0',
+                  fontSize: '1.1rem',
+                  fontWeight: 700,
+                  color: 'error.main',
+                }}
+              >
+                -{formatCurrency(monthlyOutflow)}
+              </Typography>
+            </Box>
+          </Box>
+        )}
       </Box>
 
       {/* History card */}
@@ -342,11 +380,24 @@ export const AccountDetailPanel: React.FC<AccountDetailPanelProps> = ({
                       m: 0,
                       fontSize: '0.88rem',
                       fontWeight: 700,
-                      color: isInflow ? 'success.main' : 'error.main',
+                      color:
+                        selectedAccount.type === 'income'
+                          ? 'success.main'
+                          : selectedAccount.type === 'expense'
+                            ? 'error.main'
+                            : isInflow
+                              ? 'success.main'
+                              : 'error.main',
                       whiteSpace: 'nowrap',
                     }}
                   >
-                    {isInflow ? '+' : '-'}
+                    {selectedAccount.type === 'income'
+                      ? '+'
+                      : selectedAccount.type === 'expense'
+                        ? '-'
+                        : isInflow
+                          ? '+'
+                          : '-'}
                     {formatCurrency(transaction.amount)}
                   </Typography>
                 </Box>

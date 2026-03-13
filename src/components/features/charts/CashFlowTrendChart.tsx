@@ -1,7 +1,7 @@
 import React, { useMemo, useState } from 'react'
 import {
-  BarChart,
-  Bar,
+  AreaChart,
+  Area,
   LineChart,
   Line,
   XAxis,
@@ -19,20 +19,18 @@ import { categoryService } from '@/services/categoryService'
 import Box from '@mui/material/Box'
 import Typography from '@mui/material/Typography'
 import { useTheme, alpha } from '@mui/material/styles'
-import FormControl from '@mui/material/FormControl'
-import InputLabel from '@mui/material/InputLabel'
-import Select from '@mui/material/Select'
-import MenuItem from '@mui/material/MenuItem'
 import LinearProgress from '@mui/material/LinearProgress'
 
 interface CashFlowTrendChartProps {
   transactions: Transaction[]
   accounts: Account[]
+  periodMonths?: number
 }
 
 const CashFlowTrendChart: React.FC<CashFlowTrendChartProps> = ({
   transactions,
   accounts,
+  periodMonths: periodMonthsProp,
 }) => {
   const [selectedMonthKey, setSelectedMonthKey] = useState<string | null>(null)
   const [viewMode, setViewMode] = useState<'overview' | 'category'>('overview')
@@ -65,7 +63,7 @@ const CashFlowTrendChart: React.FC<CashFlowTrendChartProps> = ({
     >()
 
     const today = new Date()
-    const periodMonths = 6
+    const periodMonths = periodMonthsProp ?? 6
 
     for (let i = periodMonths - 1; i >= 0; i -= 1) {
       const monthDate = new Date(today.getFullYear(), today.getMonth() - i, 1)
@@ -184,12 +182,12 @@ const CashFlowTrendChart: React.FC<CashFlowTrendChartProps> = ({
         ])
       ),
     }
-  }, [transactions, accounts])
+  }, [transactions, accounts, periodMonthsProp])
 
   const categoryMemoData = useMemo(() => {
     const accountMap = new Map(accounts.map((a) => [a.id, a]))
     const today = new Date()
-    const periodMonths = 6
+    const periodMonths = periodMonthsProp ?? 6
 
     const monthKeys: string[] = []
     const monthLabels: string[] = []
@@ -265,7 +263,7 @@ const CashFlowTrendChart: React.FC<CashFlowTrendChartProps> = ({
       expenseTrendData: buildTrend(expenseAmounts),
       incomeTrendData: buildTrend(incomeAmounts),
     }
-  }, [transactions, accounts])
+  }, [transactions, accounts, periodMonthsProp])
 
   const hasData = chartData.some(
     (entry) => entry.income > 0 || entry.expenses > 0
@@ -309,6 +307,10 @@ const CashFlowTrendChart: React.FC<CashFlowTrendChartProps> = ({
     selectedCategory === ''
       ? visibleCategories
       : visibleCategories.filter((c) => c.key === selectedCategory)
+
+  const periodTotalIncome = chartData.reduce((s, d) => s + d.income, 0)
+  const periodTotalExpenses = chartData.reduce((s, d) => s + d.expenses, 0)
+  const periodNet = periodTotalIncome - periodTotalExpenses
 
   if (!hasData) {
     return (
@@ -401,7 +403,7 @@ const CashFlowTrendChart: React.FC<CashFlowTrendChartProps> = ({
             sx={{ m: 0, fontSize: '0.8125rem', color: 'text.secondary' }}
           >
             {viewMode === 'overview'
-              ? 'Last 6 months · tap a bar for details'
+              ? 'Last 6 months · click a point for details'
               : 'Monthly spend by category — last 6 months'}
           </Typography>
         </Box>
@@ -444,31 +446,145 @@ const CashFlowTrendChart: React.FC<CashFlowTrendChartProps> = ({
         </Box>
       </Box>
 
-      {viewMode === 'category' && (
+      {/* Period summary strip */}
+      {viewMode === 'overview' && (
         <Box
           sx={{
-            mb: '1rem',
             display: 'flex',
-            alignItems: 'center',
             gap: '0.75rem',
+            mb: '1.25rem',
             flexWrap: 'wrap',
-            backgroundColor: alpha(muiTheme.palette.text.primary, 0.04),
-            borderRadius: '12px',
-            px: '0.875rem',
-            py: '0.625rem',
-            border: '1px solid',
-            borderColor: 'divider',
           }}
         >
-          {/* Expense / Income inline pill */}
+          <Box
+            sx={{
+              flex: '1 1 0',
+              minWidth: 110,
+              backgroundColor: alpha(incomeColor, 0.07),
+              border: '1px solid',
+              borderColor: alpha(incomeColor, 0.18),
+              borderRadius: '12px',
+              p: '0.7rem 0.875rem',
+            }}
+          >
+            <Typography
+              sx={{
+                m: 0,
+                fontSize: '0.7rem',
+                fontWeight: 600,
+                textTransform: 'uppercase',
+                letterSpacing: '0.06em',
+                color: incomeColor,
+                opacity: 0.85,
+              }}
+            >
+              Total Income
+            </Typography>
+            <Typography
+              sx={{
+                m: 0,
+                mt: '2px',
+                fontSize: '1.15rem',
+                fontWeight: 800,
+                color: 'text.primary',
+              }}
+            >
+              {formatCurrency(periodTotalIncome)}
+            </Typography>
+          </Box>
+          <Box
+            sx={{
+              flex: '1 1 0',
+              minWidth: 110,
+              backgroundColor: alpha(expenseColor, 0.07),
+              border: '1px solid',
+              borderColor: alpha(expenseColor, 0.18),
+              borderRadius: '12px',
+              p: '0.7rem 0.875rem',
+            }}
+          >
+            <Typography
+              sx={{
+                m: 0,
+                fontSize: '0.7rem',
+                fontWeight: 600,
+                textTransform: 'uppercase',
+                letterSpacing: '0.06em',
+                color: expenseColor,
+                opacity: 0.85,
+              }}
+            >
+              Total Expenses
+            </Typography>
+            <Typography
+              sx={{
+                m: 0,
+                mt: '2px',
+                fontSize: '1.15rem',
+                fontWeight: 800,
+                color: 'text.primary',
+              }}
+            >
+              {formatCurrency(periodTotalExpenses)}
+            </Typography>
+          </Box>
+          <Box
+            sx={{
+              flex: '1 1 0',
+              minWidth: 110,
+              backgroundColor: alpha(
+                periodNet >= 0 ? incomeColor : expenseColor,
+                0.07
+              ),
+              border: '1px solid',
+              borderColor: alpha(
+                periodNet >= 0 ? incomeColor : expenseColor,
+                0.18
+              ),
+              borderRadius: '12px',
+              p: '0.7rem 0.875rem',
+            }}
+          >
+            <Typography
+              sx={{
+                m: 0,
+                fontSize: '0.7rem',
+                fontWeight: 600,
+                textTransform: 'uppercase',
+                letterSpacing: '0.06em',
+                color: periodNet >= 0 ? incomeColor : expenseColor,
+                opacity: 0.85,
+              }}
+            >
+              Net Savings
+            </Typography>
+            <Typography
+              sx={{
+                m: 0,
+                mt: '2px',
+                fontSize: '1.15rem',
+                fontWeight: 800,
+                color: periodNet >= 0 ? incomeColor : expenseColor,
+              }}
+            >
+              {periodNet >= 0 ? '+' : ''}
+              {formatCurrency(Math.abs(periodNet))}
+            </Typography>
+          </Box>
+        </Box>
+      )}
+
+      {viewMode === 'category' && (
+        <Box sx={{ mb: '1.25rem' }}>
+          {/* Type toggle */}
           <Box
             sx={{
               display: 'inline-flex',
-              border: '1px solid',
-              borderColor: 'divider',
-              borderRadius: '8px',
-              overflow: 'hidden',
-              flexShrink: 0,
+              backgroundColor: alpha(muiTheme.palette.text.primary, 0.06),
+              borderRadius: '10px',
+              p: '3px',
+              gap: '2px',
+              mb: '0.75rem',
             }}
           >
             {(['expense', 'income'] as const).map((type) => (
@@ -482,16 +598,17 @@ const CashFlowTrendChart: React.FC<CashFlowTrendChartProps> = ({
                 sx={{
                   border: 'none',
                   cursor: 'pointer',
-                  px: 1.75,
-                  py: 0.625,
-                  fontSize: '0.75rem',
+                  px: 2,
+                  py: 0.75,
+                  borderRadius: '7px',
+                  fontSize: '0.8125rem',
                   fontWeight: 600,
-                  transition: 'all 0.15s',
+                  transition: 'all 0.18s ease',
                   backgroundColor:
                     categoryTypeFilter === type
                       ? type === 'expense'
-                        ? alpha(muiTheme.palette.error.main, 0.12)
-                        : alpha(muiTheme.palette.success.main, 0.12)
+                        ? alpha(muiTheme.palette.error.main, 0.15)
+                        : alpha(muiTheme.palette.success.main, 0.15)
                       : 'transparent',
                   color:
                     categoryTypeFilter === type
@@ -499,37 +616,64 @@ const CashFlowTrendChart: React.FC<CashFlowTrendChartProps> = ({
                         ? muiTheme.palette.error.main
                         : muiTheme.palette.success.main
                       : 'text.secondary',
+                  boxShadow:
+                    categoryTypeFilter === type
+                      ? '0 1px 4px rgba(0,0,0,0.10)'
+                      : 'none',
                 }}
               >
-                {type === 'expense' ? '↑ Expenses' : '↓ Income'}
+                {type === 'expense' ? 'Expenses' : 'Income'}
               </Box>
             ))}
           </Box>
 
-          {/* Category select */}
-          <FormControl size="small" sx={{ minWidth: 190, flexShrink: 0 }}>
-            <InputLabel id="category-select-label" shrink>
-              Category
-            </InputLabel>
-            <Select
-              labelId="category-select-label"
-              label="Category"
-              value={selectedCategory}
-              onChange={(e) => setSelectedCategory(e.target.value)}
-              displayEmpty
-              notched
-              sx={{ borderRadius: '8px' }}
+          {/* Scrollable category pills */}
+          {visibleCategories.length > 0 ? (
+            <Box
+              sx={{
+                display: 'flex',
+                gap: '0.5rem',
+                overflowX: 'auto',
+                pb: '4px',
+                scrollbarWidth: 'none',
+                '&::-webkit-scrollbar': { display: 'none' },
+              }}
             >
-              <MenuItem value="">All categories</MenuItem>
-              {visibleCategories.map((cat) => (
-                <MenuItem key={cat.key} value={cat.key}>
-                  {cat.name}
-                </MenuItem>
-              ))}
-            </Select>
-          </FormControl>
-
-          {visibleCategories.length === 0 && (
+              {[{ key: '', name: 'All' }, ...visibleCategories].map((cat) => {
+                const isActive = selectedCategory === cat.key
+                const activeColor =
+                  categoryTypeFilter === 'expense'
+                    ? muiTheme.palette.error.main
+                    : muiTheme.palette.success.main
+                return (
+                  <Box
+                    key={cat.key || 'all'}
+                    component="button"
+                    onClick={() => setSelectedCategory(cat.key)}
+                    sx={{
+                      border: '1.5px solid',
+                      borderColor: isActive ? activeColor : 'divider',
+                      cursor: 'pointer',
+                      px: 1.75,
+                      py: 0.625,
+                      borderRadius: '20px',
+                      fontSize: '0.8rem',
+                      fontWeight: isActive ? 600 : 400,
+                      whiteSpace: 'nowrap',
+                      flexShrink: 0,
+                      transition: 'all 0.15s ease',
+                      backgroundColor: isActive
+                        ? alpha(activeColor, 0.1)
+                        : 'background.paper',
+                      color: isActive ? activeColor : 'text.secondary',
+                    }}
+                  >
+                    {cat.name}
+                  </Box>
+                )
+              })}
+            </Box>
+          ) : (
             <Typography sx={{ fontSize: '0.8rem', color: 'text.secondary' }}>
               No {categoryTypeFilter} categories yet
             </Typography>
@@ -537,59 +681,117 @@ const CashFlowTrendChart: React.FC<CashFlowTrendChartProps> = ({
         </Box>
       )}
 
-      <Box sx={{ mt: '0.5rem' }}>
+      <Box sx={{ mt: '0.5rem', '& *:focus': { outline: 'none' } }}>
         {viewMode === 'overview' ? (
           <ResponsiveContainer width="100%" height={360}>
-            <BarChart data={chartData}>
-              <CartesianGrid strokeDasharray="3 3" stroke={chartGrid} />
+            <AreaChart
+              data={chartData}
+              onClick={(data) => {
+                const ap = data?.activePayload as
+                  | Array<{ payload?: { key?: string } }>
+                  | undefined
+                const key = ap?.[0]?.payload?.key
+                if (key) handleBarClick({ key })
+              }}
+              style={{ cursor: 'pointer', outline: 'none' }}
+            >
+              <defs>
+                <linearGradient id="incomeGradient" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="5%" stopColor={incomeColor} stopOpacity={0.4} />
+                  <stop
+                    offset="95%"
+                    stopColor={incomeColor}
+                    stopOpacity={0.02}
+                  />
+                </linearGradient>
+                <linearGradient
+                  id="expenseGradient"
+                  x1="0"
+                  y1="0"
+                  x2="0"
+                  y2="1"
+                >
+                  <stop
+                    offset="5%"
+                    stopColor={expenseColor}
+                    stopOpacity={0.35}
+                  />
+                  <stop
+                    offset="95%"
+                    stopColor={expenseColor}
+                    stopOpacity={0.02}
+                  />
+                </linearGradient>
+              </defs>
+              <CartesianGrid
+                strokeDasharray="3 3"
+                stroke={chartGrid}
+                vertical={false}
+              />
               <XAxis
                 dataKey="month"
                 tick={{ fontSize: 12, fill: chartAxis }}
-                axisLine={{ stroke: chartGrid }}
-                tickLine={{ stroke: chartGrid }}
+                axisLine={false}
+                tickLine={false}
               />
               <YAxis
                 tick={{ fontSize: 12, fill: chartAxis }}
-                axisLine={{ stroke: chartGrid }}
-                tickLine={{ stroke: chartGrid }}
+                axisLine={false}
+                tickLine={false}
                 tickFormatter={(value) => formatCurrency(value)}
+                width={82}
               />
               <Tooltip
                 contentStyle={{
                   backgroundColor: tooltipBg,
                   border: `1px solid ${tooltipBorder}`,
-                  borderRadius: '10px',
+                  borderRadius: '12px',
+                  boxShadow: '0 8px 32px rgba(0,0,0,0.12)',
                 }}
-                labelStyle={{ color: tooltipText, fontWeight: 600 }}
+                labelStyle={{
+                  color: tooltipText,
+                  fontWeight: 700,
+                  marginBottom: '4px',
+                }}
                 itemStyle={{ color: tooltipText }}
                 formatter={(value: number | undefined) =>
                   value !== undefined ? formatCurrency(value) : ''
                 }
               />
-              <Legend />
-              <Bar
+              <Legend
+                wrapperStyle={{ paddingTop: '0.75rem', fontSize: '0.8rem' }}
+              />
+              <Area
+                type="monotone"
                 dataKey="income"
                 name="Income"
-                fill={incomeColor}
-                radius={[6, 6, 0, 0]}
-                onClick={(payload) =>
-                  handleBarClick(
-                    payload?.payload as { key?: string } | undefined
-                  )
-                }
+                stroke={incomeColor}
+                strokeWidth={2.5}
+                fill="url(#incomeGradient)"
+                dot={{ fill: incomeColor, r: 4, strokeWidth: 0 }}
+                activeDot={{
+                  r: 6,
+                  strokeWidth: 2,
+                  stroke: incomeColor,
+                  fill: tooltipBg,
+                }}
               />
-              <Bar
+              <Area
+                type="monotone"
                 dataKey="expenses"
                 name="Expenses"
-                fill={expenseColor}
-                radius={[6, 6, 0, 0]}
-                onClick={(payload) =>
-                  handleBarClick(
-                    payload?.payload as { key?: string } | undefined
-                  )
-                }
+                stroke={expenseColor}
+                strokeWidth={2.5}
+                fill="url(#expenseGradient)"
+                dot={{ fill: expenseColor, r: 4, strokeWidth: 0 }}
+                activeDot={{
+                  r: 6,
+                  strokeWidth: 2,
+                  stroke: expenseColor,
+                  fill: tooltipBg,
+                }}
               />
-            </BarChart>
+            </AreaChart>
           </ResponsiveContainer>
         ) : (
           <ResponsiveContainer width="100%" height={360}>
