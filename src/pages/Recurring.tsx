@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import { Button } from '@/components/common'
-import RecurringForm from '@/components/features/RecurringForm'
-import RecurringList from '@/components/features/RecurringList'
+import { RecurringForm, RecurringList } from '@/components/features'
 import * as recurringService from '@/services/recurringService'
 import * as accountService from '@/services/accountService'
 import type {
@@ -13,7 +12,6 @@ import Box from '@mui/material/Box'
 import Typography from '@mui/material/Typography'
 import Alert from '@mui/material/Alert'
 import CircularProgress from '@mui/material/CircularProgress'
-
 
 /**
  * Recurring page - manage recurring transactions
@@ -148,7 +146,16 @@ const Recurring: React.FC = () => {
 
   if (loading) {
     return (
-      <Box sx={{ padding: '2rem', maxWidth: '1400px', margin: '0 auto', display: 'flex', alignItems: 'center', gap: 2 }}>
+      <Box
+        sx={{
+          padding: '2rem',
+          maxWidth: '1400px',
+          margin: '0 auto',
+          display: 'flex',
+          alignItems: 'center',
+          gap: 2,
+        }}
+      >
         <CircularProgress size={20} />
         <Typography>Loading recurring transactions...</Typography>
       </Box>
@@ -165,8 +172,23 @@ const Recurring: React.FC = () => {
 
   return (
     <Box sx={{ padding: '2rem', maxWidth: '1400px', margin: '0 auto' }}>
-      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: '2rem' }}>
-        <Typography component="h1" sx={{ fontSize: '1.8rem', fontWeight: 700, m: 0, color: 'var(--text-primary)' }}>
+      <Box
+        sx={{
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          mb: '2rem',
+        }}
+      >
+        <Typography
+          component="h1"
+          sx={{
+            fontSize: '1.8rem',
+            fontWeight: 700,
+            m: 0,
+            color: 'text.primary',
+          }}
+        >
           Recurring Transactions
         </Typography>
         <Button variant="primary" onClick={() => setIsFormOpen(true)}>

@@ -5,6 +5,7 @@ import { formatCurrency } from '@/utils/currencyUtils'
 import Box from '@mui/material/Box'
 import Typography from '@mui/material/Typography'
 import Chip from '@mui/material/Chip'
+import { useTheme, alpha } from '@mui/material/styles'
 
 interface AccountCardProps {
   account: Account
@@ -24,6 +25,7 @@ const AccountCard: React.FC<AccountCardProps> = ({
   onToggleStatus,
   onDelete,
 }) => {
+  const theme = useTheme()
   const getAmountDisplay = (
     accountData: Account
   ): { label: string; value: number; tone: string } => {
@@ -62,13 +64,24 @@ const AccountCard: React.FC<AccountCardProps> = ({
   }
 
   const toneColor: Record<string, string> = {
-    asset: 'var(--success-color)',
-    income: 'var(--success-color)',
-    liability: 'var(--error-color)',
-    expense: 'var(--error-color)',
+    asset: 'success.main',
+    income: 'success.main',
+    liability: 'error.main',
+    expense: 'error.main',
   }
 
   const amountDisplay = getAmountDisplay(account)
+
+  const hasInvestmentData =
+    account.type === 'asset' && account.costBasis !== undefined
+  const gainLoss = hasInvestmentData
+    ? account.balance - (account.costBasis ?? 0)
+    : 0
+  const gainLossPct =
+    hasInvestmentData && (account.costBasis ?? 0) !== 0
+      ? (gainLoss / (account.costBasis ?? 1)) * 100
+      : 0
+  const gainLossColor = gainLoss >= 0 ? 'success.main' : 'error.main'
 
   return (
     <Card sx={{ mb: 1 }} hoverable>
@@ -88,7 +101,7 @@ const AccountCard: React.FC<AccountCardProps> = ({
               m: 0,
               mb: '0.25rem',
               fontWeight: 600,
-              color: 'var(--text-primary)',
+              color: 'text.primary',
             }}
           >
             {account.name}
@@ -99,7 +112,7 @@ const AccountCard: React.FC<AccountCardProps> = ({
               sx={{
                 mb: '0.4rem',
                 fontSize: '0.8rem',
-                color: 'var(--text-secondary)',
+                color: 'text.secondary',
               }}
             >
               Sub-account of {parentName}
@@ -111,8 +124,8 @@ const AccountCard: React.FC<AccountCardProps> = ({
               display: 'inline-block',
               px: '0.5rem',
               py: '0.25rem',
-              backgroundColor: 'var(--badge-background)',
-              color: 'var(--text-secondary)',
+              backgroundColor: 'action.selected',
+              color: 'text.secondary',
               borderRadius: '4px',
               fontSize: '0.875rem',
               fontWeight: 500,
@@ -127,9 +140,10 @@ const AccountCard: React.FC<AccountCardProps> = ({
           sx={{
             backgroundColor:
               account.status === 'active'
-                ? 'rgba(34,197,94,0.1)'
-                : 'rgba(107,114,128,0.1)',
-            color: account.status === 'active' ? '#22c55e' : '#6b7280',
+                ? alpha(theme.palette.success.main, 0.1)
+                : alpha(theme.palette.secondary.main, 0.1),
+            color:
+              account.status === 'active' ? 'success.main' : 'text.secondary',
             fontWeight: 500,
             fontSize: '0.75rem',
           }}
@@ -141,13 +155,15 @@ const AccountCard: React.FC<AccountCardProps> = ({
           justifyContent: 'space-between',
           alignItems: 'center',
           py: '0.75rem',
-          borderTop: '1px solid var(--border-color)',
-          borderBottom: '1px solid var(--border-color)',
+          borderTop: '1px solid',
+          borderTopColor: 'divider',
+          borderBottom: '1px solid',
+          borderBottomColor: 'divider',
         }}
       >
         <Typography
           component="span"
-          sx={{ fontSize: '0.875rem', color: 'var(--text-secondary)' }}
+          sx={{ fontSize: '0.875rem', color: 'text.secondary' }}
         >
           {amountDisplay.label}
         </Typography>
@@ -156,12 +172,40 @@ const AccountCard: React.FC<AccountCardProps> = ({
           sx={{
             fontSize: '1.5rem',
             fontWeight: 700,
-            color: toneColor[amountDisplay.tone] ?? 'var(--text-primary)',
+            color: toneColor[amountDisplay.tone] ?? 'text.primary',
           }}
         >
           {formatCurrency(amountDisplay.value)}
         </Typography>
       </Box>
+
+      {hasInvestmentData && (
+        <Box
+          sx={{
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            py: '0.5rem',
+            borderBottom: '1px solid',
+            borderBottomColor: 'divider',
+          }}
+        >
+          <Typography
+            component="span"
+            sx={{ fontSize: '0.8rem', color: 'text.secondary' }}
+          >
+            Invested: {formatCurrency(account.costBasis ?? 0)}
+          </Typography>
+          <Typography
+            component="span"
+            sx={{ fontSize: '0.875rem', fontWeight: 600, color: gainLossColor }}
+          >
+            {gainLoss >= 0 ? '+' : ''}
+            {formatCurrency(gainLoss)} ({gainLoss >= 0 ? '+' : ''}
+            {gainLossPct.toFixed(2)}%)
+          </Typography>
+        </Box>
+      )}
       {(onEdit || onToggleStatus || onDelete) && (
         <Box sx={{ display: 'flex', gap: '0.5rem', mt: 1 }}>
           {onEdit && (

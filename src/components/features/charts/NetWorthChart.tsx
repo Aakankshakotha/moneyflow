@@ -14,6 +14,7 @@ import { formatCurrency } from '@/utils/currencyUtils'
 import type { NetWorthSnapshot } from '@/types/netWorth'
 import Box from '@mui/material/Box'
 import Typography from '@mui/material/Typography'
+import { useTheme } from '@mui/material/styles'
 
 interface NetWorthChartProps {
   snapshots: NetWorthSnapshot[]
@@ -31,23 +32,30 @@ const NetWorthChart: React.FC<NetWorthChartProps> = ({
   creatingSnapshot = false,
   onCreateSnapshot,
 }) => {
-  const rootStyles = getComputedStyle(document.documentElement)
-  const getThemeVar = (name: string, fallback: string): string =>
-    rootStyles.getPropertyValue(name).trim() || fallback
+  const muiTheme = useTheme()
 
-  const chartAxis = getThemeVar('--chart-axis', '#94a3b8')
-  const chartGrid = getThemeVar('--chart-grid', '#e6edf7')
-  const tooltipBg = getThemeVar('--chart-tooltip-bg', '#ffffff')
-  const tooltipBorder = getThemeVar('--chart-tooltip-border', '#dbe4f0')
-  const tooltipText = getThemeVar('--chart-tooltip-text', '#1f2937')
-  const seriesNetWorth = getThemeVar('--chart-series-income', '#3dbb91')
-  const seriesAssets = getThemeVar('--chart-series-1', '#5b7cfa')
-  const seriesLiabilities = getThemeVar('--chart-series-liability', '#f2b36f')
+  const chartAxis = muiTheme.palette.text.secondary
+  const chartGrid = muiTheme.palette.divider
+  const tooltipBg = muiTheme.palette.background.paper
+  const tooltipBorder = muiTheme.palette.divider
+  const tooltipText = muiTheme.palette.text.primary
+  const seriesNetWorth = muiTheme.palette.success.main
+  const seriesAssets = muiTheme.palette.primary.main
+  const seriesLiabilities = muiTheme.palette.warning.main
 
   if (loading) {
     return (
       <Card sx={{ p: '2rem' }}>
-        <Box sx={{ textAlign: 'center', py: '4rem', px: '2rem', color: 'var(--text-secondary)' }}>Loading chart...</Box>
+        <Box
+          sx={{
+            textAlign: 'center',
+            py: '4rem',
+            px: '2rem',
+            color: 'text.secondary',
+          }}
+        >
+          Loading chart...
+        </Box>
       </Card>
     )
   }
@@ -55,10 +63,37 @@ const NetWorthChart: React.FC<NetWorthChartProps> = ({
   if (snapshots.length === 0) {
     return (
       <Card sx={{ p: '2rem' }}>
-        <Typography variant="h5" component="h2" sx={{ fontSize: '1.25rem', fontWeight: 600, m: 0, mb: '1.5rem', color: 'var(--text-primary)' }}>Net Worth Trend</Typography>
-        <Box sx={{ textAlign: 'center', py: '4rem', px: '2rem', color: 'var(--text-secondary)' }}>
-          <Typography sx={{ m: '0.5rem 0' }}>No snapshot history available</Typography>
-          <Typography sx={{ fontSize: '0.875rem', color: 'var(--text-secondary)', m: '0.5rem 0' }}>
+        <Typography
+          variant="h5"
+          component="h2"
+          sx={{
+            fontSize: '1.25rem',
+            fontWeight: 600,
+            m: 0,
+            mb: '1.5rem',
+            color: 'text.primary',
+          }}
+        >
+          Net Worth Trend
+        </Typography>
+        <Box
+          sx={{
+            textAlign: 'center',
+            py: '4rem',
+            px: '2rem',
+            color: 'text.secondary',
+          }}
+        >
+          <Typography sx={{ m: '0.5rem 0' }}>
+            No snapshot history available
+          </Typography>
+          <Typography
+            sx={{
+              fontSize: '0.875rem',
+              color: 'text.secondary',
+              m: '0.5rem 0',
+            }}
+          >
             Create snapshots to track your net worth over time
           </Typography>
           {onCreateSnapshot && (
@@ -86,7 +121,19 @@ const NetWorthChart: React.FC<NetWorthChartProps> = ({
 
   return (
     <Card sx={{ p: '2rem' }}>
-      <Typography variant="h5" component="h2" sx={{ fontSize: '1.25rem', fontWeight: 600, m: 0, mb: '1.5rem', color: 'var(--text-primary)' }}>Net Worth Trend</Typography>
+      <Typography
+        variant="h5"
+        component="h2"
+        sx={{
+          fontSize: '1.25rem',
+          fontWeight: 600,
+          m: 0,
+          mb: '1.5rem',
+          color: 'text.primary',
+        }}
+      >
+        Net Worth Trend
+      </Typography>
       <Box sx={{ mt: '1rem' }}>
         <ResponsiveContainer width="100%" height={400}>
           <LineChart data={chartData}>

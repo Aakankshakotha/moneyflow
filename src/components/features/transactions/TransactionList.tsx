@@ -76,13 +76,11 @@ const TransactionList: React.FC<TransactionListProps> = ({
           textAlign: 'center',
           py: '4rem',
           px: '2rem',
-          color: 'var(--text-secondary)',
+          color: 'text.secondary',
         }}
       >
         <Typography>No transactions yet</Typography>
-        <Typography
-          sx={{ fontSize: '0.875rem', color: 'var(--text-secondary)' }}
-        >
+        <Typography sx={{ fontSize: '0.875rem', color: 'text.secondary' }}>
           Record your first transaction to start tracking your money flow
         </Typography>
       </Box>
@@ -125,17 +123,8 @@ const TransactionList: React.FC<TransactionListProps> = ({
 
         {onToggleGrouping && (
           <Button
-            variant="secondary"
+            variant={groupByCategory ? 'primary' : 'secondary'}
             size="sm"
-            style={
-              groupByCategory
-                ? {
-                    backgroundColor: 'var(--primary-color)',
-                    color: '#fff',
-                    border: 'none',
-                  }
-                : {}
-            }
             onClick={onToggleGrouping}
             title={
               groupByCategory ? 'Ungroup transactions' : 'Group by category'
@@ -152,7 +141,7 @@ const TransactionList: React.FC<TransactionListProps> = ({
             textAlign: 'center',
             py: '4rem',
             px: '2rem',
-            color: 'var(--text-secondary)',
+            color: 'text.secondary',
           }}
         >
           <Typography>No transactions found matching "{searchTerm}"</Typography>
@@ -171,10 +160,11 @@ const TransactionList: React.FC<TransactionListProps> = ({
                   sx={{
                     fontSize: '1.125rem',
                     fontWeight: 600,
-                    color: 'var(--text-primary)',
+                    color: 'text.primary',
                     m: 0,
                     pb: '0.5rem',
-                    borderBottom: '2px solid var(--border-color)',
+                    borderBottom: '2px solid',
+                    borderBottomColor: 'divider',
                     display: 'flex',
                     alignItems: 'center',
                     gap: '0.5rem',
@@ -188,7 +178,7 @@ const TransactionList: React.FC<TransactionListProps> = ({
                     component="span"
                     sx={{
                       fontSize: '0.875rem',
-                      backgroundColor: 'var(--background-secondary)',
+                      backgroundColor: 'action.selected',
                       px: '0.5rem',
                       borderRadius: '0.25rem',
                       ml: 'auto',

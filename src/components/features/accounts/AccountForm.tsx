@@ -6,9 +6,14 @@ import type {
   UpdateAccountDto,
   Account,
 } from '@/types/account'
-import { Input, Select, Button, Modal } from '@/components/common'
+import { Button, Modal } from '@/components/common'
 import { dollarsToCents, centsToDollars } from '@/utils/currencyUtils'
 import Box from '@mui/material/Box'
+import TextField from '@mui/material/TextField'
+import FormControl from '@mui/material/FormControl'
+import InputLabel from '@mui/material/InputLabel'
+import MuiSelect from '@mui/material/Select'
+import MenuItem from '@mui/material/MenuItem'
 
 interface AccountFormProps {
   isOpen: boolean
@@ -39,6 +44,11 @@ const AccountForm: React.FC<AccountFormProps> = ({
   const [balance, setBalance] = useState(
     account ? centsToDollars(account.balance).toString() : '0'
   )
+  const [costBasis, setCostBasis] = useState(
+    account?.costBasis !== undefined
+      ? centsToDollars(account.costBasis).toString()
+      : ''
+  )
   const [status, setStatus] = useState<AccountStatus>(
     account?.status || 'active'
   )
@@ -47,11 +57,18 @@ const AccountForm: React.FC<AccountFormProps> = ({
   )
   const [errors, setErrors] = useState<Record<string, string>>({})
 
+  const isAssetType = isEdit ? account?.type === 'asset' : type === 'asset'
+
   useEffect(() => {
     if (isOpen) {
       setName(account?.name || '')
       setType(account?.type || 'asset')
       setBalance(account ? centsToDollars(account.balance).toString() : '0')
+      setCostBasis(
+        account?.costBasis !== undefined
+          ? centsToDollars(account.costBasis).toString()
+          : ''
+      )
       setStatus(account?.status || 'active')
       setParentAccountId(account?.parentAccountId || '')
       setErrors({})
@@ -94,6 +111,14 @@ const AccountForm: React.FC<AccountFormProps> = ({
         ...(isDerivedFlowAccount
           ? {}
           : { balance: dollarsToCents(balanceNum) }),
+        ...(isAssetType
+          ? {
+              costBasis:
+                costBasis.trim() !== ''
+                  ? dollarsToCents(parseFloat(costBasis))
+                  : null,
+            }
+          : {}),
       }
       onSubmit(updateData)
     } else {
@@ -102,6 +127,9 @@ const AccountForm: React.FC<AccountFormProps> = ({
         type,
         parentAccountId: parentAccountId || null,
         balance: dollarsToCents(balanceNum),
+        ...(isAssetType && costBasis.trim() !== ''
+          ? { costBasis: dollarsToCents(parseFloat(costBasis)) }
+          : {}),
       }
       onSubmit(createData)
     }
@@ -114,6 +142,7 @@ const AccountForm: React.FC<AccountFormProps> = ({
     setName('')
     setType('asset')
     setBalance('0')
+    setCostBasis('')
     setStatus('active')
     setParentAccountId('')
     setErrors({})
@@ -137,67 +166,99 @@ const AccountForm: React.FC<AccountFormProps> = ({
     <Box
       component="form"
       onSubmit={handleSubmit}
-      sx={{ display: 'flex', flexDirection: 'column', gap: 1.5, pt: 1 }}
+      sx={{ display: 'flex', flexDirection: 'column', gap: 2, pt: 1 }}
     >
-      <Input
+      <TextField
         label="Account Name"
+        size="small"
+        fullWidth
         value={name}
         onChange={(e) => setName(e.target.value)}
-        error={errors.name}
+        error={Boolean(errors.name)}
+        helperText={errors.name}
         placeholder="e.g., Checking Account"
         required
       />
 
       {!isEdit && (
-        <Select
-          label="Account Type"
-          value={type}
-          onChange={(e) => setType(e.target.value as AccountType)}
-          options={[
-            { value: 'asset', label: 'Asset (what you own)' },
-            { value: 'liability', label: 'Liability (what you owe)' },
-            { value: 'income', label: 'Income (money coming in)' },
-            { value: 'expense', label: 'Expense (money going out)' },
-          ]}
-          required
-        />
+        <FormControl size="small" fullWidth required>
+          <InputLabel>Account Type</InputLabel>
+          <MuiSelect
+            label="Account Type"
+            value={type}
+            onChange={(e) => setType(e.target.value as AccountType)}
+          >
+            <MenuItem value="asset">Asset (what you own)</MenuItem>
+            <MenuItem value="liability">Liability (what you owe)</MenuItem>
+            <MenuItem value="income">Income (money coming in)</MenuItem>
+            <MenuItem value="expense">Expense (money going out)</MenuItem>
+          </MuiSelect>
+        </FormControl>
       )}
 
-      <Select
-        label="Parent Account (Optional)"
-        value={parentAccountId}
-        onChange={(e) => setParentAccountId(e.target.value)}
-        options={parentOptions}
-        placeholder="No parent (top-level account)"
-      />
+      <FormControl size="small" fullWidth>
+        <InputLabel shrink>Parent Account (Optional)</InputLabel>
+        <MuiSelect
+          label="Parent Account (Optional)"
+          displayEmpty
+          value={parentAccountId}
+          onChange={(e) => setParentAccountId(e.target.value as string)}
+          notched
+        >
+          <MenuItem value="">
+            <em>No parent (top-level account)</em>
+          </MenuItem>
+          {parentOptions.map((opt) => (
+            <MenuItem key={opt.value} value={opt.value}>
+              {opt.label}
+            </MenuItem>
+          ))}
+        </MuiSelect>
+      </FormControl>
 
-      <Input
+      <TextField
         label={isEdit ? 'Balance ($)' : 'Initial Balance ($)'}
+        size="small"
+        fullWidth
         type="number"
         value={balance}
         onChange={(e) => setBalance(e.target.value)}
-        error={errors.balance}
+        error={Boolean(errors.balance)}
         helperText={
-          isDerivedFlowAccount
+          errors.balance ||
+          (isDerivedFlowAccount
             ? 'For income/expense accounts, this value is derived from transactions.'
-            : undefined
+            : undefined)
         }
         placeholder="0.00"
-        step="0.01"
         disabled={isDerivedFlowAccount}
+        slotProps={{ htmlInput: { step: '0.01' } }}
       />
-
-      {isEdit && (
-        <Select
-          label="Status"
-          value={status}
-          onChange={(e) => setStatus(e.target.value as typeof status)}
-          options={[
-            { value: 'active', label: 'Active' },
-            { value: 'archived', label: 'Archived' },
-          ]}
-          required
+      {isAssetType && (
+        <TextField
+          label="Invested Amount / Cost Basis ($)"
+          size="small"
+          fullWidth
+          type="number"
+          value={costBasis}
+          onChange={(e) => setCostBasis(e.target.value)}
+          helperText="Optional. Set this to track unrealized gain/loss for investment accounts."
+          placeholder="0.00"
+          slotProps={{ htmlInput: { step: '0.01', min: '0' } }}
         />
+      )}
+      {isEdit && (
+        <FormControl size="small" fullWidth required>
+          <InputLabel>Status</InputLabel>
+          <MuiSelect
+            label="Status"
+            value={status}
+            onChange={(e) => setStatus(e.target.value as typeof status)}
+          >
+            <MenuItem value="active">Active</MenuItem>
+            <MenuItem value="archived">Archived</MenuItem>
+          </MuiSelect>
+        </FormControl>
       )}
 
       <Box
@@ -205,9 +266,8 @@ const AccountForm: React.FC<AccountFormProps> = ({
           display: 'flex',
           gap: 1,
           justifyContent: 'flex-end',
-          mt: 1,
-          pt: 1,
-          borderTop: '1px solid var(--border-color)',
+          mt: 0.5,
+          pt: 1.5,
         }}
       >
         <Button type="button" variant="secondary" onClick={handleClose}>

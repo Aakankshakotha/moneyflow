@@ -3,6 +3,7 @@ import type { Account } from '@/types/account'
 import type { Transaction } from '@/types/transaction'
 import type { RecurringTransaction } from '@/types/recurring'
 import type { NetWorthSnapshot } from '@/types/netWorth'
+import type { InvestmentSnapshot } from '@/types/investment'
 import {
   isValidUUID,
   isValidAmount,
@@ -21,6 +22,7 @@ const STORAGE_KEYS = {
   TRANSACTIONS: 'moneyflow_transactions',
   RECURRING: 'moneyflow_recurring',
   NET_WORTH: 'moneyflow_networth',
+  INVESTMENT_SNAPSHOTS: 'moneyflow_investment_snapshots',
   VERSION: 'moneyflow_version',
 } as const
 
@@ -504,6 +506,74 @@ export class StorageService {
   }
 
   /**
+   * Investment Snapshot Operations
+   */
+
+  async getInvestmentSnapshots(
+    accountId?: string
+  ): Promise<
+    Result<InvestmentSnapshot[], { type: 'StorageError'; message: string }>
+  > {
+    try {
+      const container = this.getContainer<InvestmentSnapshot>(
+        STORAGE_KEYS.INVESTMENT_SNAPSHOTS
+      )
+      let data = [...container.data]
+      if (accountId) {
+        data = data.filter((s) => s.accountId === accountId)
+      }
+      data.sort((a, b) => a.date.localeCompare(b.date))
+      return { success: true, data }
+    } catch (error) {
+      return {
+        success: false,
+        error: {
+          type: 'StorageError',
+          message:
+            error instanceof Error
+              ? error.message
+              : 'Failed to retrieve investment snapshots',
+        },
+      }
+    }
+  }
+
+  async saveInvestmentSnapshot(
+    snapshot: InvestmentSnapshot
+  ): Promise<
+    Result<InvestmentSnapshot, { type: 'StorageError'; message: string }>
+  > {
+    try {
+      const container = this.getContainer<InvestmentSnapshot>(
+        STORAGE_KEYS.INVESTMENT_SNAPSHOTS
+      )
+      const snapshots = [...container.data]
+      // One entry per account per day — overwrite if same accountId+date exists
+      const existingIdx = snapshots.findIndex(
+        (s) => s.accountId === snapshot.accountId && s.date === snapshot.date
+      )
+      if (existingIdx >= 0) {
+        snapshots[existingIdx] = snapshot
+      } else {
+        snapshots.push(snapshot)
+      }
+      this.setContainer(STORAGE_KEYS.INVESTMENT_SNAPSHOTS, snapshots)
+      return { success: true, data: snapshot }
+    } catch (error) {
+      return {
+        success: false,
+        error: {
+          type: 'StorageError',
+          message:
+            error instanceof Error
+              ? error.message
+              : 'Failed to save investment snapshot',
+        },
+      }
+    }
+  }
+
+  /**
    * Net Worth Snapshot Operations
    */
 
@@ -922,6 +992,10 @@ export const deleteRecurringTransaction = (id: string) =>
 export const getNetWorthSnapshots = () => storageService.getNetWorthSnapshots()
 export const saveNetWorthSnapshot = (snapshot: NetWorthSnapshot) =>
   storageService.saveNetWorthSnapshot(snapshot)
+export const getInvestmentSnapshots = (accountId?: string) =>
+  storageService.getInvestmentSnapshots(accountId)
+export const saveInvestmentSnapshot = (snapshot: InvestmentSnapshot) =>
+  storageService.saveInvestmentSnapshot(snapshot)
 export const exportData = () => storageService.exportData()
 export const importData = (data: ExportData) => storageService.importData(data)
 export const clearAllData = () => storageService.clearAllData()

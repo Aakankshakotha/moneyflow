@@ -8,6 +8,7 @@ import Dashboard from './pages/Dashboard'
 import Accounts from './pages/Accounts'
 import Transactions from './pages/Transactions'
 import Recurring from './pages/Recurring'
+import Investments from './pages/Investments'
 
 /**
  * Main application component
@@ -33,6 +34,7 @@ const App: React.FC = () => {
                 <Route path="/accounts" element={<Accounts />} />
                 <Route path="/transactions" element={<Transactions />} />
                 <Route path="/recurring" element={<Recurring />} />
+                <Route path="/investments" element={<Investments />} />
               </Routes>
             </Box>
           </Box>

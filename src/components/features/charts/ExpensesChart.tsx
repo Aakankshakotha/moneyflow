@@ -6,6 +6,7 @@ import { formatCurrency } from '@/utils/currencyUtils'
 import { categoryService } from '@/services/categoryService'
 import Box from '@mui/material/Box'
 import Typography from '@mui/material/Typography'
+import { useTheme } from '@mui/material/styles'
 
 interface ExpensesChartProps {
   transactions: Transaction[]
@@ -20,30 +21,15 @@ export const ExpensesChart: React.FC<ExpensesChartProps> = ({
   transactions,
   accounts,
 }) => {
-  const chartOptions = useMemo(() => {
-    const rootStyles = getComputedStyle(document.documentElement)
-    const getThemeVar = (name: string, fallback: string): string =>
-      rootStyles.getPropertyValue(name).trim() || fallback
+  const muiTheme = useTheme()
 
-    const palette = [
-      '#14b8a6',
-      '#8b5cf6',
-      '#f59e0b',
-      '#ec4899',
-      '#6366f1',
-      '#22c55e',
-      '#f97316',
-      '#06b6d4',
-      '#ef4444',
-      '#a855f7',
-      '#84cc16',
-      '#fb7185',
-    ]
-    const tooltipBg = getThemeVar('--chart-tooltip-bg', '#ffffff')
-    const tooltipBorder = getThemeVar('--chart-tooltip-border', '#dbe4f0')
-    const tooltipText = getThemeVar('--chart-tooltip-text', '#1f2937')
-    const legendText = getThemeVar('--text-primary', '#1f2937')
-    const cardBg = getThemeVar('--card-background', '#ffffff')
+  const chartOptions = useMemo(() => {
+    const palette = muiTheme.palette.charts.categorical
+    const tooltipBg = muiTheme.palette.background.paper
+    const tooltipBorder = muiTheme.palette.divider
+    const tooltipText = muiTheme.palette.text.primary
+    const legendText = muiTheme.palette.text.primary
+    const cardBg = muiTheme.palette.background.paper
 
     const accountMap = new Map(accounts.map((a) => [a.id, a]))
     const expensesByCategory = new Map<
@@ -176,13 +162,52 @@ export const ExpensesChart: React.FC<ExpensesChartProps> = ({
   }, [transactions, accounts])
 
   return (
-    <Box sx={{ backgroundColor: 'var(--card-background)', border: 'none', borderRadius: '12px', p: '20px', boxShadow: 'var(--shadow-soft)', height: '100%', boxSizing: 'border-box' }}>
-      <Box sx={{ mb: '8px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '1rem' }}>
-        <Typography variant="h6" component="h3" sx={{ fontSize: '1.125rem', fontWeight: 600, color: 'var(--text-primary)', m: '0 0 4px', display: 'flex', alignItems: 'center', gap: '8px' }}>
-          <Typography component="span" sx={{ fontSize: '1.25rem' }}>📊</Typography>
+    <Box
+      sx={{
+        backgroundColor: 'background.paper',
+        border: 'none',
+        borderRadius: '12px',
+        p: '20px',
+        boxShadow: 2,
+        height: '100%',
+        boxSizing: 'border-box',
+      }}
+    >
+      <Box
+        sx={{
+          mb: '8px',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          gap: '1rem',
+        }}
+      >
+        <Typography
+          variant="h6"
+          component="h3"
+          sx={{
+            fontSize: '1.125rem',
+            fontWeight: 600,
+            color: 'text.primary',
+            m: '0 0 4px',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '8px',
+          }}
+        >
+          <Typography component="span" sx={{ fontSize: '1.25rem' }}>
+            📊
+          </Typography>
           Expenses
         </Typography>
-        <Typography sx={{ fontSize: '0.875rem', color: 'var(--text-secondary)', m: 0, whiteSpace: 'nowrap' }}>
+        <Typography
+          sx={{
+            fontSize: '0.875rem',
+            color: 'text.secondary',
+            m: 0,
+            whiteSpace: 'nowrap',
+          }}
+        >
           Total: {formatCurrency(totalExpenses)}
         </Typography>
       </Box>

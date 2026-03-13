@@ -23,6 +23,7 @@
   --hover-background: #fff2e5;
   --primary-color: #f97316;
   --primary-strong: #ea580c;
+  --secondary-color: #6b7280;
   --icon-background: #fff0df;
   --badge-background: #fff0df;
   --input-background: #ffffff;
@@ -33,10 +34,10 @@
   --success-soft: rgba(22, 163, 74, 0.12);
   --error-color: #dc2626;
   --error-soft: rgba(220, 38, 38, 0.12);
-  --warning-color: #ea580c;
-  --warning-soft: rgba(234, 88, 12, 0.14);
-  --info-color: #f97316;
-  --info-soft: rgba(249, 115, 22, 0.14);
+  --warning-color: #d97706;
+  --warning-soft: rgba(217, 119, 6, 0.14);
+  --info-color: #0284c7;
+  --info-soft: rgba(2, 132, 199, 0.14);
   --chart-grid: #f2ddcb;
   --chart-axis: #b58d70;
   --chart-tooltip-bg: #ffffff;
@@ -51,7 +52,6 @@
   --chart-series-expense: #f97373;
   --chart-series-liability: #fb923c;
 
-  /* Legacy alias tokens used across older CSS */
   --color-text-primary: var(--text-primary);
   --color-text-secondary: var(--text-secondary);
   --color-bg-secondary: var(--background-secondary);
@@ -60,9 +60,11 @@
   --color-border-hover: var(--border-color-hover);
   --color-card-bg: var(--card-background);
   --color-primary: var(--primary-color);
+  --color-secondary: var(--secondary-color);
   --color-success: var(--success-color);
   --color-error: var(--error-color);
   --color-warning: var(--warning-color);
+  --color-info: var(--info-color);
 
   color-scheme: light;
   color: var(--text-primary);
@@ -85,6 +87,7 @@
   --hover-background: #1a1a20;
   --primary-color: #fb923c;
   --primary-strong: #f97316;
+  --secondary-color: #8a8a92;
   --icon-background: #252026;
   --badge-background: #251f25;
   --input-background: #121216;
@@ -95,10 +98,10 @@
   --success-soft: rgba(74, 222, 128, 0.16);
   --error-color: #f87171;
   --error-soft: rgba(248, 113, 113, 0.16);
-  --warning-color: #fb923c;
-  --warning-soft: rgba(251, 146, 60, 0.16);
-  --info-color: #fdba74;
-  --info-soft: rgba(253, 186, 116, 0.16);
+  --warning-color: #fbbf24;
+  --warning-soft: rgba(251, 191, 36, 0.16);
+  --info-color: #38bdf8;
+  --info-soft: rgba(56, 189, 248, 0.16);
   --chart-grid: #2c2420;
   --chart-axis: #c8a790;
   --chart-tooltip-bg: #121216;
@@ -122,9 +125,11 @@
   --color-border-hover: var(--border-color-hover);
   --color-card-bg: var(--card-background);
   --color-primary: var(--primary-color);
+  --color-secondary: var(--secondary-color);
   --color-success: var(--success-color);
   --color-error: var(--error-color);
   --color-warning: var(--warning-color);
+  --color-info: var(--info-color);
 
   color-scheme: dark;
   color: var(--text-primary);

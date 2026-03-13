@@ -55,10 +55,10 @@ const TransactionCard: React.FC<TransactionCardProps> = ({
     transfer: 'TRANSFER',
   }
 
-  const typeColors: Record<string, { bg: string; color: string }> = {
-    income: { bg: 'rgba(34,197,94,0.1)', color: '#22c55e' },
-    expense: { bg: 'rgba(239,68,68,0.1)', color: '#ef4444' },
-    transfer: { bg: 'rgba(99,102,241,0.1)', color: '#6366f1' },
+  const typeChipColor: Record<string, 'success' | 'error' | 'info'> = {
+    income: 'success',
+    expense: 'error',
+    transfer: 'info',
   }
 
   return (
@@ -68,7 +68,7 @@ const TransactionCard: React.FC<TransactionCardProps> = ({
         px: '1rem',
         py: '0.75rem',
         borderLeft: '3px solid transparent',
-        '&:hover': { backgroundColor: 'var(--hover-background)' },
+        '&:hover': { backgroundColor: 'action.hover' },
       }}
     >
       <Box
@@ -91,7 +91,7 @@ const TransactionCard: React.FC<TransactionCardProps> = ({
           <Typography
             sx={{
               fontSize: '0.75rem',
-              color: 'var(--text-secondary)',
+              color: 'text.secondary',
               minWidth: '65px',
             }}
           >
@@ -111,7 +111,7 @@ const TransactionCard: React.FC<TransactionCardProps> = ({
               sx={{
                 fontSize: '0.875rem',
                 fontWeight: 500,
-                color: 'var(--text-primary)',
+                color: 'text.primary',
                 whiteSpace: 'nowrap',
                 overflow: 'hidden',
                 textOverflow: 'ellipsis',
@@ -123,7 +123,7 @@ const TransactionCard: React.FC<TransactionCardProps> = ({
               component="span"
               sx={{
                 fontSize: '1rem',
-                color: 'var(--text-secondary)',
+                color: 'text.secondary',
                 flexShrink: 0,
               }}
             >
@@ -134,7 +134,7 @@ const TransactionCard: React.FC<TransactionCardProps> = ({
               sx={{
                 fontSize: '0.875rem',
                 fontWeight: 500,
-                color: 'var(--text-primary)',
+                color: 'text.primary',
                 whiteSpace: 'nowrap',
                 overflow: 'hidden',
                 textOverflow: 'ellipsis',
@@ -146,7 +146,7 @@ const TransactionCard: React.FC<TransactionCardProps> = ({
           <Typography
             sx={{
               fontSize: '0.8125rem',
-              color: 'var(--text-secondary)',
+              color: 'text.secondary',
               whiteSpace: 'nowrap',
               overflow: 'hidden',
               textOverflow: 'ellipsis',
@@ -161,12 +161,9 @@ const TransactionCard: React.FC<TransactionCardProps> = ({
           <Chip
             label={typeLabels[transactionType]}
             size="small"
-            sx={{
-              backgroundColor: typeColors[transactionType].bg,
-              color: typeColors[transactionType].color,
-              fontWeight: 600,
-              fontSize: '0.7rem',
-            }}
+            color={typeChipColor[transactionType]}
+            variant="outlined"
+            sx={{ fontWeight: 600, fontSize: '0.7rem' }}
           />
           {category && (
             <Chip
@@ -183,7 +180,7 @@ const TransactionCard: React.FC<TransactionCardProps> = ({
             sx={{
               fontSize: '0.9375rem',
               fontWeight: 600,
-              color: 'var(--text-primary)',
+              color: 'text.primary',
               whiteSpace: 'nowrap',
             }}
           >
@@ -195,8 +192,8 @@ const TransactionCard: React.FC<TransactionCardProps> = ({
               size="small"
               aria-label="Delete transaction"
               sx={{
-                color: 'var(--text-secondary)',
-                '&:hover': { color: 'var(--error-color)' },
+                color: 'text.secondary',
+                '&:hover': { color: 'error.main' },
               }}
             >
               <CloseIcon fontSize="small" />

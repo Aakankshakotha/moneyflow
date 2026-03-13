@@ -123,8 +123,9 @@ const AccountList: React.FC<AccountListProps> = ({
           gap: '1rem',
           mb: 2,
           p: '1rem',
-          backgroundColor: 'var(--background-secondary)',
-          border: '1px solid var(--border-color)',
+          backgroundColor: 'action.selected',
+          border: '1px solid',
+          borderColor: 'divider',
           borderRadius: '8px',
         }}
       >
@@ -157,10 +158,11 @@ const AccountList: React.FC<AccountListProps> = ({
           sx={{
             textAlign: 'center',
             padding: '3rem 1rem',
-            backgroundColor: 'var(--background-secondary)',
-            border: '1px solid var(--border-color)',
+            backgroundColor: 'action.selected',
+            border: '1px solid',
+            borderColor: 'divider',
             borderRadius: '8px',
-            color: 'var(--text-secondary)',
+            color: 'text.secondary',
           }}
         >
           <Typography>
@@ -174,10 +176,11 @@ const AccountList: React.FC<AccountListProps> = ({
               key={type}
               sx={{
                 padding: '1.5rem',
-                backgroundColor: 'var(--card-background)',
-                border: '1px solid var(--border-color)',
+                backgroundColor: 'background.paper',
+                border: '1px solid',
+                borderColor: 'divider',
                 borderRadius: '8px',
-                boxShadow: 'var(--shadow-soft)',
+                boxShadow: 2,
               }}
             >
               <Typography
@@ -188,34 +191,79 @@ const AccountList: React.FC<AccountListProps> = ({
                   mb: 1,
                   fontSize: '1.5rem',
                   fontWeight: 600,
-                  color: 'var(--text-primary)',
-                  borderBottom: '2px solid var(--primary-color)',
+                  color: 'text.primary',
+                  borderBottom: '2px solid',
+                  borderBottomColor: 'primary.main',
                   pb: '0.5rem',
                 }}
               >
                 {typeLabels[type] || type}
               </Typography>
+              {/* Render parents first, with children grouped underneath */}
               <Box
-                sx={{
-                  display: 'grid',
-                  gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))',
-                  gap: '1rem',
-                }}
+                sx={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}
               >
-                {orderedAccountsForType(typeAccounts).map((account) => (
-                  <AccountCard
-                    key={account.id}
-                    account={account}
-                    parentName={
-                      account.parentAccountId
-                        ? accountMap.get(account.parentAccountId)?.name
-                        : undefined
-                    }
-                    onEdit={onEdit}
-                    onToggleStatus={onToggleStatus}
-                    onDelete={onDelete}
-                  />
-                ))}
+                {orderedAccountsForType(typeAccounts)
+                  .filter((a) => !a.parentAccountId)
+                  .map((parent) => {
+                    const children = typeAccounts.filter(
+                      (a) => a.parentAccountId === parent.id
+                    )
+                    return (
+                      <Box key={parent.id}>
+                        <AccountCard
+                          account={parent}
+                          onEdit={onEdit}
+                          onToggleStatus={onToggleStatus}
+                          onDelete={onDelete}
+                        />
+                        {children.length > 0 && (
+                          <Box
+                            sx={{
+                              ml: '1.5rem',
+                              pl: '1rem',
+                              borderLeft: '2px solid',
+                              borderLeftColor: 'divider',
+                              mt: '0.5rem',
+                              display: 'flex',
+                              flexDirection: 'column',
+                              gap: '0.5rem',
+                            }}
+                          >
+                            {children
+                              .sort((a, b) => a.name.localeCompare(b.name))
+                              .map((child) => (
+                                <AccountCard
+                                  key={child.id}
+                                  account={child}
+                                  parentName={parent.name}
+                                  onEdit={onEdit}
+                                  onToggleStatus={onToggleStatus}
+                                  onDelete={onDelete}
+                                />
+                              ))}
+                          </Box>
+                        )}
+                      </Box>
+                    )
+                  })}
+                {/* Orphaned children whose parent isn't in this list */}
+                {typeAccounts
+                  .filter(
+                    (a) =>
+                      a.parentAccountId &&
+                      !typeAccounts.some((p) => p.id === a.parentAccountId)
+                  )
+                  .map((orphan) => (
+                    <AccountCard
+                      key={orphan.id}
+                      account={orphan}
+                      parentName={accountMap.get(orphan.parentAccountId!)?.name}
+                      onEdit={onEdit}
+                      onToggleStatus={onToggleStatus}
+                      onDelete={onDelete}
+                    />
+                  ))}
               </Box>
             </Box>
           ))}

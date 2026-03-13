@@ -36,12 +36,12 @@ const RecurringCard: React.FC<RecurringCardProps> = ({
     FREQUENCY_LABELS[recurring.frequency] || recurring.frequency
 
   const statusColors: Record<string, { bg: string; color: string }> = {
-    active: { bg: 'rgba(34,197,94,0.1)', color: '#22c55e' },
-    paused: { bg: 'rgba(251,146,60,0.1)', color: '#fb923c' },
+    active: { bg: 'success.light', color: 'success.main' },
+    paused: { bg: 'warning.light', color: 'warning.main' },
   }
   const statusColor = statusColors[recurring.status] ?? {
-    bg: 'rgba(107,114,128,0.1)',
-    color: '#6b7280',
+    bg: 'action.selected',
+    color: 'text.secondary',
   }
 
   return (
@@ -50,7 +50,7 @@ const RecurringCard: React.FC<RecurringCardProps> = ({
       sx={{
         p: '1.25rem',
         transition: 'background-color 0.15s',
-        '&:hover': { backgroundColor: 'var(--hover-background)' },
+        '&:hover': { backgroundColor: 'action.hover' },
       }}
     >
       <Box
@@ -84,14 +84,14 @@ const RecurringCard: React.FC<RecurringCardProps> = ({
               sx={{
                 fontSize: '0.9375rem',
                 fontWeight: 600,
-                color: 'var(--text-primary)',
+                color: 'text.primary',
               }}
             >
               {recurring.fromAccountName}
             </Typography>
             <Typography
               component="span"
-              sx={{ fontSize: '1rem', color: 'var(--text-secondary)' }}
+              sx={{ fontSize: '1rem', color: 'text.secondary' }}
             >
               →
             </Typography>
@@ -100,15 +100,13 @@ const RecurringCard: React.FC<RecurringCardProps> = ({
               sx={{
                 fontSize: '0.9375rem',
                 fontWeight: 600,
-                color: 'var(--text-primary)',
+                color: 'text.primary',
               }}
             >
               {recurring.toAccountName}
             </Typography>
           </Box>
-          <Typography
-            sx={{ fontSize: '0.875rem', color: 'var(--text-secondary)' }}
-          >
+          <Typography sx={{ fontSize: '0.875rem', color: 'text.secondary' }}>
             {recurring.description}
           </Typography>
           <Box sx={{ display: 'flex', gap: '1rem', fontSize: '0.75rem' }}>
@@ -119,8 +117,8 @@ const RecurringCard: React.FC<RecurringCardProps> = ({
                 textTransform: 'uppercase',
                 px: '0.375rem',
                 py: '0.125rem',
-                backgroundColor: '#e0e7ff',
-                color: '#4338ca',
+                backgroundColor: 'primary.light',
+                color: 'primary.contrastText',
                 borderRadius: '0.25rem',
                 fontSize: '0.75rem',
               }}
@@ -130,7 +128,7 @@ const RecurringCard: React.FC<RecurringCardProps> = ({
             {recurring.lastProcessedDate && (
               <Typography
                 component="span"
-                sx={{ fontSize: '0.75rem', color: 'var(--text-secondary)' }}
+                sx={{ fontSize: '0.75rem', color: 'text.secondary' }}
               >
                 Last: {formatDate(new Date(recurring.lastProcessedDate))}
               </Typography>
@@ -150,7 +148,7 @@ const RecurringCard: React.FC<RecurringCardProps> = ({
             sx={{
               fontSize: '1.125rem',
               fontWeight: 700,
-              color: 'var(--text-primary)',
+              color: 'text.primary',
             }}
           >
             {formatCurrency(recurring.amount)}
@@ -158,9 +156,15 @@ const RecurringCard: React.FC<RecurringCardProps> = ({
           <Chip
             label={recurring.status}
             size="small"
+            color={
+              recurring.status === 'active'
+                ? 'success'
+                : recurring.status === 'paused'
+                  ? 'warning'
+                  : 'default'
+            }
+            variant="outlined"
             sx={{
-              backgroundColor: statusColor.bg,
-              color: statusColor.color,
               fontWeight: 500,
               fontSize: '0.75rem',
               textTransform: 'capitalize',
@@ -174,7 +178,8 @@ const RecurringCard: React.FC<RecurringCardProps> = ({
           display: 'flex',
           gap: '0.5rem',
           pt: '0.75rem',
-          borderTop: '1px solid var(--border-color)',
+          borderTop: '1px solid',
+          borderTopColor: 'divider',
         }}
       >
         {onProcess && recurring.status === 'active' && (

@@ -56,16 +56,9 @@ export const RecentTransactionsTable: React.FC<
       <Chip
         label={account.name}
         size="small"
-        sx={{
-          backgroundColor: isIncome
-            ? 'rgba(34,197,94,0.1)'
-            : isExpense
-              ? 'rgba(239,68,68,0.1)'
-              : undefined,
-          color: isIncome ? '#22c55e' : isExpense ? '#ef4444' : undefined,
-          fontWeight: 500,
-          fontSize: '0.75rem',
-        }}
+        color={isIncome ? 'success' : isExpense ? 'error' : 'default'}
+        variant="outlined"
+        sx={{ fontWeight: 500, fontSize: '0.75rem' }}
       />
     )
   }
@@ -80,14 +73,9 @@ export const RecentTransactionsTable: React.FC<
       <Chip
         label={isCompleted ? 'Completed' : 'Pending'}
         size="small"
-        sx={{
-          backgroundColor: isCompleted
-            ? 'rgba(34,197,94,0.1)'
-            : 'rgba(251,146,60,0.1)',
-          color: isCompleted ? '#22c55e' : '#fb923c',
-          fontWeight: 500,
-          fontSize: '0.75rem',
-        }}
+        color={isCompleted ? 'success' : 'warning'}
+        variant="outlined"
+        sx={{ fontWeight: 500, fontSize: '0.75rem' }}
       />
     )
   }
@@ -95,8 +83,9 @@ export const RecentTransactionsTable: React.FC<
   return (
     <Box
       sx={{
-        backgroundColor: 'var(--card-background)',
-        border: '1px solid var(--border-color)',
+        backgroundColor: 'background.paper',
+        border: '1px solid',
+        borderColor: 'divider',
         borderRadius: '0.75rem',
         overflow: 'hidden',
       }}
@@ -107,7 +96,8 @@ export const RecentTransactionsTable: React.FC<
           alignItems: 'center',
           justifyContent: 'space-between',
           p: '1.25rem 1.5rem',
-          borderBottom: '1px solid var(--border-color)',
+          borderBottom: '1px solid',
+          borderBottomColor: 'divider',
         }}
       >
         <Typography
@@ -115,7 +105,7 @@ export const RecentTransactionsTable: React.FC<
           sx={{
             fontWeight: 600,
             fontSize: '1rem',
-            color: 'var(--text-primary)',
+            color: 'text.primary',
           }}
         >
           Recent Transactions
@@ -127,11 +117,11 @@ export const RecentTransactionsTable: React.FC<
           className="recent-transactions__filter-btn"
           sx={{
             textTransform: 'none',
-            borderColor: 'var(--border-color)',
-            color: 'var(--text-primary)',
+            borderColor: 'divider',
+            color: 'text.primary',
             '&:hover': {
-              borderColor: 'var(--primary-color)',
-              color: 'var(--primary-color)',
+              borderColor: 'primary.main',
+              color: 'primary.main',
             },
           }}
         >
@@ -169,7 +159,7 @@ export const RecentTransactionsTable: React.FC<
                         display: 'flex',
                         alignItems: 'center',
                         justifyContent: 'center',
-                        backgroundColor: 'var(--background-secondary)',
+                        backgroundColor: 'action.selected',
                         borderRadius: '50%',
                         flexShrink: 0,
                       }}
@@ -181,7 +171,7 @@ export const RecentTransactionsTable: React.FC<
                         sx={{
                           fontSize: '0.875rem',
                           fontWeight: 500,
-                          color: 'var(--text-primary)',
+                          color: 'text.primary',
                         }}
                       >
                         {txn.description}
@@ -189,7 +179,7 @@ export const RecentTransactionsTable: React.FC<
                       <Typography
                         sx={{
                           fontSize: '0.75rem',
-                          color: 'var(--text-secondary)',
+                          color: 'text.secondary',
                         }}
                       >
                         {txn.fromAccount.name}
@@ -209,8 +199,8 @@ export const RecentTransactionsTable: React.FC<
                       fontWeight: 600,
                       color:
                         txn.toAccount.type === 'expense'
-                          ? '#ef4444'
-                          : '#10b981',
+                          ? 'error.main'
+                          : 'success.main',
                     }}
                   >
                     {txn.toAccount.type === 'expense' ? '-' : '+'}
@@ -228,7 +218,8 @@ export const RecentTransactionsTable: React.FC<
           p: '1rem 1.5rem',
           display: 'flex',
           justifyContent: 'center',
-          borderTop: '1px solid var(--border-color)',
+          borderTop: '1px solid',
+          borderTopColor: 'divider',
         }}
       >
         <Button
@@ -236,13 +227,13 @@ export const RecentTransactionsTable: React.FC<
           className="view-all-btn"
           sx={{
             textTransform: 'none',
-            borderColor: 'var(--border-color)',
-            color: 'var(--text-primary)',
+            borderColor: 'divider',
+            color: 'text.primary',
             px: 3,
             py: 1.25,
             '&:hover': {
-              borderColor: 'var(--primary-color)',
-              color: 'var(--primary-color)',
+              borderColor: 'primary.main',
+              color: 'primary.main',
             },
           }}
         >

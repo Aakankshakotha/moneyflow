@@ -6,6 +6,7 @@ import DialogContent from '@mui/material/DialogContent'
 import DialogActions from '@mui/material/DialogActions'
 import IconButton from '@mui/material/IconButton'
 import CloseIcon from '@mui/icons-material/Close'
+import type { SxProps, Theme } from '@mui/material/styles'
 
 export interface ModalProps {
   isOpen: boolean
@@ -17,6 +18,7 @@ export interface ModalProps {
   closeOnBackdropClick?: boolean
   closeOnEscape?: boolean
   className?: string
+  contentSx?: SxProps<Theme>
 }
 
 export function Modal({
@@ -29,6 +31,7 @@ export function Modal({
   closeOnBackdropClick = true,
   closeOnEscape = true,
   className = '',
+  contentSx,
 }: ModalProps) {
   const titleId = useId()
 
@@ -60,8 +63,8 @@ export function Modal({
         className: modalClasses,
         sx: {
           borderRadius: 2,
-          border: '1px solid var(--border-color)',
-          backgroundColor: 'var(--card-background)',
+          border: '1px solid', borderColor: 'divider',
+          backgroundColor: 'background.paper',
         },
       }}
     >
@@ -77,7 +80,9 @@ export function Modal({
           <CloseIcon fontSize="small" />
         </IconButton>
       </DialogTitle>
-      <DialogContent className="modal-body">{children}</DialogContent>
+      <DialogContent className="modal-body" sx={contentSx}>
+        {children}
+      </DialogContent>
       {footer && (
         <DialogActions className="modal-footer">{footer}</DialogActions>
       )}

@@ -89,14 +89,14 @@ const RecurringList: React.FC<RecurringListProps> = ({
             textAlign: 'center',
             py: '4rem',
             px: '2rem',
-            color: 'var(--text-secondary)',
+            color: 'text.secondary',
           }}
         >
           {recurring.length === 0 ? (
             <>
               <Typography>No recurring transactions yet</Typography>
               <Typography
-                sx={{ fontSize: '0.875rem', color: 'var(--text-secondary)' }}
+                sx={{ fontSize: '0.875rem', color: 'text.secondary' }}
               >
                 Create your first recurring transaction to automate regular
                 transfers

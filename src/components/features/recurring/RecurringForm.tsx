@@ -5,6 +5,7 @@ import type { CreateRecurringDto, RecurrenceFrequency } from '@/types/recurring'
 import type { Account } from '@/types/account'
 import Box from '@mui/material/Box'
 import Typography from '@mui/material/Typography'
+import { alpha } from '@mui/material/styles'
 
 interface RecurringFormProps {
   isOpen: boolean
@@ -130,8 +131,8 @@ const RecurringForm: React.FC<RecurringFormProps> = ({
           <Box
             sx={{
               p: '0.75rem',
-              backgroundColor: '#fee2e2',
-              color: 'var(--error-color)',
+              backgroundColor: (theme) => alpha(theme.palette.error.main, 0.1),
+              color: 'error.main',
               borderRadius: '0.375rem',
               fontSize: '0.875rem',
             }}
@@ -154,7 +155,7 @@ const RecurringForm: React.FC<RecurringFormProps> = ({
         {selectedFromAccount && (
           <Typography
             variant="body2"
-            sx={{ mt: -1, mb: 0.5, color: 'var(--text-secondary)', pl: 0.5 }}
+            sx={{ mt: -1, mb: 0.5, color: 'text.secondary', pl: 0.5 }}
           >
             Available: {formatCurrency(selectedFromAccount.balance)}
           </Typography>
@@ -174,7 +175,7 @@ const RecurringForm: React.FC<RecurringFormProps> = ({
         {selectedToAccount && (
           <Typography
             variant="body2"
-            sx={{ mt: -1, mb: 0.5, color: 'var(--text-secondary)', pl: 0.5 }}
+            sx={{ mt: -1, mb: 0.5, color: 'text.secondary', pl: 0.5 }}
           >
             Current: {formatCurrency(selectedToAccount.balance)}
           </Typography>

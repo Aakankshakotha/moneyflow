@@ -44,14 +44,14 @@ export function Input({
             display: 'block',
             fontSize: '0.875rem',
             fontWeight: 500,
-            color: 'var(--text-secondary)',
+            color: 'text.secondary',
             marginBottom: '0.25rem',
           }}
         >
           {label}
           {required && (
             <span
-              style={{ color: 'var(--error-color)', marginLeft: '0.15rem' }}
+              style={{ color: 'error.main', marginLeft: '0.15rem' }}
             >
               *
             </span>
@@ -79,12 +79,12 @@ export function Input({
           px: 1.5,
           py: 1,
           border: '1px solid',
-          borderColor: error ? 'error.main' : 'var(--border-color)',
+          borderColor: error ? 'error.main' : 'divider',
           borderRadius: '0.375rem',
-          backgroundColor: 'var(--input-background)',
+          backgroundColor: 'background.paper',
           '&:focus-within': {
-            borderColor: 'var(--primary-color)',
-            backgroundColor: 'var(--input-background-focus)',
+            borderColor: 'primary.main',
+            backgroundColor: 'background.paper',
           },
         }}
       />

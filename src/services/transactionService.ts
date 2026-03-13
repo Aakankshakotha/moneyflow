@@ -77,8 +77,14 @@ export async function recordTransaction(
     }
   }
 
-  // Check if from account has sufficient balance
-  if (fromAccount.type !== 'income' && fromAccount.balance < data.amount) {
+  // Check if from account has sufficient balance.
+  // Liability accounts (credit cards, loans) can go negative — spending increases debt, so no balance check.
+  // Income accounts are source-only virtual accounts, also exempt.
+  if (
+    fromAccount.type !== 'income' &&
+    fromAccount.type !== 'liability' &&
+    fromAccount.balance < data.amount
+  ) {
     return {
       success: false,
       error: {

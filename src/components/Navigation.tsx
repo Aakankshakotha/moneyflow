@@ -18,14 +18,15 @@ const Navigation: React.FC = () => {
     <Box
       component="nav"
       sx={{
-        backgroundColor: 'var(--card-background)',
-        color: 'var(--text-primary)',
+        backgroundColor: 'background.paper',
+        color: 'text.primary',
         padding: '1rem 2rem',
         display: 'flex',
         alignItems: 'center',
         gap: '2rem',
-        boxShadow: 'var(--shadow-soft)',
-        borderBottom: '1px solid var(--border-color)',
+        boxShadow: 2,
+        borderBottom: '1px solid',
+        borderBottomColor: 'divider',
       }}
     >
       <Box>
@@ -34,7 +35,7 @@ const Navigation: React.FC = () => {
           sx={{
             fontSize: '1.5rem',
             fontWeight: 600,
-            color: 'var(--primary-color)',
+            color: 'primary.main',
             letterSpacing: '-0.01em',
           }}
         >
@@ -51,7 +52,7 @@ const Navigation: React.FC = () => {
           gap: '2rem',
           flex: 1,
           '& a': {
-            color: 'var(--text-secondary)',
+            color: 'text.secondary',
             textDecoration: 'none',
             fontSize: '1rem',
             fontWeight: 500,
@@ -59,12 +60,12 @@ const Navigation: React.FC = () => {
             borderRadius: '4px',
             transition: 'background-color 0.2s, color 0.2s',
             '&:hover': {
-              backgroundColor: 'var(--hover-background)',
-              color: 'var(--text-primary)',
+              backgroundColor: 'action.hover',
+              color: 'text.primary',
             },
             '&.active': {
-              backgroundColor: 'var(--primary-color)',
-              color: '#ffffff',
+              backgroundColor: 'primary.main',
+              color: 'common.white',
             },
           },
           '& li': { m: 0 },
@@ -103,6 +104,14 @@ const Navigation: React.FC = () => {
             Recurring
           </NavLink>
         </Box>
+        <Box component="li">
+          <NavLink
+            to="/investments"
+            className={({ isActive }) => (isActive ? 'active' : '')}
+          >
+            Investments
+          </NavLink>
+        </Box>
       </Box>
       <IconButton
         onClick={toggleTheme}
@@ -112,11 +121,12 @@ const Navigation: React.FC = () => {
           width: 40,
           height: 40,
           fontSize: '1.25rem',
-          backgroundColor: 'var(--button-background)',
-          border: '1px solid var(--border-color)',
+          backgroundColor: 'action.selected',
+          border: '1px solid',
+          borderColor: 'divider',
           borderRadius: '8px',
           '&:hover': {
-            backgroundColor: 'var(--button-hover-background)',
+            backgroundColor: 'action.hover',
             transform: 'scale(1.05)',
           },
         }}

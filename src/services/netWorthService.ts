@@ -34,7 +34,9 @@ export async function calculateNetWorth(): Promise<
     .filter((account) => account.type === 'asset')
     .reduce((sum, account) => sum + account.balance, 0)
 
-  const totalLiabilities = activeAccounts
+  // Liability balances go negative when in debt (e.g. credit card owed ₹500 → balance = -500).
+  // We negate the sum so totalLiabilities is a positive number representing what you owe.
+  const totalLiabilities = -activeAccounts
     .filter((account) => account.type === 'liability')
     .reduce((sum, account) => sum + account.balance, 0)
 

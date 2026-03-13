@@ -45,13 +45,14 @@ export function Button({
     onClick?.(e)
   }
 
-  const muiVariant = variant === 'ghost' ? 'outlined' : 'contained'
-  const muiColor: 'primary' | 'secondary' | 'error' =
-    variant === 'danger'
-      ? 'error'
-      : variant === 'secondary'
-        ? 'secondary'
-        : 'primary'
+  const muiVariant: 'contained' | 'outlined' | 'text' =
+    variant === 'secondary'
+      ? 'outlined'
+      : variant === 'ghost'
+        ? 'text'
+        : 'contained'
+  const muiColor: 'primary' | 'error' | 'inherit' =
+    variant === 'danger' ? 'error' : variant === 'ghost' ? 'inherit' : 'primary'
 
   const sxBySize = {
     sm: { py: 0.5, px: 1.5, fontSize: '0.875rem' },

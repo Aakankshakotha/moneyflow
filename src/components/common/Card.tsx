@@ -33,16 +33,16 @@ export function Card({
       sx={[
         {
           border: '1px solid',
-          borderColor: 'var(--border-color)',
+          borderColor: 'divider',
           borderRadius: '0.5rem',
-          backgroundColor: 'var(--card-background)',
+          backgroundColor: 'background.paper',
           transition: 'all 0.2s ease',
-          boxShadow: 'var(--shadow-soft)',
+          boxShadow: 2,
           overflow: 'hidden',
           ...(hoverable && {
             '&:hover': {
-              boxShadow: '0 10px 30px rgba(15,23,42,0.12)',
-              borderColor: 'var(--border-color-hover)',
+              boxShadow: 4,
+              borderColor: 'divider',
             },
           }),
         },
@@ -52,19 +52,24 @@ export function Card({
     >
       {title && (
         <Box
-          sx={{ px: 3, py: 2, borderBottom: '1px solid var(--border-color)' }}
+          sx={{
+            px: 3,
+            py: 2,
+            borderBottom: '1px solid',
+            borderBottomColor: 'divider',
+          }}
         >
           <Typography
             component="h3"
             variant="h6"
-            sx={{ m: 0, fontWeight: 600, color: 'var(--text-primary)' }}
+            sx={{ m: 0, fontWeight: 600, color: 'text.primary' }}
           >
             {title}
           </Typography>
           {subtitle && (
             <Typography
               variant="body2"
-              sx={{ mt: '0.25rem', color: 'var(--text-secondary)' }}
+              sx={{ mt: '0.25rem', color: 'text.secondary' }}
             >
               {subtitle}
             </Typography>
@@ -77,8 +82,9 @@ export function Card({
           sx={{
             px: 3,
             py: 2,
-            borderTop: '1px solid var(--border-color)',
-            background: 'var(--background-secondary)',
+            borderTop: '1px solid',
+            borderTopColor: 'divider',
+            background: 'action.selected',
           }}
         >
           {footer}
