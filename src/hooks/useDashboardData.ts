@@ -16,6 +16,10 @@ export interface DashboardMetrics {
   lastMonthIncome: number
   lastMonthExpenses: number
   lastMonthCashFlow: number
+  thisMonthAssetDelta: number
+  lastMonthAssetDelta: number
+  thisMonthLiabilityDelta: number
+  lastMonthLiabilityDelta: number
 }
 
 export interface UseDashboardDataReturn {
@@ -120,6 +124,29 @@ export const useDashboardData = (): UseDashboardDataReturn => {
 
   const lastMonthCashFlow = lastMonthIncome - lastMonthExpenses
 
+  // Net change in asset account balances (inflows minus outflows, transfers cancel out)
+  const netTypeFlow = (
+    txns: typeof thisMonthTransactions,
+    type: string
+  ): number =>
+    txns.reduce((sum, txn) => {
+      if (accountMap.get(txn.toAccountId)?.type === type) sum += txn.amount
+      if (accountMap.get(txn.fromAccountId)?.type === type) sum -= txn.amount
+      return sum
+    }, 0)
+
+  const thisMonthAssetDelta = netTypeFlow(thisMonthTransactions, 'asset')
+  const lastMonthAssetDelta = netTypeFlow(lastMonthTransactions, 'asset')
+  // totalLiabilities = -(sum of liability balances), so negate the raw flow
+  const thisMonthLiabilityDelta = -netTypeFlow(
+    thisMonthTransactions,
+    'liability'
+  )
+  const lastMonthLiabilityDelta = -netTypeFlow(
+    lastMonthTransactions,
+    'liability'
+  )
+
   return {
     calculation,
     accounts,
@@ -134,6 +161,10 @@ export const useDashboardData = (): UseDashboardDataReturn => {
       lastMonthIncome,
       lastMonthExpenses,
       lastMonthCashFlow,
+      thisMonthAssetDelta,
+      lastMonthAssetDelta,
+      thisMonthLiabilityDelta,
+      lastMonthLiabilityDelta,
     },
     loading,
     error,

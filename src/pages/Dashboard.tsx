@@ -23,9 +23,6 @@ const PERIOD_LABELS: Record<Period, string> = {
   all: 'All',
 }
 
-/**
- * Dashboard page - displays financial overview with charts and metrics
- */
 const Dashboard: React.FC = () => {
   const { accounts, transactions, metrics, loading, error } = useDashboardData()
   const {
@@ -33,11 +30,9 @@ const Dashboard: React.FC = () => {
     totalAssets,
     totalLiabilities,
     cashFlow,
-    income,
-    expenses,
-    lastMonthIncome,
-    lastMonthExpenses,
     lastMonthCashFlow,
+    thisMonthAssetDelta,
+    thisMonthLiabilityDelta,
   } = metrics
   const muiTheme = useTheme()
   const navigate = useNavigate()
@@ -281,49 +276,8 @@ const Dashboard: React.FC = () => {
               m: '0.35rem 0 0',
             }}
           >
-            {period === '1m' &&
-              new Date().toLocaleDateString('en-US', {
-                month: 'long',
-                year: 'numeric',
-              })}
-            {period === '1y' && `Jan – Dec ${new Date().getFullYear()}`}
-            {period === 'all' && 'All time'}
+            Current balances &amp; activity at a glance
           </Typography>
-        </Box>
-
-        {/* Period pill selector */}
-        <Box
-          sx={{
-            display: 'inline-flex',
-            backgroundColor: alpha(muiTheme.palette.text.primary, 0.06),
-            borderRadius: '12px',
-            p: '4px',
-            gap: '2px',
-          }}
-        >
-          {(Object.keys(PERIOD_LABELS) as Period[]).map((p) => (
-            <Box
-              key={p}
-              component="button"
-              onClick={() => setPeriod(p)}
-              sx={{
-                border: 'none',
-                cursor: 'pointer',
-                px: 2.5,
-                py: 1,
-                borderRadius: '9px',
-                fontSize: '0.875rem',
-                fontWeight: 600,
-                transition: 'all 0.18s ease',
-                backgroundColor:
-                  period === p ? 'background.paper' : 'transparent',
-                color: period === p ? 'text.primary' : 'text.secondary',
-                boxShadow: period === p ? '0 1px 4px rgba(0,0,0,0.14)' : 'none',
-              }}
-            >
-              {PERIOD_LABELS[p]}
-            </Box>
-          ))}
         </Box>
       </Box>
 
@@ -379,18 +333,33 @@ const Dashboard: React.FC = () => {
           value={netWorth}
           icon={<Box component="span">💎</Box>}
           color="blue"
+          trend={{
+            value: cashFlow,
+            direction: cashFlow >= 0 ? 'up' : 'down',
+            period: 'this month',
+          }}
         />
         <MetricCard
           title="Total Assets"
           value={totalAssets}
           icon={<Box component="span">💰</Box>}
           color="green"
+          trend={{
+            value: thisMonthAssetDelta,
+            direction: thisMonthAssetDelta >= 0 ? 'up' : 'down',
+            period: 'this month',
+          }}
         />
         <MetricCard
           title="Liabilities"
           value={totalLiabilities}
           icon={<Box component="span">📉</Box>}
           color="pink"
+          trend={{
+            value: thisMonthLiabilityDelta,
+            direction: thisMonthLiabilityDelta <= 0 ? 'down' : 'up',
+            period: 'this month',
+          }}
         />
         <MetricCard
           title="Cash Flow"
@@ -403,6 +372,74 @@ const Dashboard: React.FC = () => {
             period: 'vs last month',
           }}
         />
+      </Box>
+
+      <Box
+        sx={{
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          mb: '1.25rem',
+        }}
+      >
+        <Box>
+          <Typography
+            sx={{
+              fontWeight: 700,
+              fontSize: '1rem',
+              color: 'text.primary',
+              m: 0,
+            }}
+          >
+            Activity Charts
+          </Typography>
+          <Typography
+            sx={{ fontSize: '0.8rem', color: 'text.secondary', m: '2px 0 0' }}
+          >
+            {period === '1m'
+              ? new Date().toLocaleDateString('en-US', {
+                  month: 'long',
+                  year: 'numeric',
+                })
+              : period === '1y'
+                ? `Jan – Dec ${new Date().getFullYear()}`
+                : 'All time'}
+          </Typography>
+        </Box>
+        {/* Period pill selector */}
+        <Box
+          sx={{
+            display: 'inline-flex',
+            backgroundColor: alpha(muiTheme.palette.text.primary, 0.06),
+            borderRadius: '12px',
+            p: '4px',
+            gap: '2px',
+          }}
+        >
+          {(Object.keys(PERIOD_LABELS) as Period[]).map((p) => (
+            <Box
+              key={p}
+              component="button"
+              onClick={() => setPeriod(p)}
+              sx={{
+                border: 'none',
+                cursor: 'pointer',
+                px: 2.5,
+                py: 1,
+                borderRadius: '9px',
+                fontSize: '0.875rem',
+                fontWeight: 600,
+                transition: 'all 0.18s ease',
+                backgroundColor:
+                  period === p ? 'background.paper' : 'transparent',
+                color: period === p ? 'text.primary' : 'text.secondary',
+                boxShadow: period === p ? '0 1px 4px rgba(0,0,0,0.14)' : 'none',
+              }}
+            >
+              {PERIOD_LABELS[p]}
+            </Box>
+          ))}
+        </Box>
       </Box>
 
       <Box
@@ -451,7 +488,7 @@ const Dashboard: React.FC = () => {
       <Box sx={{ width: '100%', mb: '2rem' }}>
         <RecentTransactionsTable
           transactions={filteredTransactions}
-          limit={10}
+          limit={5}
         />
       </Box>
     </Box>

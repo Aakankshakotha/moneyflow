@@ -107,10 +107,9 @@ const CashFlowTrendChart: React.FC<CashFlowTrendChartProps> = ({
         monthData.income += transaction.amount
         monthData.incomeCount += 1
 
-        const categoryKey = transaction.category || `account-${fromAccount.id}`
-        const categoryName = transaction.category
-          ? categoryService.getCategoryName(transaction.category)
-          : fromAccount.name
+        // Always key by account ID to avoid duplicates from tagged/untagged txns
+        const categoryKey = `account-${fromAccount.id}`
+        const categoryName = fromAccount.name
         const existingCategory = monthData.incomeCategories.get(categoryKey)
 
         if (existingCategory) {
@@ -228,10 +227,10 @@ const CashFlowTrendChart: React.FC<CashFlowTrendChartProps> = ({
       }
 
       if (fromAccount.type === 'income' && toAccount.type === 'asset') {
-        const catKey = txn.category || `acct-${fromAccount.id}`
-        const catName = txn.category
-          ? categoryService.getCategoryName(txn.category)
-          : fromAccount.name
+        // Always key by account so transactions with/without a category tag
+        // don't create duplicate entries for the same income source.
+        const catKey = `acct-${fromAccount.id}`
+        const catName = fromAccount.name
         incomeCatNames.set(catKey, catName)
         if (!incomeAmounts.has(catKey)) incomeAmounts.set(catKey, new Map())
         const m = incomeAmounts.get(catKey)!
