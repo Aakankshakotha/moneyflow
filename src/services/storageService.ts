@@ -19,11 +19,15 @@ import {
  */
 const STORAGE_KEYS = {
   ACCOUNTS: 'moneyflow_accounts',
-  TRANSACTIONS: 'moneyflow_transactions',
   RECURRING: 'moneyflow_recurring',
-  NET_WORTH: 'moneyflow_networth',
   INVESTMENT_SNAPSHOTS: 'moneyflow_investment_snapshots',
   VERSION: 'moneyflow_version',
+  // Partitioned keys — dynamic suffixes _YYYY_MM / _YYYY
+  TRANSACTION_PREFIX: 'moneyflow_transactions_',
+  NET_WORTH_PREFIX: 'moneyflow_networth_',
+  // Legacy monolithic keys — used only for one-time migration
+  LEGACY_TRANSACTIONS: 'moneyflow_transactions',
+  LEGACY_NET_WORTH: 'moneyflow_networth',
 } as const
 
 /**
@@ -199,16 +203,21 @@ export class StorageService {
 
   /**
    * Transaction Operations
+   * Transactions are partitioned by month: moneyflow_transactions_YYYY_MM
    */
 
   async getTransactions(): Promise<
     Result<Transaction[], { type: 'StorageError'; message: string }>
   > {
     try {
-      const container = this.getContainer<Transaction>(
-        STORAGE_KEYS.TRANSACTIONS
-      )
-      return { success: true, data: container.data }
+      this.migrateTransactionsIfNeeded()
+      const keys = this.getAllTransactionPartitionKeys()
+      const all: Transaction[] = []
+      for (const key of keys) {
+        const container = this.getContainer<Transaction>(key)
+        all.push(...container.data)
+      }
+      return { success: true, data: all }
     } catch (error) {
       return {
         success: false,
@@ -259,7 +268,6 @@ export class StorageService {
       { type: 'ValidationError' | 'StorageError'; message: string }
     >
   > {
-    // Validate transaction
     const validationError = this.validateTransaction(transaction)
     if (validationError) {
       return {
@@ -272,12 +280,9 @@ export class StorageService {
     }
 
     try {
-      const transactionsResult = await this.getTransactions()
-      const transactions = transactionsResult.success
-        ? transactionsResult.data
-        : []
-
-      // Update or add transaction
+      const partitionKey = this.getTransactionPartitionKey(transaction.date)
+      const container = this.getContainer<Transaction>(partitionKey)
+      const transactions = [...container.data]
       const existingIndex = transactions.findIndex(
         (t) => t.id === transaction.id
       )
@@ -286,9 +291,7 @@ export class StorageService {
       } else {
         transactions.push(transaction)
       }
-
-      this.setContainer(STORAGE_KEYS.TRANSACTIONS, transactions)
-
+      this.setContainer(partitionKey, transactions)
       return { success: true, data: transaction }
     } catch (error) {
       return {
@@ -310,34 +313,24 @@ export class StorageService {
     Result<void, { type: 'NotFoundError' | 'StorageError'; message: string }>
   > {
     try {
-      const transactionsResult = await this.getTransactions()
-      if (!transactionsResult.success) {
-        return {
-          success: false,
-          error: {
-            type: 'StorageError',
-            message: 'Failed to retrieve transactions',
-          },
+      const keys = this.getAllTransactionPartitionKeys()
+      for (const key of keys) {
+        const container = this.getContainer<Transaction>(key)
+        const idx = container.data.findIndex((t) => t.id === id)
+        if (idx !== -1) {
+          const updated = [...container.data]
+          updated.splice(idx, 1)
+          this.setContainer(key, updated)
+          return { success: true, data: undefined }
         }
       }
-
-      const transactions = transactionsResult.data
-      const existingIndex = transactions.findIndex((t) => t.id === id)
-
-      if (existingIndex === -1) {
-        return {
-          success: false,
-          error: {
-            type: 'NotFoundError',
-            message: 'Transaction not found',
-          },
-        }
+      return {
+        success: false,
+        error: {
+          type: 'NotFoundError',
+          message: 'Transaction not found',
+        },
       }
-
-      transactions.splice(existingIndex, 1)
-      this.setContainer(STORAGE_KEYS.TRANSACTIONS, transactions)
-
-      return { success: true, data: undefined }
     } catch (error) {
       return {
         success: false,
@@ -575,19 +568,21 @@ export class StorageService {
 
   /**
    * Net Worth Snapshot Operations
+   * Snapshots are partitioned by year: moneyflow_networth_YYYY
    */
 
   async getNetWorthSnapshots(): Promise<
     Result<NetWorthSnapshot[], { type: 'StorageError'; message: string }>
   > {
     try {
-      const container = this.getContainer<NetWorthSnapshot>(
-        STORAGE_KEYS.NET_WORTH
-      )
-      // Sort by date descending
-      const sorted = [...container.data].sort((a, b) =>
-        b.date.localeCompare(a.date)
-      )
+      this.migrateNetWorthIfNeeded()
+      const keys = this.getAllNetWorthPartitionKeys()
+      const all: NetWorthSnapshot[] = []
+      for (const key of keys) {
+        const container = this.getContainer<NetWorthSnapshot>(key)
+        all.push(...container.data)
+      }
+      const sorted = all.sort((a, b) => b.date.localeCompare(a.date))
       return { success: true, data: sorted }
     } catch (error) {
       return {
@@ -611,7 +606,6 @@ export class StorageService {
       { type: 'ValidationError' | 'StorageError'; message: string }
     >
   > {
-    // Validate snapshot
     const validationError = this.validateNetWorthSnapshot(snapshot)
     if (validationError) {
       return {
@@ -624,17 +618,14 @@ export class StorageService {
     }
 
     try {
-      const snapshotsResult = await this.getNetWorthSnapshots()
-      const snapshots = snapshotsResult.success ? snapshotsResult.data : []
-
-      // Keep exactly one snapshot per date, replacing any prior same-date record
-      const normalized = snapshots.filter(
+      const partitionKey = this.getNetWorthPartitionKey(snapshot.date)
+      const container = this.getContainer<NetWorthSnapshot>(partitionKey)
+      // Keep exactly one snapshot per date within this year's partition
+      const normalized = container.data.filter(
         (item) => item.date !== snapshot.date && item.id !== snapshot.id
       )
       normalized.push(snapshot)
-
-      this.setContainer(STORAGE_KEYS.NET_WORTH, normalized)
-
+      this.setContainer(partitionKey, normalized)
       return { success: true, data: snapshot }
     } catch (error) {
       return {
@@ -766,9 +757,29 @@ export class StorageService {
       await this.clearAllData()
 
       this.setContainer(STORAGE_KEYS.ACCOUNTS, data.accounts)
-      this.setContainer(STORAGE_KEYS.TRANSACTIONS, data.transactions)
       this.setContainer(STORAGE_KEYS.RECURRING, data.recurring)
-      this.setContainer(STORAGE_KEYS.NET_WORTH, data.netWorthSnapshots)
+
+      // Import transactions grouped by month
+      const txByMonth: Record<string, Transaction[]> = {}
+      for (const tx of data.transactions) {
+        const key = this.getTransactionPartitionKey(tx.date)
+        if (!txByMonth[key]) txByMonth[key] = []
+        txByMonth[key].push(tx)
+      }
+      for (const [key, txs] of Object.entries(txByMonth)) {
+        this.setContainer(key, txs)
+      }
+
+      // Import net worth snapshots grouped by year
+      const nwByYear: Record<string, NetWorthSnapshot[]> = {}
+      for (const snap of data.netWorthSnapshots) {
+        const key = this.getNetWorthPartitionKey(snap.date)
+        if (!nwByYear[key]) nwByYear[key] = []
+        nwByYear[key].push(snap)
+      }
+      for (const [key, snaps] of Object.entries(nwByYear)) {
+        this.setContainer(key, snaps)
+      }
 
       return { success: true, data: undefined }
     } catch (error) {
@@ -788,10 +799,19 @@ export class StorageService {
   > {
     try {
       localStorage.removeItem(STORAGE_KEYS.ACCOUNTS)
-      localStorage.removeItem(STORAGE_KEYS.TRANSACTIONS)
       localStorage.removeItem(STORAGE_KEYS.RECURRING)
-      localStorage.removeItem(STORAGE_KEYS.NET_WORTH)
-
+      localStorage.removeItem(STORAGE_KEYS.INVESTMENT_SNAPSHOTS)
+      // Remove all transaction month partitions
+      for (const key of this.getAllTransactionPartitionKeys()) {
+        localStorage.removeItem(key)
+      }
+      // Remove all net worth year partitions
+      for (const key of this.getAllNetWorthPartitionKeys()) {
+        localStorage.removeItem(key)
+      }
+      // Remove legacy monolithic keys if they exist
+      localStorage.removeItem(STORAGE_KEYS.LEGACY_TRANSACTIONS)
+      localStorage.removeItem(STORAGE_KEYS.LEGACY_NET_WORTH)
       return { success: true, data: undefined }
     } catch (error) {
       return {
@@ -850,6 +870,86 @@ export class StorageService {
       )
     }
   }
+
+  // ─── Partition Key Helpers ───────────────────────────────────────────────
+
+  private getTransactionPartitionKey(date: string): string {
+    const [year, month] = date.split('-')
+    return `${STORAGE_KEYS.TRANSACTION_PREFIX}${year}_${month}`
+  }
+
+  private getNetWorthPartitionKey(date: string): string {
+    const year = date.split('-')[0]
+    return `${STORAGE_KEYS.NET_WORTH_PREFIX}${year}`
+  }
+
+  private getAllTransactionPartitionKeys(): string[] {
+    const keys: string[] = []
+    for (let i = 0; i < localStorage.length; i++) {
+      const key = localStorage.key(i)
+      if (key && /^moneyflow_transactions_\d{4}_\d{2}$/.test(key)) {
+        keys.push(key)
+      }
+    }
+    return keys.sort()
+  }
+
+  private getAllNetWorthPartitionKeys(): string[] {
+    const keys: string[] = []
+    for (let i = 0; i < localStorage.length; i++) {
+      const key = localStorage.key(i)
+      if (key && /^moneyflow_networth_\d{4}$/.test(key)) {
+        keys.push(key)
+      }
+    }
+    return keys.sort()
+  }
+
+  // ─── One-Time Migrations ──────────────────────────────────────────────────
+
+  private migrateTransactionsIfNeeded(): void {
+    const legacy = localStorage.getItem(STORAGE_KEYS.LEGACY_TRANSACTIONS)
+    if (!legacy) return
+    try {
+      const parsed = JSON.parse(legacy)
+      const transactions: Transaction[] = parsed.data ?? []
+      const byMonth: Record<string, Transaction[]> = {}
+      for (const tx of transactions) {
+        const key = this.getTransactionPartitionKey(tx.date)
+        if (!byMonth[key]) byMonth[key] = []
+        byMonth[key].push(tx)
+      }
+      for (const [key, txs] of Object.entries(byMonth)) {
+        this.setContainer(key, txs)
+      }
+      localStorage.removeItem(STORAGE_KEYS.LEGACY_TRANSACTIONS)
+    } catch {
+      // Leave legacy key in place if migration fails
+    }
+  }
+
+  private migrateNetWorthIfNeeded(): void {
+    const legacy = localStorage.getItem(STORAGE_KEYS.LEGACY_NET_WORTH)
+    if (!legacy) return
+    try {
+      const parsed = JSON.parse(legacy)
+      const snapshots: NetWorthSnapshot[] = parsed.data ?? []
+      const byYear: Record<string, NetWorthSnapshot[]> = {}
+      for (const snap of snapshots) {
+        const key = this.getNetWorthPartitionKey(snap.date)
+        if (!byYear[key]) byYear[key] = []
+        byYear[key].push(snap)
+      }
+      for (const [key, snaps] of Object.entries(byYear)) {
+        this.setContainer(key, snaps)
+      }
+      localStorage.removeItem(STORAGE_KEYS.LEGACY_NET_WORTH)
+    } catch {
+      // Leave legacy key in place if migration fails
+    }
+  }
+
+  // ─── Validators ───────────────────────────────────────────────────────────
 
   private validateAccount(account: Account): string | null {
     if (!isValidUUID(account.id)) {
